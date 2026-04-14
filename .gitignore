@@ -1,0 +1,47 @@
+model/
+feature/
+PWM_library/
+*.ipynb_checkpoints
+Predict_*.tsv
+Cross_evaluation*.tsv
+
+
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build
+dist/
+build/
+*.o
+*.a
+
+# Environment
+.env
+.env.local
+
+# Cache
+__pycache__/
+.pytest_cache/
+.cache/
+
+# Temporary
+*.tmp
+*.temp
