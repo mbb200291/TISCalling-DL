@@ -1,21 +1,29 @@
 import random
 from typing import List, Tuple
 
+import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+)
 
-import pandas as pd
-import pprint
 from datetime import datetime
+import pandas as pd
+from pprint import pprint
 
-
+# from tqdm import tqdm
 SEED = 42
 random.seed(SEED)
 torch.manual_seed(SEED)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+print('DEVICE:', DEVICE)
 # RNA vocabulary
 VOCAB = {
     "A": 1,
@@ -25,7 +33,6 @@ VOCAB = {
     "N": 5,
 }
 PAD_IDX = 0
-
 def encode_sequence(seq: str) -> List[int]:
     """
     convert seq to int list
@@ -40,6 +47,17 @@ def encode_position(position: int, n: int) -> List[int]:
     """
     return [0] * position + [1] * (n - position)
 
+def get_sampler(labels_np):
+    class_counts = np.bincount(labels_np)   # [count_0, count_1]
+    class_weights = 1.0 / class_counts
+
+    sample_weights = class_weights[labels_np]
+    sampler = WeightedRandomSampler(
+        weights=torch.tensor(sample_weights, dtype=torch.float),
+        num_samples=len(sample_weights),
+        replacement=True
+    )
+    return sampler
 
 class RNADataset(Dataset):
     def __init__(self, sequences: List[str], positions: List[int], labels: List[int]):
@@ -159,71 +177,147 @@ class RNASequenceBinaryClassifier(nn.Module):
         # denom = mask.sum(dim=1).clamp(min=1)                  # [B, 1]
         # h_global = summed / denom                             # [B, 2H]
         # h = torch.cat([h, h_global], dim=-1)           # [B, 4H]
-        
+
         logits = self.classifier(self.dropout(h))      # [B, 1]
-        return logits.squeeze(-1)   
+        return logits.squeeze(-1)
 
-
-def compute_binary_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> float:
-    probs = torch.sigmoid(logits)
-    preds = (probs >= 0.5).float()
-    correct = (preds == labels).sum().item()
-    return correct / labels.size(0)
-
-
-def train_one_epoch(model, dataloader, optimizer, criterion, device):
+def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: float = 0.5):
     model.train()
 
-    total_loss = 0.0
-    total_acc = 0.0
     total_samples = 0
+
+    tp = tn = fp = fn = 0
 
     for input_ids, pos_features, lengths, labels in dataloader:
         input_ids = input_ids.to(device)
         pos_features = pos_features.to(device)
         lengths = lengths.to(device)
-        labels = labels.to(device)
+        labels = labels.to(device).float()
 
         optimizer.zero_grad()
 
-        logits = model(input_ids, pos_features, lengths)   # [B]
+        logits = model(input_ids, pos_features, lengths)
         loss = criterion(logits, labels)
 
         loss.backward()
         optimizer.step()
 
+        probs = torch.sigmoid(logits)
+        preds = (probs >= threshold).float()
+
         batch_size = labels.size(0)
-        total_loss += loss.item() * batch_size
-        total_acc += compute_binary_accuracy(logits, labels) * batch_size
         total_samples += batch_size
 
-    return total_loss / total_samples, total_acc / total_samples
+        tp += ((preds == 1) & (labels == 1)).sum().item()
+        tn += ((preds == 0) & (labels == 0)).sum().item()
+        fp += ((preds == 1) & (labels == 0)).sum().item()
+        fn += ((preds == 0) & (labels == 1)).sum().item()
+
+    accuracy = (tp + tn) / max(tp + tn + fp + fn, 1)
+    precision = tp / max(tp + fp, 1)
+    recall = tp / max(tp + fn, 1)
+    f1 = 2 * precision * recall / max(precision + recall, 1e-12)
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+    }
 
 
 @torch.no_grad()
-def evaluate(model, dataloader, criterion, device):
+def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
     model.eval()
 
-    total_loss = 0.0
-    total_acc = 0.0
-    total_samples = 0
+    tp = tn = fp = fn = 0
 
     for input_ids, pos_features, lengths, labels in dataloader:
         input_ids = input_ids.to(device)
         pos_features = pos_features.to(device)
         lengths = lengths.to(device)
-        labels = labels.to(device)
+        labels = labels.to(device).float()
 
         logits = model(input_ids, pos_features, lengths)
-        loss = criterion(logits, labels)
 
-        batch_size = labels.size(0)
-        total_loss += loss.item() * batch_size
-        total_acc += compute_binary_accuracy(logits, labels) * batch_size
-        total_samples += batch_size
+        probs = torch.sigmoid(logits)
+        preds = (probs >= threshold).float()
 
-    return total_loss / total_samples, total_acc / total_samples
+        tp += ((preds == 1) & (labels == 1)).sum().item()
+        tn += ((preds == 0) & (labels == 0)).sum().item()
+        fp += ((preds == 1) & (labels == 0)).sum().item()
+        fn += ((preds == 0) & (labels == 1)).sum().item()
 
+    accuracy = (tp + tn) / max(tp + tn + fp + fn, 1)
+    precision = tp / max(tp + fp, 1)
+    recall = tp / max(tp + fn, 1)
+    f1 = 2 * precision * recall / max(precision + recall, 1e-12)
+
+    return {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+    }
+
+
+def train_model(
+    train_loader,
+    val_loader,
+    embed_dim=16,
+    hidden_dim=64,
+    num_layers=1,
+    dropout=0.2,
+    EPOCH=1,
+    naming_prefix='model'
+):
+    model = RNASequenceBinaryClassifier(
+        vocab_size=max(VOCAB.values()) + 1,
+        embed_dim=embed_dim,
+        hidden_dim=hidden_dim,
+        num_layers=num_layers,
+        dropout=dropout,
+    ).to(DEVICE)
+
+    print("total parameters:", sum(p.numel() for p in model.parameters()))
+    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad))
+
+    criterion = nn.BCEWithLogitsLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    best_val_f1 = 0.0
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_path = f"model/{naming_prefix}_{run_id}.pt"
+
+    for epoch in range(1, EPOCH + 1):
+        train_metrics = train_one_epoch(
+            model, train_loader, optimizer, criterion, DEVICE
+        )
+
+        val_metrics = evaluate(
+            model, val_loader, criterion, DEVICE
+        )
+
+        print(
+            f"Epoch {epoch:02d} | "
+            f"train_acc={train_metrics['accuracy']:.4f} "
+            f"train_prec={train_metrics['precision']:.4f} "
+            f"train_rec={train_metrics['recall']:.4f} "
+            f"train_f1={train_metrics['f1']:.4f} | "
+            f"val_acc={val_metrics['accuracy']:.4f} "
+            f"val_prec={val_metrics['precision']:.4f} "
+            f"val_rec={val_metrics['recall']:.4f} "
+            f"val_f1={val_metrics['f1']:.4f}"
+        )
+
+        if val_metrics["f1"] > best_val_f1:
+            best_val_f1 = val_metrics["f1"]
+            torch.save(model.state_dict(), save_path)
+            print(f"  -> saved best model by val_f1 to {save_path}")
+
+    print(f"Best validation F1: {best_val_f1:.4f}")
+
+    return model, save_path
 
 @torch.no_grad()
 def predict_prob(model, seq: str, feat: List[int], device: torch.device) -> float:
@@ -273,49 +367,6 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
     #     "labels": all_labels,
     # }
 
-
-def train_model(train_loader, val_loader, 
-                embed_dim=16, hidden_dim=64, num_layers=1, dropout=0.2,
-                EPOCH=1,
-               ):
-    model = RNASequenceBinaryClassifier(
-        vocab_size=max(VOCAB.values()) + 1,
-        embed_dim=embed_dim,
-        hidden_dim=hidden_dim,
-        num_layers=num_layers,
-        dropout=dropout,
-    ).to(DEVICE)
-    print("total parameters:", sum(p.numel() for p in model.parameters()))
-    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad))
-
-
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-    
-    num_epochs = EPOCH
-    best_val_acc = 0.0
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    for epoch in range(1, num_epochs + 1):
-        train_loss, train_acc = train_one_epoch(
-            model, train_loader, optimizer, criterion, DEVICE
-        )
-        val_loss, val_acc = evaluate(
-            model, val_loader, criterion, DEVICE
-        )
-    
-        print(
-            f"Epoch {epoch:02d} | "
-            f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} | "
-            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}"
-        )
-    
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            torch.save(model.state_dict(), f"biGRU_clf_{run_id}.pt")
-            print("  -> saved best model")
-    return model
-
 def make_dataset(sequences, pos_features, labels, batch_size=2):
     dataset = RNADataset(sequences, pos_features, labels)
 
@@ -323,20 +374,25 @@ def make_dataset(sequences, pos_features, labels, batch_size=2):
     train_size = int(0.7 * len(sequences))
     val_size   = int(0.15 * len(sequences))
     test_size  = len(dataset) - train_size - val_size
-    
+
     train_dataset, val_dataset, test_dataset = random_split(
         dataset,
         [train_size, val_size, test_size],
         generator=torch.Generator().manual_seed(SEED),
     )
-    
+
+    # Get labels for the training subset to create the sampler
+    train_labels_for_sampler = np.array([labels[i] for i in train_dataset.indices])
+    sampler = get_sampler(train_labels_for_sampler)
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=True,
+        sampler=sampler,
+        shuffle=False,  # disable when sampler provided
         collate_fn=collate_fn,
     )
-    
+
     val_loader = DataLoader(
         val_dataset,
         batch_size=batch_size,
@@ -346,21 +402,12 @@ def make_dataset(sequences, pos_features, labels, batch_size=2):
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=2,
+        batch_size=batch_size, # Use the consistent batch_size
         shuffle=False,
         collate_fn=collate_fn,
     )
 
     return train_loader, val_loader, test_loader
-import numpy as np
-from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix,
-)
-
 
 def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
     """
@@ -375,7 +422,9 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
 
     # confusion matrix: [[tn, fp],
     #                    [fn, tp]]
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    # Pass labels=[0, 1] to ensure a 2x2 confusion matrix even if only one class is present
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    tn, fp, fn, tp = cm.ravel()
 
     specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
 
@@ -391,16 +440,8 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
         "fn": fn,
     }
 
-def main():
-    # hyper parameters
-    h_bs = 2
-    h_emb_dim = 16
-    h_hidden_dim = 32 # 64
-    h_num_layers = 1
-    h_dropout = 0.2
-    h_epoch = 5
-    
-    # test run 
+def get_test_dataset(batch_size):
+    # test run
     sequences = [
         "ATGCTTACG",
         "GGGAAATTTCC",
@@ -419,25 +460,46 @@ def main():
     ]
     
     labels = [0, 1, 0, 1, 1, 0, 1, 0, 1, 1]
-    
+
+    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, batch_size)
+    return train_loader, val_loader, test_loader
+
+
+def main():
+    # hyper parameters
+    h_bs = 2**5
+    h_emb_dim = 8 # 16
+    h_hidden_dim = 16 #32 # 64
+    h_num_layers = 1
+    h_dropout = 0.2
+    h_epoch = 10
+
+    train_loader, val_loader, test_loader = get_test_dataset(h_bs)
+
+    model, best_model_path = train_model(
+    train_loader, val_loader,
+    h_emb_dim, h_hidden_dim, h_num_layers,
+    h_dropout, h_epoch,
+    naming_prefix='test-run'
+    )
+
+    # real data
+    '''
+    df_data = pd.read_csv("input_data/df_data.csv")
+    print(df_data.shape)
+    sequences, positions, labels = df_data.seq.tolist(), df_data.position.tolist(), df_data.label.tolist()
     train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, h_bs)
     model = train_model(
         train_loader, val_loader,
         h_emb_dim, h_hidden_dim, h_num_layers,
-        h_dropout, h_epoch)
-    
-    # real data 
-    df_data = pd.read_csv("input_data/df_data.csv")
-    sequences, positions, labels = df_data.seq.tolist(), df_data.position.tolist(), df_data.label.tolist()
-    
-    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, h_bs)
-    # model = train_model(
-    #     train_loader, val_loader,
-    #     h_emb_dim, h_hidden_dim, h_num_layers,
-    #     h_dropout, h_epoch)
-    
+        h_dropout, h_epoch,
+        naming_prefix='biGRU_clf'
+        )
+    '''
+
+    # evaluate test set
     yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
-    pprint.pprint(compute_binary_metrics(yhat.numpy(), labels.numpy()))
+    pprint(compute_binary_metrics(yhat.numpy(), labels.numpy()))
 
 
 if __name__ == '__main__':
