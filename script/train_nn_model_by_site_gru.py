@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler
+from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler, Subset
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -12,6 +12,8 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix,
 )
+from sklearn.model_selection import GroupShuffleSplit
+from typing import List
 
 from datetime import datetime
 import pandas as pd
@@ -33,6 +35,7 @@ VOCAB = {
     "N": 5,
 }
 PAD_IDX = 0
+
 def encode_sequence(seq: str) -> List[int]:
     """
     convert seq to int list
@@ -285,7 +288,7 @@ def train_model(
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-    best_val_f1 = 0.0
+    best_val_f1 = -1
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_path = f"model/{naming_prefix}_{run_id}.pt"
 
@@ -367,22 +370,62 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
     #     "labels": all_labels,
     # }
 
-def make_dataset(sequences, pos_features, labels, batch_size=2):
+
+def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=2):
+    assert len(sequences) == len(pos_features) == len(labels) == len(groups), \
+        "sequences, pos_features, labels, groups length not the same"
+
     dataset = RNADataset(sequences, pos_features, labels)
 
+    indices = np.arange(len(dataset))
+    groups = np.array(groups)
+    labels = np.array(labels)
 
-    train_size = int(0.7 * len(sequences))
-    val_size   = int(0.15 * len(sequences))
-    test_size  = len(dataset) - train_size - val_size
-
-    train_dataset, val_dataset, test_dataset = random_split(
-        dataset,
-        [train_size, val_size, test_size],
-        generator=torch.Generator().manual_seed(SEED),
+    # split train-val/test：15%
+    gss_test = GroupShuffleSplit(
+        n_splits=1,
+        test_size=0.15,
+        random_state=SEED,
+    )
+    train_val_idx, test_idx = next(
+        gss_test.split(indices, labels, groups=groups)
     )
 
+    # split val from train-val (85%) -> adjust ratio as based on total
+    # 0.15 / 0.85 ≈ 0.17647
+    val_ratio_in_trainval = 0.15 / 0.85
+
+    gss_val = GroupShuffleSplit(
+        n_splits=1,
+        test_size=val_ratio_in_trainval,
+        random_state=SEED,
+    )
+    train_rel_idx, val_rel_idx = next(
+        gss_val.split(
+            indices[train_val_idx],
+            labels[train_val_idx],
+            groups=groups[train_val_idx],
+        )
+    )
+
+    train_idx = train_val_idx[train_rel_idx]
+    val_idx = train_val_idx[val_rel_idx]
+
+    # sanity check group not overlap
+    train_groups = set(groups[train_idx])
+    val_groups = set(groups[val_idx])
+    test_groups = set(groups[test_idx])
+
+    assert train_groups.isdisjoint(val_groups), "train / val groups overlaped"
+    assert train_groups.isdisjoint(test_groups), "train / test groups overlaped"
+    assert val_groups.isdisjoint(test_groups), "val / test groups overlaped"
+
+    train_dataset = Subset(dataset, train_idx.tolist())
+    val_dataset = Subset(dataset, val_idx.tolist())
+    test_dataset = Subset(dataset, test_idx.tolist())
+
     # Get labels for the training subset to create the sampler
-    train_labels_for_sampler = np.array([labels[i] for i in train_dataset.indices])
+    train_labels_for_sampler = labels[train_idx]
     sampler = get_sampler(train_labels_for_sampler)
 
     train_loader = DataLoader(
@@ -402,7 +445,7 @@ def make_dataset(sequences, pos_features, labels, batch_size=2):
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=batch_size, # Use the consistent batch_size
+        batch_size=batch_size,
         shuffle=False,
         collate_fn=collate_fn,
     )
@@ -461,7 +504,10 @@ def get_test_dataset(batch_size):
     
     labels = [0, 1, 0, 1, 1, 0, 1, 0, 1, 1]
 
-    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, batch_size)
+    genes = ['a', 'a', 'b', 'c', 'd', 'd', 'e', 'f', 'f', 'g']
+
+    train_loader, val_loader, test_loader = make_dataset(
+        sequences, positions, labels, genes, batch_size)
     return train_loader, val_loader, test_loader
 
 
@@ -469,33 +515,29 @@ def main():
     # hyper parameters
     h_bs = 2**5
     h_emb_dim = 8 # 16
-    h_hidden_dim = 16 #32 # 64
-    h_num_layers = 1
+    h_hidden_dim = 8  #16 #32 # 64
+    h_num_layers = 2
     h_dropout = 0.2
     h_epoch = 10
 
     train_loader, val_loader, test_loader = get_test_dataset(h_bs)
 
     model, best_model_path = train_model(
-    train_loader, val_loader,
-    h_emb_dim, h_hidden_dim, h_num_layers,
-    h_dropout, h_epoch,
-    naming_prefix='test-run'
+            train_loader, val_loader, h_emb_dim, h_hidden_dim, h_num_layers, h_dropout, h_epoch,
+            naming_prefix='test-run'
     )
 
     # real data
-    '''
     df_data = pd.read_csv("input_data/df_data.csv")
     print(df_data.shape)
-    sequences, positions, labels = df_data.seq.tolist(), df_data.position.tolist(), df_data.label.tolist()
-    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, h_bs)
-    model = train_model(
+    sequences, positions, labels, genes = df_data.seq.tolist(), df_data.position.tolist(), df_data.label.tolist(), df_data.gene_id.tolist()
+    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, genes, h_bs)
+    model, best_model_path = train_model(
         train_loader, val_loader,
         h_emb_dim, h_hidden_dim, h_num_layers,
         h_dropout, h_epoch,
         naming_prefix='biGRU_clf'
-        )
-    '''
+    )
 
     # evaluate test set
     yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
