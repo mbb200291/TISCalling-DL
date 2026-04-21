@@ -1,10 +1,15 @@
 import random
 from typing import List, Tuple
+from collections import Counter
+from datetime import datetime
 
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler, Subset
+from performer_pytorch.performer_pytorch import FixedPositionalEmbedding
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 from sklearn.metrics import (
     accuracy_score,
@@ -14,8 +19,6 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from sklearn.model_selection import GroupShuffleSplit
-
-from datetime import datetime
 import pandas as pd
 from pprint import pprint
 
@@ -47,7 +50,7 @@ def encode_position(position: int, n: int) -> List[int]:
     """
     convert position int to as onehot label
     """
-    return [0] * position + [1] * (n - position)
+    return [0] * position + [1] + [0] * (n - position - 1)
 
 def get_sampler(labels_np):
     class_counts = np.bincount(labels_np)   # [count_0, count_1]
@@ -109,8 +112,6 @@ def collate_fn(batch):
 
     labels = torch.stack(labels)
     return padded_seqs, padded_feats, lengths, labels
-import torch
-import torch.nn as nn
 
 
 class RNASequenceBinaryClassifier(nn.Module):
@@ -150,7 +151,9 @@ class RNASequenceBinaryClassifier(nn.Module):
         self.input_proj = nn.Linear(embed_dim + 1, d_model)
         self.input_norm = nn.LayerNorm(d_model)
 
-        self.position_embedding = nn.Embedding(max_len, d_model)
+        # self.position_embedding = nn.Embedding(max_len, d_model)   # embed by simply postion number
+        self.frame_embedding = nn.Embedding((max_len//3 if max_len%3 == 0 else max_len//3 + 1) + 1, d_model)  # 3 reading frames 
+        self.pos_emb = FixedPositionalEmbedding(d_model, max_len)  # Sinusoidal
 
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
@@ -178,7 +181,7 @@ class RNASequenceBinaryClassifier(nn.Module):
 
         if self.pooling_mode == "marker":
             classifier_in_dim = d_model
-        else:
+        else:  # mean pooling
             classifier_in_dim = d_model * 2
 
         self.classifier = nn.Linear(classifier_in_dim, 1)
@@ -213,18 +216,29 @@ class RNASequenceBinaryClassifier(nn.Module):
         seq_emb = self.embedding(input_ids)
 
         # [B, L, 1]
-        feat = pos_features.unsqueeze(-1).float()
+        ind = pos_features.unsqueeze(-1).float()
 
         # [B, L, E+1] -> [B, L, D]
-        x = torch.cat([seq_emb, feat], dim=-1)
+        x = torch.cat([seq_emb, ind], dim=-1)
         x = self.input_proj(x)
         x = self.input_norm(x)
 
         # positional embedding
-        pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
-        x = x + self.position_embedding(pos_ids)
+        ## [+] embedding matrix
+        # pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
+        # x += self.position_embedding(pos_ids)
 
-        # True for padding
+        ## Sinusoidal
+        x += self.pos_emb(x)
+
+        # frame embedding
+        marker_pos = pos_features.argmax(dim=1)        # (B,)
+        frame_offset = (marker_pos % 3).unsqueeze(1)   # (B, 1)
+        pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
+        frame_ids = (pos_ids + 3 - frame_offset) // 3      # (B, L)
+        x += self.frame_embedding(frame_ids)
+
+        # label the padding token
         padding_mask = input_ids.eq(self.pad_idx)  # [B, L]
 
         # [B, L, D]
@@ -267,11 +281,12 @@ class RNASequenceBinaryClassifier(nn.Module):
         logits = self.classifier(self.dropout(h))  # [B, 1]
         return logits.squeeze(-1)                  # [B]
 
+
 def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: float = 0.5):
     model.train()
 
+    total_loss = 0.0
     total_samples = 0
-
     tp = tn = fp = fn = 0
 
     for input_ids, pos_features, lengths, labels in dataloader:
@@ -288,11 +303,11 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: 
         loss.backward()
         optimizer.step()
 
+        total_loss += loss.item() * labels.size(0)
+        total_samples += labels.size(0)
+
         probs = torch.sigmoid(logits)
         preds = (probs >= threshold).float()
-
-        batch_size = labels.size(0)
-        total_samples += batch_size
 
         tp += ((preds == 1) & (labels == 1)).sum().item()
         tn += ((preds == 0) & (labels == 0)).sum().item()
@@ -305,6 +320,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: 
     f1 = 2 * precision * recall / max(precision + recall, 1e-12)
 
     return {
+        "loss": total_loss / max(total_samples, 1),
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
@@ -316,6 +332,8 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: 
 def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
     model.eval()
 
+    total_loss = 0.0
+    total_samples = 0
     tp = tn = fp = fn = 0
 
     for input_ids, pos_features, lengths, labels in dataloader:
@@ -325,6 +343,10 @@ def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
         labels = labels.to(device).float()
 
         logits = model(input_ids, pos_features, lengths)
+        loss = criterion(logits, labels)
+
+        total_loss += loss.item() * labels.size(0)
+        total_samples += labels.size(0)
 
         probs = torch.sigmoid(logits)
         preds = (probs >= threshold).float()
@@ -340,77 +362,100 @@ def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
     f1 = 2 * precision * recall / max(precision + recall, 1e-12)
 
     return {
+        "loss": total_loss / max(total_samples, 1),
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
         "f1": f1,
     }
 
-
 def train_model(
     train_loader,
     val_loader,
-    embed_dim=16,
-    d_model=64,
-    num_layers=1,
-    dropout=0.2,
-    num_heads=4,
-    ff_dim=128,
-    max_epoch=1,
-    naming_prefix='model'
+    hp_queryer,
+    # embed_dim=16,
+    # d_model=64,
+    # num_layers=1,
+    # dropout=0.2,
+    # num_heads=4,
+    # ff_dim=128,
+    # max_epoch=1,
+    pos_weight,
+    naming_prefix='model',
+    patience=5,
 ):
+    print('hyperparameters:', hp_queryer())
     model = RNASequenceBinaryClassifier(
         vocab_size=max(VOCAB.values()) + 1,
-        embed_dim=embed_dim,
-        num_layers=num_layers,
-        dropout=dropout,
-        d_model=d_model,
-        num_heads=num_heads,
-        ff_dim=ff_dim,
+        **hp_queryer("embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads', 'ff_dim'),
+        # embed_dim=embed_dim,
+        # num_layers=num_layers,
+        # dropout=dropout,
+        # d_model=d_model,
+        # num_heads=num_heads,
+        # ff_dim=ff_dim,
         max_len=4096,
         pad_idx=PAD_IDX,
-        pooling_mode="attention",  # "marker" | "mean" | "attention"
+        pooling_mode="marker",  # "marker" | "mean" | "attention"
     ).to(DEVICE)
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs")
+        model = torch.nn.DataParallel(model)
+    print("total parameters:", sum(p.numel() for p in model.parameters()), flush=True)
+    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad), flush=True)
 
-    print("total parameters:", sum(p.numel() for p in model.parameters()))
-    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight * hp_queryer('weight_fold')['weight_fold'])
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
 
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    # lr scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode='max',
+        factor=0.5,       # lr shrink factor
+        patience=5,       # number of epoch to tolenent no loss improving
+        min_lr=1e-6,
+    )
 
     best_val_f1 = -1
+    # best_val_loss = float('inf')
+    epochs_no_improve = 0   # early stopping counter
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_path = f"model/{naming_prefix}_{run_id}.pt"
 
-    for epoch in range(1, max_epoch + 1):
-        train_metrics = train_one_epoch(
-            model, train_loader, optimizer, criterion, DEVICE
-        )
+    for epoch in range(1, hp_queryer('max_epoch')['max_epoch'] + 1):
+        train_metrics = train_one_epoch(model, train_loader, optimizer, criterion, DEVICE)
+        val_metrics = evaluate(model, val_loader, criterion, DEVICE)
 
-        val_metrics = evaluate(
-            model, val_loader, criterion, DEVICE
-        )
+        current_lr = optimizer.param_groups[0]['lr']
 
         print(
-            f"Epoch {epoch:02d} | "
-            f"train_acc={train_metrics['accuracy']:.4f} "
-            f"train_prec={train_metrics['precision']:.4f} "
-            f"train_rec={train_metrics['recall']:.4f} "
+            f"Epoch {epoch:02d} | lr={current_lr:.2e} | "
+            f"train_loss={train_metrics['loss']:.4f} "
             f"train_f1={train_metrics['f1']:.4f} | "
-            f"val_acc={val_metrics['accuracy']:.4f} "
-            f"val_prec={val_metrics['precision']:.4f} "
-            f"val_rec={val_metrics['recall']:.4f} "
-            f"val_f1={val_metrics['f1']:.4f}"
+            f"val_loss={val_metrics['loss']:.4f} "
+            f"val_f1={val_metrics['f1']:.4f}",
+            flush=True
         )
 
+        scheduler.step(val_metrics['f1'])
+
+        # if val_metrics["f1"] > best_val_loss:
         if val_metrics["f1"] > best_val_f1:
+            # best_val_loss = val_metrics["loss"]
             best_val_f1 = val_metrics["f1"]
-            torch.save(model.state_dict(), save_path)
-            print(f"  -> saved best model by val_f1 to {save_path}")
+            epochs_no_improve = 0
+            print(f"  -> saved best model to {save_path}", flush=True)
+            state_dict = model.module.state_dict() if isinstance(model, torch.nn.DataParallel) else model.state_dict()
+            torch.save(state_dict, save_path)
+        else:
+            epochs_no_improve += 1
+            if epochs_no_improve >= patience:
+                print(f"  -> early stopping at epoch {epoch} (no improvement for {patience} epochs)", flush=True)
+                break
 
     print(f"Best validation F1: {best_val_f1:.4f}")
-
     return model, save_path
+
 
 @torch.no_grad()
 def predict_prob(model, seq: str, feat: List[int], device: torch.device) -> float:
@@ -447,7 +492,7 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
 
         all_probs.append(probs.cpu())
         all_preds.append(preds.cpu())
-        all_labels.append(labels)   # labels 通常已在 CPU
+        all_labels.append(labels)
 
     all_probs = torch.cat(all_probs)   # [N]
     all_preds = torch.cat(all_preds)   # [N]
@@ -458,6 +503,8 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
 def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=2):
     assert len(sequences) == len(pos_features) == len(labels) == len(groups), \
         "sequences, pos_features, labels, groups length not the same"
+
+    print('labels:', dict(Counter(labels)))
 
     dataset = RNADataset(sequences, pos_features, labels)
 
@@ -510,13 +557,21 @@ def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=
 
     # Get labels for the training subset to create the sampler
     train_labels_for_sampler = labels[train_idx]
-    sampler = get_sampler(train_labels_for_sampler)
+    # sampler = get_sampler(train_labels_for_sampler)  # switch to loss weight
+    num_pos = (train_labels_for_sampler == 1).sum()
+    num_neg = (train_labels_for_sampler == 0).sum()
+    pos_weight = torch.tensor(
+        [num_neg / max(num_pos, 1)],
+        dtype=torch.float32,
+        device=DEVICE,
+    )
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        sampler=sampler,
-        shuffle=False,  # disable when sampler provided
+        # sampler=sampler,
+        # shuffle=False,  # disable when sampler provided
+        shuffle=True,
         collate_fn=collate_fn,
     )
 
@@ -534,7 +589,7 @@ def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=
         collate_fn=collate_fn,
     )
 
-    return train_loader, val_loader, test_loader
+    return train_loader, val_loader, test_loader, pos_weight
 
 def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
     """
@@ -555,12 +610,20 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
 
     specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
 
+    # MCC
+    denom = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+    if denom == 0:
+        mcc = 0.0
+    else:
+        mcc = (tp * tn - fp * fn) / np.sqrt(denom)
+
     return {
         "accuracy": acc,
         "precision": precision,
         "recall": recall,
         "specificity": specificity,
         "f1": f1,
+        "mcc": mcc,
         "tp": tp,
         "tn": tn,
         "fp": fp,
@@ -590,51 +653,104 @@ def get_test_dataset(batch_size):
 
     genes = ['a', 'a', 'b', 'c', 'd', 'd', 'e', 'f', 'f', 'g']
 
-    train_loader, val_loader, test_loader = make_dataset(
+    train_loader, val_loader, test_loader, pos_weight = make_dataset(
         sequences, positions, labels, genes, batch_size)
-    return train_loader, val_loader, test_loader
+    return train_loader, val_loader, test_loader, pos_weight
 
-def get_hyperparameters():
-    return {
-        'max_epoch': 10,
-        'embed_dim': 8,
-        'd_model': 8, #64,
-        'num_layers': 1,
-        'dropout': 0.2,
-        'num_heads': 4,
-        'ff_dim': 4, #64, #128,
-        'batch_size': 4
-        }
+
+def load_model(path: str, hp_queryer, device: torch.device = DEVICE) -> RNASequenceBinaryClassifier:
+    model = RNASequenceBinaryClassifier(
+        vocab_size=max(VOCAB.values()) + 1,
+        **hp_queryer("embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads', 'ff_dim'),
+        # embed_dim=16,
+        # d_model=32,
+        # num_layers=1,
+        # num_heads=2,
+        # ff_dim=64,
+        # dropout=0.1,
+        max_len=4096,
+        pad_idx=PAD_IDX,
+        # pooling_mode="attention",
+        pooling_mode="marker",
+    ).to(device)
+
+    state_dict = torch.load(path, map_location=device)
+    model.load_state_dict(state_dict)
+    if torch.cuda.device_count() > 1:  # seperate to multiple gpu
+        model = torch.nn.DataParallel(model)
+
+    model.eval()
+    return model
+
+def hyperparameters_queryer(*args):
+    return {k: v for k, v in {
+        'embed_dim': 32,
+        'd_model': 64, # 32 ~ 64
+        'num_layers': 2, # 1 ~ 2
+        'num_heads': 4, # 2 ~ 4 
+        'ff_dim': 128, #64 ~ 128 (convension = d_model * 2)
+        'batch_size': 16, # 32 ~ 64
+        'max_epoch': 50,
+        'dropout': 0.2, 
+        'weight_fold': 1,
+    }.items() if k in args or len(args)==0}
+
 
 def main():
-    train_loader, val_loader, test_loader = get_test_dataset(10)
+    print('run at:', datetime.now().strftime("%Y%m%d_%H%M%S"))
+    train_loader, val_loader, test_loader, pos_weight = get_test_dataset(10)
 
     model, best_model_path = train_model(
             train_loader, val_loader,
-            **{k: v for k, v in get_hyperparameters().items() if k != "batch_size"},
+            hyperparameters_queryer,
+            pos_weight, 
             naming_prefix='test-run'
     )
 
     # real data
     df_data = pd.read_csv("input_data/df_data.csv")
-    print(df_data.shape)
+    print(df_data.shape, flush=True)
     
     # exclude size more than cutoff
-    df_data = df_data.loc[df_data.position < 4096]
-    df_data['seq'] = df_data.seq.str[:4096]
-    print(df_data.shape)
+    ## exclude strategy 1: remove position label only
+    # df_data = df_data.loc[df_data.position < 4096 - 50]
+    ## exclude strategy 2: revmove whole transcript when candidate start site exceed 4k
+    gene_to_exclude = set(df_data.gene_id[(df_data.position > 4096 - 50) & (df_data.label == 1)].tolist())
+    df_data = df_data.loc[~df_data.gene_id.isin(gene_to_exclude)]
+    df_data = df_data.loc[df_data.position < 4096 - 50]
+    df_data['seq'] = df_data.seq.str[:4096]  
+    print(df_data.shape, flush=True)
 
-    sequences, positions, labels, genes = df_data.seq.tolist(), df_data.position.tolist(), df_data.label.tolist(), df_data.gene_id.tolist()
-    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, genes, get_hyperparameters()['batch_size'])
-    model, best_model_path = train_model(
+    sequences, positions, labels, genes = (
+        df_data.seq.tolist(), df_data.position.tolist(),
+        df_data.label.tolist(), df_data.gene_id.tolist())
+
+    # debug -> label as 1 when codon is ATG
+    labels = []
+    for seq, pos in zip(sequences, positions):
+        if seq[pos:pos+3] == 'ATG':
+            labels.append(1)
+        else:
+            labels.append(0)
+
+    # # debug -> truncate seq before atg -> examine relative postion
+    # for i in range(len(sequences)):
+    #     sequences[i] = sequences[i][positions[i]:]
+    #     positions[i] = 0
+
+    train_loader, val_loader, test_loader, pos_weight = make_dataset(sequences, positions, labels, genes, **hyperparameters_queryer('batch_size'))
+    _, best_model_path = train_model(
         train_loader, val_loader,
-        **{k: v for k, v in get_hyperparameters().items() if k != "batch_size"},
-        naming_prefix='transformer_clf'
+        hyperparameters_queryer,
+        pos_weight,
+        naming_prefix='transformer_clf',
     )
+    
+    model = load_model(best_model_path, hyperparameters_queryer, DEVICE)
 
     # evaluate test set
     yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
-    pprint(compute_binary_metrics(yhat.numpy(), labels.numpy()))
+    pprint(compute_binary_metrics(labels.numpy(), yhat.numpy()))
 
 
 if __name__ == '__main__':

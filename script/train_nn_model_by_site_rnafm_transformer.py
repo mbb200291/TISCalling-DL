@@ -5,6 +5,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler, Subset
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -13,7 +16,6 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 from sklearn.model_selection import GroupShuffleSplit
-from typing import List
 
 from datetime import datetime
 import pandas as pd
@@ -35,7 +37,6 @@ VOCAB = {
     "N": 5,
 }
 PAD_IDX = 0
-
 def encode_sequence(seq: str) -> List[int]:
     """
     convert seq to int list
@@ -86,6 +87,43 @@ class RNADataset(Dataset):
             torch.tensor(label, dtype=torch.float),        # [L]
         )
 
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset
+import hashlib
+
+class CachedPretrainDataset(Dataset):
+    def __init__(self, raw_data, frozen_encoder, device, cache_path="cache.pt"):
+        self.device = device
+        
+        # 嘗試讀取 cache
+        try:
+            self.cached_embeddings = torch.load(cache_path)
+            print("Cache loaded!")
+        except:
+            print("Building cache...")
+            self.cached_embeddings = self._build_cache(
+                raw_data, frozen_encoder, cache_path
+            )
+    
+    def _build_cache(self, raw_data, encoder, cache_path):
+        encoder.eval()
+        embeddings = []
+        
+        with torch.no_grad():               # 不需要梯度
+            for batch in raw_data:
+                emb = encoder(batch.to(self.device))
+                embeddings.append(emb.cpu())
+        
+        cached = torch.cat(embeddings, dim=0)
+        torch.save(cached, cache_path)
+        return cached
+    
+    def __getitem__(self, idx):
+        return self.cached_embeddings[idx], self.labels[idx]
+
+
+
 def collate_fn(batch):
     """
     return:
@@ -110,20 +148,36 @@ def collate_fn(batch):
 
     labels = torch.stack(labels)
     return padded_seqs, padded_feats, lengths, labels
+import torch
+import torch.nn as nn
+
 
 class RNASequenceBinaryClassifier(nn.Module):
     def __init__(
         self,
         vocab_size: int,
         embed_dim: int = 16,
-        hidden_dim: int = 64,
-        # feature_dim: int = 1,
-        num_layers: int = 1,
+        d_model: int = 64,
+        num_heads: int = 4,
+        num_layers: int = 2,
+        ff_dim: int = 128,
         dropout: float = 0.2,
+        max_len: int = 4096,
         pad_idx: int = PAD_IDX,
+        pooling_mode: str = "attention",  # "marker" | "mean" | "attention"
     ):
         super().__init__()
+
+        valid_pooling_modes = {"marker", "mean", "attention"}
+        if pooling_mode not in valid_pooling_modes:
+            raise ValueError(
+                f"pooling_mode must be one of {valid_pooling_modes}, got {pooling_mode}"
+            )
+
         self.pad_idx = pad_idx
+        self.d_model = d_model
+        self.max_len = max_len
+        self.pooling_mode = pooling_mode
 
         self.embedding = nn.Embedding(
             num_embeddings=vocab_size,
@@ -131,58 +185,165 @@ class RNASequenceBinaryClassifier(nn.Module):
             padding_idx=pad_idx,
         )
 
-        self.encoder = nn.GRU(
-            input_size=embed_dim + 1,  # 1 for the position indicator
-            hidden_size=hidden_dim,
-            num_layers=num_layers,
+        # input = token embedding + 1 scalar feature
+        self.input_proj = nn.Linear(embed_dim + 1, d_model)
+        self.input_norm = nn.LayerNorm(d_model)
+
+        self.position_embedding = nn.Embedding(max_len, d_model)
+
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=num_heads,
+            dim_feedforward=ff_dim,
+            dropout=dropout,
             batch_first=True,
-            bidirectional=True,
-            dropout=dropout if num_layers > 1 else 0.0,
+            norm_first=True,
+            activation="gelu",
+        )
+        self.encoder = nn.TransformerEncoder(
+            encoder_layer=encoder_layer,
+            num_layers=num_layers,
         )
 
+        if self.pooling_mode == "attention":
+            self.marker_attention = nn.MultiheadAttention(
+                embed_dim=d_model,
+                num_heads=num_heads,
+                dropout=dropout,
+                batch_first=True,
+            )
+
         self.dropout = nn.Dropout(dropout)
-        self.classifier = nn.Linear(hidden_dim * 2, 1)  # binary -> 1 logit
-        # self.classifier = nn.Linear(hidden_dim * 4, 1)  # [another version concat position output and all postion polling]
+
+        if self.pooling_mode == "marker":
+            classifier_in_dim = d_model
+        else:
+            classifier_in_dim = d_model * 2
+
+        self.classifier = nn.Linear(classifier_in_dim, 1)
+
+class RNATISBinaryClassification(nn.Module):
+    def __init__(self, pretrain_model, num_classes):
+        super().__init__()
+        self.encoder = pretrain_mode
+        self.classifier = nn.Linear(768, num_classes)
+    
+    def forward(self, x):
+        features = self.encoder(x)
+        return self.classifier(features)
+
+    def __init__(self, pretrain_model, num_classes):
+        super().__init__()
+        self.encoder = pretrain_model
+        self.classifier = nn.Linear(768, num_classes)
+        self._cache_mode = False
+    
+    def enable_cache_mode(self):
+        """切換到 cache 模式：跳過 encoder"""
+        self._cache_mode = True
+        for param in self.encoder.parameters():
+            param.requires_grad = False
+    
+    def disable_cache_mode(self):
+        """切換回正常模式：準備 fine-tune encoder"""
+        self._cache_mode = False
+    
+    def forward(self, x):
+        if self._cache_mode:
+            # x 已經是 cached embedding，直接跳過 encoder
+            features = x
+        else:
+            # 正常走完整個 encoder
+            features = self.encoder(x)
+        
+        return self.classifier(features)
+
+
+
+    def _masked_mean_pool(
+        self,
+        x: torch.Tensor,              # [B, L, D]
+        padding_mask: torch.Tensor,   # [B, L], True = padding
+    ) -> torch.Tensor:
+        valid_mask = (~padding_mask).unsqueeze(-1).float()    # [B, L, 1]
+        x_masked = x * valid_mask                             # [B, L, D]
+        denom = valid_mask.sum(dim=1).clamp(min=1.0)         # [B, 1]
+        mean_pooled = x_masked.sum(dim=1) / denom            # [B, D]
+        return mean_pooled
 
     def forward(
         self,
         input_ids: torch.Tensor,      # [B, L]
         pos_features: torch.Tensor,   # [B, L]
-        lengths: torch.Tensor,        # [B]
+        lengths: torch.Tensor,        # [B], kept for interface compatibility
     ) -> torch.Tensor:
-        seq_emb = self.embedding(input_ids)                    # [B, L, E]
-        feat = pos_features.unsqueeze(-1).float()             # [B, L, 1]
-        x = torch.cat([seq_emb, feat], dim=-1)                # [B, L, E+1]
+        del lengths  # no needed
 
-        packed = nn.utils.rnn.pack_padded_sequence(
+        B, L = input_ids.shape
+
+        if L > self.max_len:
+            raise ValueError(
+                f"Sequence length {L} exceeds max_len={self.max_len}"
+            )
+
+        # [B, L, E]
+        seq_emb = self.embedding(input_ids)
+
+        # [B, L, 1]
+        feat = pos_features.unsqueeze(-1).float()
+
+        # [B, L, E+1] -> [B, L, D]
+        x = torch.cat([seq_emb, feat], dim=-1)
+        x = self.input_proj(x)
+        x = self.input_norm(x)
+
+        # positional embedding
+        pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
+        x = x + self.position_embedding(pos_ids)
+
+        # True for padding
+        padding_mask = input_ids.eq(self.pad_idx)  # [B, L]
+
+        # [B, L, D]
+        out = self.encoder(
             x,
-            lengths.cpu(),
-            batch_first=True,
-            enforce_sorted=False,
+            src_key_padding_mask=padding_mask,
         )
-        packed_out, _ = self.encoder(packed)
-        out, _ = nn.utils.rnn.pad_packed_sequence(
-            packed_out,
-            batch_first=True,
-        )                                                     # [B, L, 2H]
 
-        marker_idx = pos_features.argmax(dim=1)               # [B]
+        # candidate start site indicators
+        marker_idx = pos_features.argmax(dim=1)  # [B]
+        batch_idx = torch.arange(B, device=input_ids.device)
 
-        batch_size = input_ids.size(0)
-        batch_idx = torch.arange(batch_size, device=input_ids.device)
+        # [B, D]
+        marker_h = out[batch_idx, marker_idx, :]
 
-        h = out[batch_idx, marker_idx, :]              # [B, 2H]
+        if self.pooling_mode == "marker":
+            h = marker_h
 
-        # # [concat to global mean pooling]
-        # mask = (input_ids != self.pad_idx).unsqueeze(-1)      # [B, L, 1]
-        # out_masked = out * mask
-        # summed = out_masked.sum(dim=1)                        # [B, 2H]
-        # denom = mask.sum(dim=1).clamp(min=1)                  # [B, 1]
-        # h_global = summed / denom                             # [B, 2H]
-        # h = torch.cat([h, h_global], dim=-1)           # [B, 4H]
+        elif self.pooling_mode == "mean":
+            global_h = self._masked_mean_pool(out, padding_mask)  # [B, D]
+            h = torch.cat([marker_h, global_h], dim=-1)           # [B, 2D]
 
-        logits = self.classifier(self.dropout(h))      # [B, 1]
-        return logits.squeeze(-1)
+        elif self.pooling_mode == "attention":
+            query = marker_h.unsqueeze(1)  # [B, 1, D]
+
+            global_h, _ = self.marker_attention(
+                query=query,
+                key=out,
+                value=out,
+                key_padding_mask=padding_mask,
+                need_weights=False,
+            )                               # [B, 1, D]
+
+            global_h = global_h.squeeze(1)  # [B, D]
+            h = torch.cat([marker_h, global_h], dim=-1)  # [B, 2D]
+
+        else:
+            raise RuntimeError(f"Unexpected pooling_mode: {self.pooling_mode}")
+
+        logits = self.classifier(self.dropout(h))  # [B, 1]
+        return logits.squeeze(-1)                  # [B]
+
 
 def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: float = 0.5):
     model.train()
@@ -222,7 +383,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: 
     f1 = 2 * precision * recall / max(precision + recall, 1e-12)
 
     return {
-        "loss": total_loss / max(total_samples, 1),
+        "loss": total_loss / max(total_samples, 1),   # 新增
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
@@ -271,51 +432,57 @@ def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
         "f1": f1,
     }
 
-
 def train_model(
     train_loader,
     val_loader,
-    embed_dim=16,
-    hidden_dim=64,
-    num_layers=1,
-    dropout=0.2,
-    EPOCH=1,
+    hp_queryer,
+    # embed_dim=16,
+    # d_model=64,
+    # num_layers=1,
+    # dropout=0.2,
+    # num_heads=4,
+    # ff_dim=128,
+    # max_epoch=1,
     naming_prefix='model',
-    patience=5,      
+    patience=5,
 ):
     model = RNASequenceBinaryClassifier(
         vocab_size=max(VOCAB.values()) + 1,
-        embed_dim=embed_dim,
-        hidden_dim=hidden_dim,
-        num_layers=num_layers,
-        dropout=dropout,
+        **hp_queryer("embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads', 'ff_dim'),
+        # embed_dim=embed_dim,
+        # num_layers=num_layers,
+        # dropout=dropout,
+        # d_model=d_model,
+        # num_heads=num_heads,
+        # ff_dim=ff_dim,
+        max_len=4096,
+        pad_idx=PAD_IDX,
+        pooling_mode="attention",  # "marker" | "mean" | "attention"
     ).to(DEVICE)
-
     if torch.cuda.device_count() > 1:
-        print(f"Using {torch.cuda.device_count()} GPUs")
+        print(f"Using {torch.cuda.device_count()} GPUs", flush=True)
         model = torch.nn.DataParallel(model)
-
-    print("total parameters:", sum(p.numel() for p in model.parameters()))
-    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    print("total parameters:", sum(p.numel() for p in model.parameters()), flush=True)
+    print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad), flush=True)
 
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-    # scheduler
+    # lr scheduler
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
         mode='max',
-        factor=0.5,
-        patience=3,
+        factor=0.5,       # lr shrink factor
+        patience=3,       # number of epoch to tolenent no loss improving
         min_lr=1e-6,
     )
 
     best_val_f1 = -1
-    epochs_no_improve = 0
+    epochs_no_improve = 0   # early stopping counter
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     save_path = f"model/{naming_prefix}_{run_id}.pt"
 
-    for epoch in range(1, EPOCH + 1):
+    for epoch in range(1, hp_queryer('max_epoch')['max_epoch'] + 1):
         train_metrics = train_one_epoch(model, train_loader, optimizer, criterion, DEVICE)
         val_metrics = evaluate(model, val_loader, criterion, DEVICE)
 
@@ -326,7 +493,8 @@ def train_model(
             f"train_loss={train_metrics['loss']:.4f} "
             f"train_f1={train_metrics['f1']:.4f} | "
             f"val_loss={val_metrics['loss']:.4f} "
-            f"val_f1={val_metrics['f1']:.4f}"
+            f"val_f1={val_metrics['f1']:.4f}",
+            flush=True,
         )
 
         scheduler.step(val_metrics['f1'])
@@ -334,18 +502,19 @@ def train_model(
         if val_metrics["f1"] > best_val_f1:
             best_val_f1 = val_metrics["f1"]
             epochs_no_improve = 0
-            # DataParallel
+            # torch.save(model.state_dict(), save_path)
+            print(f"  -> saved best model to {save_path}", flush=True)
             state_dict = model.module.state_dict() if isinstance(model, torch.nn.DataParallel) else model.state_dict()
             torch.save(state_dict, save_path)
-            print(f"  -> saved best model to {save_path}")
         else:
             epochs_no_improve += 1
             if epochs_no_improve >= patience:
-                print(f"  -> early stopping at epoch {epoch} (no improvement for {patience} epochs)")
+                print(f"  -> early stopping at epoch {epoch} (no improvement for {patience} epochs)", flush=True)
                 break
 
-    print(f"Best validation F1: {best_val_f1:.4f}")
+    print(f"Best validation F1: {best_val_f1:.4f}", flush=True)
     return model, save_path
+
 
 @torch.no_grad()
 def predict_prob(model, seq: str, feat: List[int], device: torch.device) -> float:
@@ -490,7 +659,6 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
 
     specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
 
-
     # MCC
     denom = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
     if denom == 0:
@@ -510,7 +678,6 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
         "fp": fp,
         "fn": fn,
     }
-
 
 def get_test_dataset(batch_size):
     # test run
@@ -540,49 +707,77 @@ def get_test_dataset(batch_size):
     return train_loader, val_loader, test_loader
 
 
-def main():
-    h_bs = 2**5
-    h_emb_dim = 8
-    h_hidden_dim = 8
-    h_num_layers = 3
-    h_dropout = 0.2
-    h_epoch = 50
+def load_model(path: str, device: torch.device = DEVICE) -> RNASequenceBinaryClassifier:
+    model = RNASequenceBinaryClassifier(
+        vocab_size=max(VOCAB.values()) + 1,
+        **hp_queryer("embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads', 'ff_dim'),
+        # embed_dim=16,
+        # d_model=32,
+        # num_layers=1,
+        # num_heads=2,
+        # ff_dim=64,
+        # dropout=0.1,
+        max_len=4096,
+        pad_idx=PAD_IDX,
+        pooling_mode="attention",
+    ).to(device)
 
-    train_loader, val_loader, test_loader = get_test_dataset(h_bs)
+    state_dict = torch.load(path, map_location=device)
+    model.load_state_dict(state_dict)
+    model.eval()
+    return model
+
+def hyperparameters_queryer(*args):
+    return {k: v for k, v in {
+        'embed_dim': 16,
+        'd_model': 32, # -> 64
+        'num_layers': 1, # -> 2
+        'num_heads': 2, # -> 4 
+        'ff_dim': 64,  # -> 128 (convension = d_model * 2)
+        'batch_size': 16, #32,  # -> 64
+        'max_epoch': 50,
+        'dropout': 0.2, 
+    }.items() if k in args}
+
+
+def main():
+    train_loader, val_loader, test_loader = get_test_dataset(10)
+
     model, best_model_path = train_model(
-        train_loader, val_loader,
-        embed_dim=h_emb_dim,
-        hidden_dim=h_hidden_dim,
-        num_layers=h_num_layers,
-        dropout=h_dropout,
-        EPOCH=h_epoch,
-        naming_prefix='test-run',
+            train_loader, val_loader,
+            hyperparameters_queryer,
+            naming_prefix='test-run'
     )
 
     # real data
     df_data = pd.read_csv("input_data/df_data.csv")
-    print(df_data.shape)
+    print(df_data.shape, flush=True)
+    
+    # exclude size more than cutoff
+    ## exclude strategy 1: remove position label only
+    # df_data = df_data.loc[df_data.position < 4096 - 50]
+    ## exclude strategy 2: revmove whole transcript
+    gene_to_exclude = set(df_data.gene_id[(df_data.position > 4096 - 50) & (df_data.label == 1)].tolist())
+    df_data = df_data.loc[~df_data.gene_id.isin(gene_to_exclude)]
+    df_data = df_data.loc[df_data.position < 4096 - 50]
+    df_data['seq'] = df_data.seq.str[:4096]  
+    print(df_data.shape, flush=True)
+
     sequences, positions, labels, genes = (
-        df_data.seq.tolist(),
-        df_data.position.tolist(),
-        df_data.label.tolist(),
-        df_data.gene_id.tolist(),
-    )
-    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, genes, h_bs)
+        df_data.seq.tolist(), df_data.position.tolist(),
+        df_data.label.tolist(), df_data.gene_id.tolist())
+    train_loader, val_loader, test_loader = make_dataset(sequences, positions, labels, genes, **hyperparameters_queryer('batch_size'))
     model, best_model_path = train_model(
         train_loader, val_loader,
-        embed_dim=h_emb_dim,
-        hidden_dim=h_hidden_dim,
-        num_layers=h_num_layers,
-        dropout=h_dropout,
-        EPOCH=h_epoch,
-        naming_prefix='biGRU_clf',
+        hyperparameters_queryer,
+        naming_prefix='transformer_clf'
     )
 
     # evaluate test set
     yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
-    pprint(compute_binary_metrics(labels.numpy(), yhat.numpy()))
+    pprint(compute_binary_metrics(labels.numpy(), yhat.numpy()), flush=True)
 
 
 if __name__ == '__main__':
     main()
+    print()
