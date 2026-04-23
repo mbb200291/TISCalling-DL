@@ -2,27 +2,30 @@ import random
 from typing import List, Tuple
 from collections import Counter
 from datetime import datetime
+import math
 
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, random_split, WeightedRandomSampler, Subset
 from performer_pytorch.performer_pytorch import FixedPositionalEmbedding
-import os
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
     recall_score,
     f1_score,
     confusion_matrix,
+    roc_auc_score, 
+    average_precision_score
 )
 from sklearn.model_selection import GroupShuffleSplit
 import pandas as pd
 from pprint import pprint
 
-# from tqdm import tqdm
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
+
 SEED = 42
 random.seed(SEED)
 torch.manual_seed(SEED)
@@ -151,9 +154,9 @@ class RNASequenceBinaryClassifier(nn.Module):
         self.input_proj = nn.Linear(embed_dim + 1, d_model)
         self.input_norm = nn.LayerNorm(d_model)
 
-        # self.position_embedding = nn.Embedding(max_len, d_model)   # embed by simply postion number
-        self.frame_embedding = nn.Embedding((max_len//3 if max_len%3 == 0 else max_len//3 + 1) + 1, d_model)  # 3 reading frames 
-        self.pos_emb = FixedPositionalEmbedding(d_model, max_len)  # Sinusoidal
+        self.position_embedding = nn.Embedding(max_len * 2, d_model)   # embed by simply postion number
+        self.frame_embedding = nn.Embedding(math.ceil(2 * max_len / 3) + 1, d_model)  # 3 reading frames 
+        # self.pos_emb = FixedPositionalEmbedding(d_model, max_len)  # Sinusoidal
 
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
@@ -224,19 +227,20 @@ class RNASequenceBinaryClassifier(nn.Module):
         x = self.input_norm(x)
 
         # positional embedding
-        ## [+] embedding matrix
-        # pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
-        # x += self.position_embedding(pos_ids)
+        marker_pos = pos_features.argmax(dim=1)        # (B,)
+        pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
+        relative_pos_id = pos_ids - marker_pos.unsqueeze(1) + self.max_len - 1  # (B, L)  # add max len to ensure index all postion and map zero to fix number
+        x += self.position_embedding(relative_pos_id)
 
-        ## Sinusoidal
-        x += self.pos_emb(x)
+        # ## Sinusoidal
+        # x += self.pos_emb(x)
 
         # frame embedding
-        marker_pos = pos_features.argmax(dim=1)        # (B,)
-        frame_offset = (marker_pos % 3).unsqueeze(1)   # (B, 1)
-        pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
-        frame_ids = (pos_ids + 3 - frame_offset) // 3      # (B, L)
-        x += self.frame_embedding(frame_ids)
+        # frame_offset = (marker_pos % 3).unsqueeze(1)   # (B, 1)
+        # pos_ids = torch.arange(L, device=input_ids.device).unsqueeze(0)  # [1, L]
+        # frame_ids = (pos_ids + 3 - frame_offset) // 3      # (B, L)
+        relative_frame_ids = relative_pos_id // 3
+        x += self.frame_embedding(relative_frame_ids)
 
         # label the padding token
         padding_mask = input_ids.eq(self.pad_idx)  # [B, L]
@@ -327,14 +331,17 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold: 
         "f1": f1,
     }
 
-
 @torch.no_grad()
 def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
+    
     model.eval()
 
     total_loss = 0.0
     total_samples = 0
     tp = tn = fp = fn = 0
+
+    all_labels = []
+    all_probs = []
 
     for input_ids, pos_features, lengths, labels in dataloader:
         input_ids = input_ids.to(device)
@@ -345,8 +352,9 @@ def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
         logits = model(input_ids, pos_features, lengths)
         loss = criterion(logits, labels)
 
-        total_loss += loss.item() * labels.size(0)
-        total_samples += labels.size(0)
+        batch_size = labels.size(0)
+        total_loss += loss.item() * batch_size
+        total_samples += batch_size
 
         probs = torch.sigmoid(logits)
         preds = (probs >= threshold).float()
@@ -356,18 +364,49 @@ def evaluate(model, dataloader, criterion, device, threshold: float = 0.5):
         fp += ((preds == 1) & (labels == 0)).sum().item()
         fn += ((preds == 0) & (labels == 1)).sum().item()
 
+        all_labels.append(labels.detach().cpu())
+        all_probs.append(probs.detach().cpu())
+
     accuracy = (tp + tn) / max(tp + tn + fp + fn, 1)
     precision = tp / max(tp + fp, 1)
     recall = tp / max(tp + fn, 1)
+    specificity = tn / max(tn + fp, 1)
     f1 = 2 * precision * recall / max(precision + recall, 1e-12)
+
+    # MCC
+    mcc_denom = (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+    if mcc_denom == 0:
+        mcc = 0.0
+    else:
+        mcc = (tp * tn - fp * fn) / np.sqrt(mcc_denom)
+
+    all_labels = torch.cat(all_labels).numpy()
+    all_probs = torch.cat(all_probs).numpy()
+
+    # AUC / AUPR is not defined when label only single class
+    if len(np.unique(all_labels)) < 2:
+        auc = float("nan")
+        aupr = float("nan")
+    else:
+        auc = roc_auc_score(all_labels, all_probs)
+        aupr = average_precision_score(all_labels, all_probs)
 
     return {
         "loss": total_loss / max(total_samples, 1),
         "accuracy": accuracy,
         "precision": precision,
         "recall": recall,
+        "specificity": specificity,
         "f1": f1,
+        "mcc": mcc,
+        "auc": auc,
+        "aupr": aupr,
+        "tp": tp,
+        "tn": tn,
+        "fp": fp,
+        "fn": fn,
     }
+
 
 def train_model(
     train_loader,
@@ -382,13 +421,15 @@ def train_model(
     # max_epoch=1,
     pos_weight,
     naming_prefix='model',
-    patience=20,
+    patience=10,
     # pooling_mode='marker',
 ):
     print('hyperparameters:', hp_queryer())
     model = RNASequenceBinaryClassifier(
         vocab_size=max(VOCAB.values()) + 1,
-        **hp_queryer("embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads', 'ff_dim', 'max_len', 'pooling_mode'),
+        **hp_queryer(
+            "embed_dim", 'num_layers', 'dropout', 'd_model', 'num_heads',
+            'ff_dim', 'max_len', 'pooling_mode'),
         # embed_dim=embed_dim,
         # num_layers=num_layers,
         # dropout=dropout,
@@ -406,14 +447,14 @@ def train_model(
     print("total trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad), flush=True)
 
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight * hp_queryer('weight_fold')['weight_fold'])
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=hp_queryer('lr')['lr'])
 
     # lr scheduler
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
         mode='max',
         factor=0.5,       # lr shrink factor
-        patience=10,       # number of epoch to  no loss improving
+        patience=10,       # number of epoch to tolenent no loss improving
         min_lr=1e-6,
     )
 
@@ -436,11 +477,13 @@ def train_model(
             f"train_precision={train_metrics['precision']:.4f} "
             f"train_recall={train_metrics['recall']:.4f} "
             f"train_f1={train_metrics['f1']:.4f} | "
+            # f"train_aupr={train_metrics['aupr']:.4f}",
             f"val_loss={val_metrics['loss']:.4f} "
             f"val_accuracy={val_metrics['accuracy']:.4f} "
             f"val_precision={val_metrics['precision']:.4f} "
             f"val_recall={val_metrics['recall']:.4f} "
             f"val_f1={val_metrics['f1']:.4f}",
+            f"val_aupr={val_metrics['aupr']:.4f}",
             flush=True
         )
 
@@ -484,6 +527,7 @@ def predict_prob(model, seq: str, feat: List[int], device: torch.device) -> floa
 def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.5):
     model.eval()
 
+    all_logits = []
     all_probs = []
     all_preds = []
     all_labels = []
@@ -497,6 +541,7 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
         probs = torch.sigmoid(logits)                      # [B]
         preds = (probs >= threshold).float()               # [B]
 
+        all_logits.append(logits.cpu())
         all_probs.append(probs.cpu())
         all_preds.append(preds.cpu())
         all_labels.append(labels)
@@ -505,7 +550,7 @@ def predict_batch(model, dataloader, device: torch.device, threshold: float = 0.
     all_preds = torch.cat(all_preds)   # [N]
     all_labels = torch.cat(all_labels) # [N]
 
-    return all_probs, all_preds, all_labels
+    return all_logits, all_probs, all_preds, all_labels
 
 def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=2):
     assert len(sequences) == len(pos_features) == len(labels) == len(groups), \
@@ -598,7 +643,7 @@ def make_dataset(sequences, pos_features, labels, groups: List[str], batch_size=
 
     return train_loader, val_loader, test_loader, pos_weight
 
-def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
+def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_prob: np.ndarray):
     """
     y_true: [N] 0/1
     y_pred: [N] 0/1
@@ -624,11 +669,21 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray):
     else:
         mcc = (tp * tn - fp * fn) / np.sqrt(denom)
 
+    # AUC / AUPR is not defined when label only single class
+    if len(np.unique(y_true)) < 2:
+        auc = float("nan")
+        aupr = float("nan")
+    else:
+        auc = roc_auc_score(y_true, y_pred_prob)
+        aupr = average_precision_score(y_true, y_pred_prob)
+
     return {
         "accuracy": acc,
         "precision": precision,
         "recall": recall,
         "specificity": specificity,
+        "auc": auc,
+        "aupr": aupr,
         "f1": f1,
         "mcc": mcc,
         "tp": tp,
@@ -691,17 +746,18 @@ def load_model(path: str, hp_queryer, device: torch.device = DEVICE) -> RNASeque
 
 def hyperparameters_queryer(*args):
     return {k: v for k, v in {
-        'embed_dim': 64,
+        'embed_dim': 32,
         'd_model': 64, # 32 ~ 64
         'num_layers': 3, # 1 ~ 2
         'num_heads': 8, # 2 ~ 4 
         'ff_dim': 128, #64 ~ 128 (convension = d_model * 2)
-        'batch_size': 32, # 32 ~ 64
+        'batch_size': 32, #16, # 32 ~ 64
         'max_epoch': 50,
-        'dropout': 0.05, 
-        'weight_fold': 1, #1,
-        'max_len': 201, #4096,
+        'dropout': 0.3, #0.2, 
+        'weight_fold': 0.1 , #0.5, #1,
+        'max_len': 2048, #4096,
         'pooling_mode': 'attention',
+        'lr': 1e-3,
     }.items() if k in args or len(args)==0}
 
 
@@ -720,7 +776,7 @@ def main():
     df_data = pd.read_csv("input_data/df_data.csv")
     print(df_data.shape, flush=True)
     
-    # # exclude size more than cutoff
+    # # exclude size more than length limit
     # ## exclude strategy 1: remove position label only
     # # df_data = df_data.loc[df_data.position < 4096 - 50]
     # ## exclude strategy 2: revmove whole transcript when candidate start site exceed 4k
@@ -729,6 +785,33 @@ def main():
     # df_data = df_data.loc[df_data.position < 4096 - 50]
     # df_data['seq'] = df_data.seq.str[:4096]  
     # print(df_data.shape, flush=True)
+    ## exclude strategy 3: centralize by candidate atg
+    def cut_transcript(length_limit: int, seq: str, position: int, buffer=100):
+        assert buffer >= 1
+
+        if len(seq) <= length_limit:
+            return seq, position
+
+        if position < length_limit - buffer:  # keep 5'end
+            return seq[:length_limit], position
+
+        if len(seq) - position < buffer:  # 3' end buffer is not enough -> cut from 3'end to centralize target
+            start = len(seq) - length_limit
+            return seq[-length_limit:], position - start
+
+        left_truncate_size = length_limit - buffer
+        start = position - left_truncate_size
+        end = position + buffer
+        return seq[start:end], position - start
+
+    length_limit = hyperparameters_queryer("max_len")["max_len"]
+    buffer_size = 100
+
+    df_data[["seq", "position"]] = df_data.apply(
+        lambda row: cut_transcript(length_limit, row["seq"], row["position"], buffer_size),
+        axis=1,
+        result_type="expand"
+    )
 
     sequences, positions, labels, genes = (
         df_data.seq.tolist(), df_data.position.tolist(),
@@ -747,10 +830,10 @@ def main():
     #     sequences[i] = sequences[i][positions[i]:]
     #     positions[i] = 0
 
-    # debug -> select window range arround target
-    for i in range(len(sequences)):
-        sequences[i] = sequences[i][max(positions[i]-100, 0):positions[i]+101]
-        positions[i] = min(100, positions[i])
+    # # debug -> select window range arround target
+    # for i in range(len(sequences)):
+    #     sequences[i] = sequences[i][max(positions[i]-100, 0):positions[i]+101]
+    #     positions[i] = min(100, positions[i])
 
     train_loader, val_loader, test_loader, pos_weight = make_dataset(sequences, positions, labels, genes, **hyperparameters_queryer('batch_size'))
 
@@ -764,8 +847,8 @@ def main():
     model = load_model(best_model_path, hyperparameters_queryer, DEVICE)
 
     # evaluate test set
-    yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
-    pprint(compute_binary_metrics(labels.numpy(), yhat.numpy()))
+    _, yhat_prob, yhat, labels = predict_batch(model, test_loader, DEVICE)
+    pprint(compute_binary_metrics(labels.numpy(), yhat.numpy(), yhat_prob.numpy()))
 
 
 if __name__ == '__main__':
