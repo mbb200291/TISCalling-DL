@@ -34,7 +34,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
 # ── AIDO.RNA HuggingFace model id ─────────────────────────────────────────────
-AIDO_RNA_MODEL_ID = "genbio-ai/AIDO.RNA-1.6B"   # adjust if using a different variant  # aido_rna_1b600m
+AIDO_RNA_MODEL_ID = "aido_rna_1b600m"   # adjust if using a different variant  # aido_rna_1b600m
+# AIDO_RNA_MODEL_ID = "genbio-ai/AIDO.RNA-1.6B"   # adjust if using a different variant  # aido_rna_1b600m
 
 PAD_IDX = 0   # kept for collate_fn interface; actual padding handled by tokenizer
 
@@ -94,76 +95,37 @@ class RNADataset(Dataset):
         )
 
 
-# def make_collate_fn(tokenizer):
-#     """
-#     Returns a collate_fn that tokenizes a batch of raw RNA strings with the
-#     AIDO.RNA tokenizer and also builds per-sample position indicator tensors
-#     that are aligned to the tokenizer token ids.
-
-#     NOTE: AIDO.RNA uses a character-level (or near character-level) BPE tokenizer.
-#     For a nucleotide-level tokenizer each character maps to one token, so
-#     `position` in nucleotide space == token index.  If you switch to a
-#     multi-char BPE tokenizer you will need to adjust the position mapping via
-#     the tokenizer's `char_to_token` offset mapping.
-#     """
-
-#     def collate_fn(batch):
-#         seqs, positions, labels = zip(*batch)
-
-#         # ── tokenise ──────────────────────────────────────────────────────────
-#         encoding = tokenizer(
-#             list(seqs),
-#             return_tensors="pt",
-#             padding=True,
-#             truncation=False,          # caller is responsible for length control
-#             return_offsets_mapping=True,
-#         )
-#         input_ids = encoding["input_ids"]           # [B, L_tok]
-#         attention_mask = encoding["attention_mask"] # [B, L_tok]
-#         offsets = encoding["offset_mapping"]        # [B, L_tok, 2]
-
-#         B, L_tok = input_ids.shape
-
-#         # ── map nucleotide position → token index ─────────────────────────────
-#         # For each sample find the token whose char-span contains `position`.
-#         pos_features = torch.zeros(B, L_tok, dtype=torch.float)
-#         for i, pos in enumerate(positions):
-#             token_idx = None
-#             for t, (start, end) in enumerate(offsets[i].tolist()):
-#                 if start <= pos < end:
-#                     token_idx = t
-#                     break
-#             if token_idx is None:
-#                 # fallback: use the last non-padding token
-#                 token_idx = int(attention_mask[i].sum()) - 1
-#             pos_features[i, token_idx] = 1.0
-
-#         lengths = attention_mask.sum(dim=1)          # [B]
-#         labels_t = torch.stack(list(labels))         # [B]
-
-#         return input_ids, attention_mask, pos_features, lengths, labels_t
-
-#     return collate_fn
 from modelgenerator.tasks import Embed
+_wrapper = Embed.from_config({"model.backbone": AIDO_RNA_MODEL_ID})
+_base_model = _wrapper.backbone
+_transform  = _wrapper.transform
 
-def get_collate_fn(model_id):
-    def collate_fn(batch):
-        wrapper = Embed.from_config({"model.backbone": model_id}).eval()
-        seqs, positions, labels = zip(*batch)
-        
-        transformed = wrapper.transform({"sequences": list(seqs)})
-        input_ids      = transformed["input_ids"]       # [B, L]
-        attention_mask = transformed["attention_mask"]  # [B, L]
-        
-        B, L = input_ids.shape
-        pos_features = torch.zeros(B, L, dtype=torch.float)
-        for i, pos in enumerate(positions):
-            pos_features[i, pos + 1] = 1.0  # +1 for CLS token
-        
-        lengths  = attention_mask.sum(dim=1)
-        labels_t = torch.stack(list(labels))
-        return input_ids, attention_mask, pos_features, lengths, labels_t
-    return collate_fn
+
+def build_dora_backbone(lora_r=16, lora_alpha=32, lora_dropout=0.05):
+    lora_cfg = LoraConfig(
+        task_type=TaskType.FEATURE_EXTRACTION,
+        r=lora_r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
+        use_dora=True, bias="none",
+        target_modules=["query", "key", "value", "dense"],
+    )
+    for param in _base_model.parameters():
+        param.requires_grad = False
+    return get_peft_model(_base_model, lora_cfg)
+
+
+def collate_fn(batch):
+    seqs, positions, labels = zip(*batch)
+    transformed = _transform({"sequences": list(seqs)})
+    input_ids      = transformed["input_ids"]
+    attention_mask = transformed["attention_mask"]
+    B, L = input_ids.shape
+    pos_features = torch.zeros(B, L, dtype=torch.float)
+    for i, pos in enumerate(positions):
+        pos_features[i, pos + 1] = 1.0
+    lengths  = attention_mask.sum(dim=1)
+    labels_t = torch.stack(list(labels))
+    return input_ids, attention_mask, pos_features, lengths, labels_t
+
 
 class AIDORNAClassifier(nn.Module):
     """
@@ -231,13 +193,11 @@ class AIDORNAClassifier(nn.Module):
     ) -> torch.Tensor:                 # [B]  raw logits
 
         # ── backbone (AIDO.RNA + DoRA adapters) ───────────────────────────────
-        outputs = self.backbone(
+        hidden = self.backbone(
             input_ids=input_ids,
             attention_mask=attention_mask,
-            output_hidden_states=False,
+            all_hidden_states=False,
         )
-        # last hidden state: [B, L, D]
-        hidden = outputs.last_hidden_state
 
         # ── (commented out) add relative positional / frame embeddings ────────
         # marker_pos = pos_features.argmax(dim=1)
@@ -257,52 +217,29 @@ class AIDORNAClassifier(nn.Module):
             h = marker_h                                                  # [B, D]
 
         elif self.pooling_mode == "attention":
-            padding_mask = (attention_mask == 0)
-
-            # marker token attend to whole sequence
+            padding_mask = (attention_mask == 0)                          # [B, L] True=pad
             global_h, _ = self.marker_attention(
-                query=marker_h.unsqueeze(1),   # [B, 1, D]
+                query=marker_h.unsqueeze(1),                              # [B, 1, D]
                 key=hidden,
                 value=hidden,
                 key_padding_mask=padding_mask,
                 need_weights=False,
             )
-            global_h = global_h.squeeze(1)    # [B, D]
-
-            cls_h = hidden[:, 0, :]           # [B, D] CLS Token
-
-            # concat: marker(candidate TIS site) + CLS + marker attend to whole seq
-            h = torch.cat([marker_h, global_h, cls_h], dim=-1)  # [B, 3D]
+            global_h = global_h.squeeze(1)                               # [B, D]
+            h = torch.cat([marker_h, global_h], dim=-1)                  # [B, 2D]
 
         logits = self.classifier(self.dropout(h))   # [B, 1]
         return logits.squeeze(-1)                   # [B]
 
-
-def build_dora_backbone(model_id, lora_r=16 , lora_alpha=32, lora_dropout=0.05):
-    wrapper = Embed.from_config({"model.backbone": model_id})  # aido_rna_1b600m
-    base_model = wrapper.model
-    
-    lora_cfg = LoraConfig(
-        task_type=TaskType.FEATURE_EXTRACTION,
-        r=lora_r,
-        lora_alpha=lora_alpha,
-        lora_dropout=lora_dropout,
-        use_dora=True,
-        bias="none",
-        target_modules=["query", "key", "value", "dense"],
-    )
-    return get_peft_model(base_model, lora_cfg), wrapper.transform
-
 def build_model(hp: dict, device: torch.device) -> AIDORNAClassifier:
-    backbone, _ = build_dora_backbone(
-        model_id=AIDO_RNA_MODEL_ID,
+    backbone = build_dora_backbone(
         lora_r=hp.get("lora_r", 16),
         lora_alpha=hp.get("lora_alpha", 32),
         lora_dropout=hp.get("lora_dropout", 0.05),
     )
 
     # Get hidden dim from backbone config
-    d_model = backbone.config.hidden_size
+    d_model = 2048
 
     model = AIDORNAClassifier(
         backbone=backbone,
@@ -312,9 +249,9 @@ def build_model(hp: dict, device: torch.device) -> AIDORNAClassifier:
         pooling_mode=hp.get("pooling_mode", "attention"),
     ).to(device)
 
-    if torch.cuda.device_count() > 1:
-        print(f"Using {torch.cuda.device_count()} GPUs")
-        model = nn.DataParallel(model)
+    # if torch.cuda.device_count() > 1:
+    #     print(f"Using {torch.cuda.device_count()} GPUs")
+    #     model = nn.DataParallel(model)
 
     total = sum(p.numel() for p in model.parameters())
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -534,11 +471,9 @@ def make_dataset(sequences, positions, labels, groups, batch_size=8):
     num_neg = (train_labels == 0).sum()
     pos_weight = torch.tensor([num_neg / max(num_pos, 1)], dtype=torch.float32, device=DEVICE)
 
-    # collate = make_collate_fn(tokenizer)
-
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  collate_fn=get_collate_fn(AIDO_RNA_MODEL_ID))
-    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, collate_fn=get_collate_fn(AIDO_RNA_MODEL_ID))
-    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, collate_fn=get_collate_fn(AIDO_RNA_MODEL_ID))
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  collate_fn=collate_fn)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
     return train_loader, val_loader, test_loader, pos_weight
 

@@ -10,4 +10,5 @@ conda activate TIScalling
 
 # Prepare PWM and codon usage table
 # python script/train_nn_model_by_site_rnafm_transformer_AIDORNA.py  # pretrain model AIDO.RNA 
-python script/train_nn_model_by_site_rnafm_transformer_RiNALMo.py  # pretrain model AIDO.RNA 
+# python script/train_nn_model_by_site_rnafm_transformer_RiNALMo.py  # pretrain model AIDO.RNA 
+python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_noncanonicaltis.py  # pretrain model AIDO.RNA and select non-canonical tis 
