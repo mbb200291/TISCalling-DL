@@ -45,7 +45,8 @@ def main(args):
     ic(tags['y'].value_counts())
     X_df = features.drop(columns='ID')
     y = np.array(tags['y'].tolist())
-    ml_util.ml_training_and_testing(X_df, y, model_name, model_dir)
+    # ml_util.ml_training_and_testing(X_df, y, model_name, model_dir)
+    ml_util.ml_training_and_testing(X_df, y, features.ID.tolist(), model_name, model_dir)
 
 if __name__ == '__main__':
     

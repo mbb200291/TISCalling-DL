@@ -98,7 +98,26 @@ def find_best_threshold(y_true, y_probs):
     return best_threshold, best_f1
 
 
-def ml_training_and_testing(X_df, y, model_name, model_dir):
+def group_aware_train_test_split(X_df, y, groups, test_size=0.2, random_state=42):
+    from sklearn.model_selection import StratifiedGroupKFold
+    sgkf = StratifiedGroupKFold(
+        n_splits=int(1/test_size),
+        shuffle=True,
+        random_state=random_state
+    )
+
+    train_idx, test_idx = next(sgkf.split(X_df, y, groups=groups))
+
+    X_train = X_df.iloc[train_idx]
+    X_test  = X_df.iloc[test_idx]
+
+    y_train = y[train_idx]
+    y_test  = y[test_idx]
+    return X_train, X_test, y_train, y_test 
+
+
+
+def ml_training_and_testing(X_df, y, groups, model_name, model_dir):
     #save files to the model directory
     out = os.path.join(model_dir, f'Model_{model_name}')
     #out = f'Model_{model_name}'
@@ -106,7 +125,8 @@ def ml_training_and_testing(X_df, y, model_name, model_dir):
         os.makedirs(out)
 
     # Split data into training and test sets. Do sampling for training set
-    X_train, X_test, y_train, y_test = train_test_split(X_df, y, test_size=0.2, random_state=42, stratify=y)
+    # X_train, X_test, y_train, y_test = train_test_split(X_df, y, test_size=0.2, random_state=42, stratify=y)
+    X_train, X_test, y_train, y_test = group_aware_train_test_split(X_df, y, groups, test_size=0.2, random_state=42)
     #X_train_up, y_train_up = SMOTE(random_state=42).fit_resample(X_train, y_train)
     X_test_down, y_test_down = RandomUnderSampler(random_state=42).fit_resample(X_test, y_test)
     X_train_down, y_train_down = RandomUnderSampler().fit_resample(X_train, y_train)
