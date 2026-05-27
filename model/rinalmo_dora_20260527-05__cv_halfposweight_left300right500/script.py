@@ -1,5 +1,6 @@
 import random
 import math
+import shutil
 from typing import List, Tuple
 from datetime import datetime
 from collections import Counter, defaultdict
@@ -12,7 +13,7 @@ from torch.utils.data import Dataset, DataLoader, Subset
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     f1_score, confusion_matrix, roc_auc_score, average_precision_score,
-    balanced_accuracy_score, matthews_corrcoef, fbeta_score
+    balanced_accuracy_score, matthews_corrcoef
 )
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import StratifiedGroupKFold
@@ -34,8 +35,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 
 # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
 # ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo-giga (650M) ─
@@ -43,7 +44,7 @@ RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 
-# ── 全域只載入一次 tokenizer ──────────────────────────────────────────────────
+# ── load tokenizer once ──────────────────────────────────────────────────
 print(f"Loading tokenizer: {RINALMO_MODEL_ID}", flush=True)
 _tokenizer = RnaTokenizer.from_pretrained(RINALMO_MODEL_ID)
 
@@ -531,27 +532,6 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
     )
 
 
-# def get_criterion_fn(hyperparameters: dict, section_ratio: dict[int, float], section_neg_pos_ratio: dict[int, float]):
-#     section_scaling = float(hyperparameters.get("section_scaling", 0.0))
-#     section_label_scaling = float(hyperparameters.get("section_label_scaling", 1.5))
-#     max_weight = hyperparameters.get("max_weight", 100)
-
-#     def criterion_fn(logits, labels, sections):
-#         sample_w = torch.ones_like(labels, dtype=torch.float32, device=logits.device)
-#         for section in torch.unique(sections):
-#             key = int(section.item())
-#             mask = sections == section
-#             sec_w = float(section_ratio.get(key, 1.0)) ** section_scaling * hyperparameters.get("section_weight_fold", {}).get(str(key), 1)
-#             pos_w = float(section_neg_pos_ratio.get(key, 1.0)) ** section_label_scaling * hyperparameters.get("section_pos_weight_fold", {}).get(str(key), 1)
-#             sample_w[mask] *= sec_w
-#             sample_w[mask & (labels == 1)] *= pos_w
-#         if max_weight is not None:
-#             sample_w = torch.clamp(sample_w, max=float(max_weight))
-#         return F.binary_cross_entropy_with_logits(logits, labels.float(), weight=sample_w)
-
-#     return criterion_fn
-
-
 # ══════════════════════════════════════════════════════════════════════════════
 # Train loop
 # ══════════════════════════════════════════════════════════════════════════════
@@ -559,16 +539,12 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
 def train_model(train_loader, val_loader, hp: dict,
                 # section_ratio, section_neg_pos_ratio,
                 pos_weight,
-                patience=15):
+                patience=15,
+                save_path: str = "model.pt"):
 
     print("hyperparameters:", hp)
     model = build_model(hp, DEVICE)
 
-    # criterion_fn = get_criterion_fn(
-    #     hp,
-    #     section_ratio,
-    #     section_neg_pos_ratio,
-    # )
     criterion = nn.BCEWithLogitsLoss(
         pos_weight=pos_weight * hp.get("weight_fold", 1.0)
     )
@@ -583,10 +559,6 @@ def train_model(train_loader, val_loader, hp: dict,
 
     best_score = -1
     no_improve = 0
-    # run_id     = datetime.now().strftime("%Y%m%d_%H%M%S")
-    # save_path  = f"model/{naming_prefix}_{run_id}.pt"
-    # os.makedirs("model", exist_ok=True)
-    save_path = 'model.pt'
 
     for epoch in range(1, hp.get("max_epoch", 50) + 1):
         tr = train_one_epoch(model, train_loader, optimizer, criterion, DEVICE)
@@ -653,105 +625,128 @@ def load_model(path: str, hp: dict, device: torch.device = DEVICE) -> RiNALMoCla
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Dataset factory
+# Repeated CV dataset factory
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _stratified_group_split(indices, labels_a, groups_a, test_frac, seed):
-    """
-    StratifiedGroupKFold has no `test_size` arg — it's controlled via n_splits.
-    We pick the closest n_splits to the requested fraction and take the first fold.
-    """
-    n_splits = max(2, round(1.0 / test_frac))
-    sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
-    train_idx, test_idx = next(sgkf.split(indices, labels_a, groups=groups_a))
-    return train_idx, test_idx
-
-
-def make_dataset(sequences, labels, groups, sections, batch_size=8, training=True):
-    assert len(sequences) == len(labels) == len(groups) == len(sections)
-    print("labels:", dict(Counter(labels)))
-
-    dataset = RNADataset(sequences, labels, sections)
-
-    indices    = np.arange(len(dataset))
-    groups_a   = np.array(groups)
-    labels_a   = np.array(labels)
-    sections_a = np.array(sections)
-
-    # outer split: ~20% test, group-disjoint, label-stratified
-    train_val_idx, test_idx = _stratified_group_split(
-        indices, labels_a, groups_a, test_frac=0.2, seed=SEED,
-    )
-
-    # inner split: take ~10 of the inner pool as val
-    inner_indices = indices[train_val_idx]
-    inner_labels  = labels_a[train_val_idx]
-    inner_groups  = groups_a[train_val_idx]
-    train_rel, val_rel = _stratified_group_split(
-        inner_indices, inner_labels, inner_groups,
-        test_frac=0.1 / 0.8, seed=SEED,
-    )
-    train_idx = train_val_idx[train_rel]
-    val_idx   = train_val_idx[val_rel]
-
-    # sanity: no group overlap across splits
-    assert set(groups_a[train_idx]).isdisjoint(set(groups_a[val_idx]))
-    assert set(groups_a[train_idx]).isdisjoint(set(groups_a[test_idx]))
-    assert set(groups_a[val_idx]).isdisjoint(set(groups_a[test_idx]))
-
+def _build_loaders_from_indices(dataset, train_idx, val_idx, batch_size, training):
     train_ds = Subset(dataset, train_idx.tolist())
     val_ds   = Subset(dataset, val_idx.tolist())
-    test_ds  = Subset(dataset, test_idx.tolist())
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=training,  collate_fn=collate_fn)
-    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
-    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
-
-    # # determine section weight (from training data only)
-    # train_labels   = labels_a[train_idx]
-    # train_sections = sections_a[train_idx]
-
-    # section_counts = Counter(train_sections)
-    # total_train    = len(train_idx)
-
-    # section_ratio = {
-    #     section: total_train / count
-    #     for section, count in section_counts.items()
-    # }
-
-    # section_label_counts = defaultdict(lambda: Counter())
-    # for section, label in zip(train_sections, train_labels):
-    #     section_label_counts[int(section)][int(label)] += 1
-
-    # section_neg_pos_ratio = {}
-    # for section in section_counts:
-    #     neg_count = section_label_counts[section][0]
-    #     pos_count = section_label_counts[section][1]
-    #     if pos_count == 0:
-    #         section_neg_pos_ratio[int(section)] = 1.0
-    #     else:
-    #         section_neg_pos_ratio[int(section)] = neg_count / pos_count
-
-    train_labels = labels_a[train_idx]
-    num_pos  = (train_labels == 1).sum()
-    num_neg  = (train_labels == 0).sum()
-    pos_weight = torch.tensor(
-        [num_neg / max(num_pos, 1)], dtype=torch.float32, device=DEVICE
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size,
+        shuffle=training, collate_fn=collate_fn,
     )
-    print("train labels:", dict(Counter(train_labels)))
-    print("val labels:",   dict(Counter(labels_a[val_idx])))
-    print("test labels:",  dict(Counter(labels_a[test_idx])))
+    val_loader = DataLoader(
+        val_ds, batch_size=batch_size,
+        shuffle=False, collate_fn=collate_fn,
+    )
+    return train_loader, val_loader
 
-    # print("train sections:", dict(section_counts))
-    # print("section_ratio:",  section_ratio)
-    # print("section_neg_pos_ratio:", section_neg_pos_ratio)
-    print("pos_weight:", pos_weight)
 
-    return (
-        train_loader, val_loader, test_loader,
-        # section_ratio, section_neg_pos_ratio,
+def make_cv_folds(
+    sequences, labels, groups, sections,
+    n_splits: int = 5,
+    n_repeats: int = 5,
+    batch_size: int = 8,
+    training: bool = True,
+):
+    """
+    Generator over repeated StratifiedGroupKFold splits.
+
+    Yields per fold:
+        repeat_idx, fold_idx,
+        train_loader, val_loader,
         pos_weight,
-        train_idx, val_idx, test_idx,
+        train_idx, val_idx
+    """
+    assert len(sequences) == len(labels) == len(groups) == len(sections)
+    print("labels (full):", dict(Counter(labels)), flush=True)
+
+    dataset    = RNADataset(sequences, labels, sections)
+    indices    = np.arange(len(dataset))
+    labels_a   = np.array(labels)
+    groups_a   = np.array(groups)
+
+    for repeat_idx in range(n_repeats):
+        seed = SEED + repeat_idx
+        sgkf = StratifiedGroupKFold(
+            n_splits=n_splits, shuffle=True, random_state=seed,
+        )
+
+        for fold_idx, (train_rel, val_rel) in enumerate(
+            sgkf.split(indices, labels_a, groups=groups_a)
+        ):
+            train_idx = indices[train_rel]
+            val_idx   = indices[val_rel]
+
+            # sanity: group-disjoint
+            assert set(groups_a[train_idx]).isdisjoint(set(groups_a[val_idx])), \
+                f"group leak at repeat={repeat_idx} fold={fold_idx}"
+
+            train_loader, val_loader = _build_loaders_from_indices(
+                dataset, train_idx, val_idx, batch_size, training,
+            )
+
+            train_labels = labels_a[train_idx]
+            num_pos = (train_labels == 1).sum()
+            num_neg = (train_labels == 0).sum()
+            pos_weight = torch.tensor(
+                [num_neg / max(num_pos, 1)],
+                dtype=torch.float32, device=DEVICE,
+            )
+
+            print(
+                f"\n=== repeat {repeat_idx+1}/{n_repeats} | "
+                f"fold {fold_idx+1}/{n_splits} ===", flush=True,
+            )
+            print("train labels:", dict(Counter(train_labels)), flush=True)
+            print("val   labels:", dict(Counter(labels_a[val_idx])), flush=True)
+            print("pos_weight:", pos_weight, flush=True)
+
+            yield (
+                repeat_idx, fold_idx,
+                train_loader, val_loader,
+                pos_weight,
+                train_idx, val_idx,
+            )
+
+
+def get_cv_dataset(df, hp, n_splits=5, n_repeats=5, training=True):
+    """
+    Returns a generator over (repeat, fold) splits.
+    """
+    df = df.copy()
+    print(df.shape, flush=True)
+
+    left_window  = hp["left_window"]
+    right_window = hp["right_window"]
+
+    df["seq"] = [
+        centralize_transcript(left_window, right_window, s, p)
+        for s, p in zip(df["seq"].values, df["position"].values)
+    ]
+
+    section_idx = {
+        'Annotated':   0,
+        '5UTRnonATG':  1,
+        '5UTRATG':     2,
+        'CDSATG':      3,
+        'CDSnonATG':   4,
+        '3UTRATG':     0,  # too small, merge to annotated
+        '3UTRnonATG':  0,  # too small, merge to annotated
+    }
+
+    sequences = df.seq.tolist()
+    labels    = df.label.tolist()
+    genes     = df.gene_id.tolist()
+    sections  = list(map(lambda x: section_idx[x], df.section))
+
+    return make_cv_folds(
+        sequences, labels, genes, sections,
+        n_splits=n_splits,
+        n_repeats=n_repeats,
+        batch_size=hp["batch_size"],
+        training=training,
     )
 
 
@@ -787,6 +782,21 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_prob: 
     }
 
 
+def summarize_cv_results(df_all: pd.DataFrame, metric_cols=None):
+    """
+    df_all 須含欄位：repeat, fold, section, 以及各 metric 欄位。
+    回傳 (mean_df, std_df)，以 section 為列。
+    """
+    if metric_cols is None:
+        skip = {"repeat", "fold", "section"}
+        metric_cols = [c for c in df_all.columns if c not in skip]
+
+    grouped = df_all.groupby("section", as_index=True)[metric_cols]
+    mean_df = grouped.mean(numeric_only=True)
+    std_df  = grouped.std(numeric_only=True, ddof=1)
+    return mean_df, std_df
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Hyperparameters
 # ══════════════════════════════════════════════════════════════════════════════
@@ -801,27 +811,11 @@ def hyperparameters_queryer(*args):
         "pooling_mode": "attention",
         "batch_size":   16,
         "max_epoch":    50,
-        # "section_scaling": 0,
-        # "section_weight_fold": {
-        #     "0": 1,
-        #     "1": 1,
-        #     "2": 1,
-        #     "3": 1,
-        #     "4": 1
-        # },
-        # "section_label_scaling": 0,
-        # "section_pos_weight_fold": {
-        #     "0": 1,
-        #     "1": 10,
-        #     "2": 1,
-        #     "3": 1,
-        #     "4": 10
-        # },
         'weight_fold': 0.5,
         "max_weight": 300,
         "lr":           1e-4,
-        "left_window":  300,
-        "right_window": 500,
+        "left_window":  200,
+        "right_window": 200,
         'ignore_sec': -1
     }
     if not args:
@@ -835,12 +829,6 @@ def hyperparameters_queryer(*args):
 # Sequence length control
 # ══════════════════════════════════════════════════════════════════════════════
 def centralize_transcript(left_window: int, right_window: int, seq: str, position: int):
-    """
-    Build a fixed-length window of (left_window + 1 + right_window) nucleotides
-    centred on `seq[position]` (the marker). Missing sides are padded with
-    literal '<pad>' tokens so the marker always lands at the same token index
-    after tokenisation: CLS + left_window pads/nts, then marker.
-    """
     # left side: `left_window` nt before the marker
     nt_before = position
     if nt_before >= left_window:
@@ -862,120 +850,108 @@ def centralize_transcript(left_window: int, right_window: int, seq: str, positio
     return left_padding + seq[lb:rb] + right_padding
 
 
-def get_dataset(df, hp, training=True):
-    df = df.copy()
-    print(df.shape, flush=True)
-
-    left_window  = hp["left_window"]
-    right_window = hp["right_window"]
-
-    df["seq"] = [
-        centralize_transcript(left_window, right_window, s, p)
-        for s, p in zip(df["seq"].values, df["position"].values)    
-    ]
-
-    section_idx = {
-        'Annotated':   0,
-        '5UTRnonATG':  1,
-        '5UTRATG':     2,
-        'CDSATG':      3,
-        'CDSnonATG':   4,
-        '3UTRATG':     0,  # too small, merge to annotated
-        '3UTRnonATG':  0,  # too small, merge to annotated
-    }
-
-    sequences = df.seq.tolist()
-    labels    = df.label.tolist()
-    genes     = df.gene_id.tolist()
-    sections  = list(map(lambda x: section_idx[x], df.section))
-
-    return make_dataset(
-        sequences, labels, genes, sections,
-        batch_size=hp["batch_size"], training=training
-    )
-
-def select_best_cu_on_fscore(y, yhat_prob, beta=2):
-    best_cu = 0.5
-    best_score = -1
-    for cu in yhat_prob.unique():
-        yhat = [(1 if x > cu else 0) for x in yhat_prob]
-        score = fbeta_score(y, yhat, zero_division=0, beta=beta)
-        if score > best_score:
-            best_cu = cu
-            best_score = score
-    return best_cu
-
-
 # ══════════════════════════════════════════════════════════════════════════════
-# Main
+# Main (CV version)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main():
     import sys
     print("run at:", datetime.now().strftime("%Y%m%d_%H%M%S"), flush=True)
 
+    # CLI: python script.py [train|eval] [n_splits] [n_repeats]
+    mode      = sys.argv[1] if len(sys.argv) > 1 else "train"
+    n_splits  = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+    n_repeats = int(sys.argv[3]) if len(sys.argv) > 3 else 5
+    print(f"mode={mode} | n_splits={n_splits} | n_repeats={n_repeats}", flush=True)
+
     hp = hyperparameters_queryer()
     df = pd.read_csv("../../input_data/df_data.csv").reset_index(drop=True)
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'train':  # train mode
-        (
-            train_loader, val_loader, test_loader,
-            # section_ratio, section_neg_pos_ratio,
-            pos_weight,
-            train_idx, val_idx, test_idx,
-        ) = get_dataset(df, hp)
-        train_model(
-            train_loader, val_loader, hp, pos_weight, patience=5,
+    all_val_rows   = []   # 每折 val set 的 evaluate_group 結果
+    fold_summaries = []   # 每折一行的精簡 summary
+
+    cv_iter = get_cv_dataset(
+        df, hp,
+        n_splits=n_splits,
+        n_repeats=n_repeats,
+        training=(mode == "train"),
+    )
+
+    for (
+        repeat_idx, fold_idx,
+        train_loader, val_loader,
+        pos_weight,
+        train_idx, val_idx,
+    ) in cv_iter:
+
+        save_path = f"model_r{repeat_idx}_f{fold_idx}.pt"
+
+        if mode == "train":
+            # 每折獨立訓練；直接把 best checkpoint 寫到 per-fold 路徑
+            model = train_model(
+                train_loader, val_loader, hp, pos_weight,
+                patience=5, save_path=save_path,
+            )
+            # 重新載入 best
+            model = load_model(save_path, hp, DEVICE)
+        else:
+            model = load_model(save_path, hp, DEVICE)
+
+        # ── val set evaluation ────────────────────────────────────────────
+        yhat_prob, yhat, labels_t = predict_batch(
+            model, val_loader, DEVICE, ignore_sec=-1,
         )
-        model = load_model('model.pt', hp, DEVICE)
-    else:
-        (
-            train_loader, val_loader, test_loader,
-            # section_ratio, section_neg_pos_ratio,
-            pos_weight,
-            train_idx, val_idx, test_idx,
-        ) = get_dataset(df, hp, False)
+        df_val = df.iloc[val_idx].copy()
+        df_val["yhat_prob"] = yhat_prob.numpy()
+        df_val["yhat"]      = yhat.numpy()
 
-        model = load_model('model.pt', hp, DEVICE)
+        df_grp = evaluate_group(df_val)
+        df_grp["repeat"] = repeat_idx
+        df_grp["fold"]   = fold_idx
+        all_val_rows.append(df_grp)
 
-        # training set
-        print('========== training set: all sites ==========', flush=True)
-        yhat_prob, yhat, labels_t = predict_batch(model, train_loader, DEVICE, ignore_sec=-1)
-        df_train = df.iloc[train_idx].copy()
-        df_train['yhat_prob'] = yhat_prob.numpy()
-        df_train['yhat'] = yhat.numpy()
-        print(evaluate_group(df_train).to_string(), flush=True)
-    
-    # val set
-    print('========== val set: all sites ==========', flush=True)
-    yhat_prob, yhat, labels_t = predict_batch(model, val_loader, DEVICE, ignore_sec=-1)
-    df_val = df.iloc[val_idx].copy()
-    df_val['yhat_prob'] = yhat_prob.numpy()
-    df_val['yhat'] = yhat.numpy()
-    print(evaluate_group(df_val).to_string(), flush=True)
-    sect_best_cut = {
-        sec: select_best_cu_on_fscore(
-            df_val.label[df_val.section == sec],
-            df_val.yhat_prob[df_val.section == sec],
-            beta=2)
-        for sec in df_val.section.unique()
-    }
-    print('sect_best_cut:', sect_best_cut, flush=True)
-    print('--- cutoff adj ---', flush=True)
-    print(evaluate_group(df_val, sec_cutoff=sect_best_cut).to_string(), flush=True)
-       
-    # test set
-    print('========== test set: all sites ==========', flush=True)
-    yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=-1)
-    pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
+        # quick per-fold log
+        all_row = df_grp[df_grp.section == "all"].iloc[0]
+        fold_summaries.append({
+            "repeat": repeat_idx, "fold": fold_idx,
+            "aupr": all_row.get("aupr", float("nan")),
+            "auc":  all_row.get("auc",  float("nan")),
+            "f1":   all_row.get("f1",   float("nan")),
+            "mcc":  all_row.get("mcc",  float("nan")),
+        })
+        print(
+            f"[r{repeat_idx} f{fold_idx}] val all-section: "
+            f"aupr={all_row.get('aupr', float('nan')):.4f} "
+            f"auc={all_row.get('auc',  float('nan')):.4f} "
+            f"f1={all_row.get('f1',    float('nan')):.4f} "
+            f"mcc={all_row.get('mcc',  float('nan')):.4f}",
+            flush=True,
+        )
 
-    df_test = df.iloc[test_idx].copy()
-    df_test['yhat_prob'] = yhat_prob.numpy()
-    df_test['yhat'] = yhat.numpy()
-    
-    print(evaluate_group(df_test).to_string(), flush=True)
-    print('--- cutoff adj ---', flush=True)
-    print(evaluate_group(df_test, sec_cutoff=sect_best_cut).to_string(), flush=True)
+        # 釋放 GPU memory
+        del model
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    # ── aggregate across folds & repeats ─────────────────────────────────────
+    df_all = pd.concat(all_val_rows, ignore_index=True)
+
+    out_csv = f"cv_results_{n_splits}fold_{n_repeats}repeat.csv"
+    df_all.to_csv(out_csv, index=False)
+    print(f"\nper-fold detail saved to: {out_csv}", flush=True)
+
+    print("\n========== per-fold summary (all-section) ==========", flush=True)
+    print(pd.DataFrame(fold_summaries).to_string(index=False), flush=True)
+
+    mean_df, std_df = summarize_cv_results(df_all)
+
+    print(f"\n========== mean across {n_splits}x{n_repeats} folds ==========",
+          flush=True)
+    print(mean_df.to_string(), flush=True)
+
+    print(f"\n========== std across {n_splits}x{n_repeats} folds ==========",
+          flush=True)
+    print(std_df.to_string(), flush=True)
 
 
 if __name__ == "__main__":
