@@ -1,7 +1,9 @@
 input_data/df_data.csv
 *.out
+*.tsv
 
-model/
+model/**/*.pt
+model/**/*.pkl
 feature/
 PWM_library/
 *.ipynb_checkpoints

@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader, Subset
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     f1_score, confusion_matrix, roc_auc_score, average_precision_score,
-    balanced_accuracy_score, matthews_corrcoef
+    balanced_accuracy_score, matthews_corrcoef, fbeta_score
 )
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import StratifiedGroupKFold
@@ -39,8 +39,8 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
 # ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo-giga (650M) ─
-# RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
 RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
+# RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 
 # ── 全域只載入一次 tokenizer ──────────────────────────────────────────────────
@@ -201,13 +201,22 @@ def compute_downsample_binary_metrics(
     return metrics
 
 
-def evaluate_group(df, cutoff_default=0.5, sec_cufoff=None):
-    if sec_cufoff is None:
-        sec_cufoff = {}
-    rows = []
+def evaluate_group(df, cutoff_default=0.5, sec_cutoff=None):
+    if sec_cutoff is None:
+        sec_cutoff = {}
+    rows = [
+        {'section': 'all'} | compute_downsample_binary_metrics(
+            df.label.values,
+            df.yhat_prob.values,
+            cutoff_default),
+        {'section': 'non-annotated'} | compute_downsample_binary_metrics(
+            df.label[df.section != 'Annotated'].values,
+            df.yhat_prob[df.section != 'Annotated'].values,
+            cutoff_default),
+        ]
     for sec in df.section.unique():
         df_temp = df.loc[df.section == sec]
-        cutoff = sec_cufoff.get(sec, cutoff_default)  # select specified cutoff by section
+        cutoff = sec_cutoff.get(sec, cutoff_default)  # select specified cutoff by section
         perf_result = compute_downsample_binary_metrics(
             df_temp.label.values,
             df_temp.yhat_prob.values,
@@ -377,8 +386,8 @@ def build_dora_backbone(lora_r=16, lora_alpha=32, lora_dropout=0.05):
         target_modules=["query", "key", "value", "dense"],
     )
     peft_model = get_peft_model(base_model, lora_cfg)
-    # peft_model.enable_input_require_grads()
-    # peft_model.gradient_checkpointing_enable()
+    peft_model.enable_input_require_grads()
+    peft_model.gradient_checkpointing_enable()
     peft_model.print_trainable_parameters()
     return peft_model
 
@@ -456,7 +465,7 @@ def _compute_metrics_from_logits(
 # Training / evaluation loops
 # ══════════════════════════════════════════════════════════════════════════════
 
-def train_one_epoch(model, dataloader, optimizer, criterion_fn, device, threshold=0.5):
+def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold=0.5):
     model.train()
     total_loss = total_samples = 0
     all_logits, all_labels = [], []
@@ -470,7 +479,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion_fn, device, threshol
 
         optimizer.zero_grad()
         logits = model(input_ids, attention_mask, lengths)
-        loss   = criterion_fn(logits, labels, sections)
+        loss   = criterion(logits, labels)
         loss.backward()
         optimizer.step()
 
@@ -522,44 +531,48 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
     )
 
 
-def get_criterion_fn(hyperparameters: dict, section_ratio: dict[int, float], section_neg_pos_ratio: dict[int, float]):
-    section_scaling = float(hyperparameters.get("section_scaling", 0.0))
-    section_label_scaling = float(hyperparameters.get("section_label_scaling", 1.5))
-    max_weight = hyperparameters.get("max_weight", 100)
+# def get_criterion_fn(hyperparameters: dict, section_ratio: dict[int, float], section_neg_pos_ratio: dict[int, float]):
+#     section_scaling = float(hyperparameters.get("section_scaling", 0.0))
+#     section_label_scaling = float(hyperparameters.get("section_label_scaling", 1.5))
+#     max_weight = hyperparameters.get("max_weight", 100)
 
-    def criterion_fn(logits, labels, sections):
-        sample_w = torch.ones_like(labels, dtype=torch.float32, device=logits.device)
-        for section in torch.unique(sections):
-            key = int(section.item())
-            mask = sections == section
-            sec_w = float(section_ratio.get(key, 1.0)) ** section_scaling * hyperparameters.get("section_weight_fold", {}).get(str(key), 1)
-            pos_w = float(section_neg_pos_ratio.get(key, 1.0)) ** section_label_scaling * hyperparameters.get("section_pos_weight_fold", {}).get(str(key), 1)
-            sample_w[mask] *= sec_w
-            sample_w[mask & (labels == 1)] *= pos_w
-        if max_weight is not None:
-            sample_w = torch.clamp(sample_w, max=float(max_weight))
-        return F.binary_cross_entropy_with_logits(logits, labels.float(), weight=sample_w)
+#     def criterion_fn(logits, labels, sections):
+#         sample_w = torch.ones_like(labels, dtype=torch.float32, device=logits.device)
+#         for section in torch.unique(sections):
+#             key = int(section.item())
+#             mask = sections == section
+#             sec_w = float(section_ratio.get(key, 1.0)) ** section_scaling * hyperparameters.get("section_weight_fold", {}).get(str(key), 1)
+#             pos_w = float(section_neg_pos_ratio.get(key, 1.0)) ** section_label_scaling * hyperparameters.get("section_pos_weight_fold", {}).get(str(key), 1)
+#             sample_w[mask] *= sec_w
+#             sample_w[mask & (labels == 1)] *= pos_w
+#         if max_weight is not None:
+#             sample_w = torch.clamp(sample_w, max=float(max_weight))
+#         return F.binary_cross_entropy_with_logits(logits, labels.float(), weight=sample_w)
 
-    return criterion_fn
-
+#     return criterion_fn
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Train loop
 # ══════════════════════════════════════════════════════════════════════════════
 
-def train_model(train_loader, val_loader, hp: dict, section_ratio, section_neg_pos_ratio,
+def train_model(train_loader, val_loader, hp: dict,
+                # section_ratio, section_neg_pos_ratio,
+                pos_weight,
                 patience=15):
 
     print("hyperparameters:", hp)
     model = build_model(hp, DEVICE)
 
-    criterion_fn = get_criterion_fn(
-        hp,
-        section_ratio,
-        section_neg_pos_ratio,
+    # criterion_fn = get_criterion_fn(
+    #     hp,
+    #     section_ratio,
+    #     section_neg_pos_ratio,
+    # )
+    criterion = nn.BCEWithLogitsLoss(
+        pos_weight=pos_weight * hp.get("weight_fold", 1.0)
     )
-    eval_criterion = nn.BCEWithLogitsLoss()
+    # eval_criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=hp.get("lr", 1e-4),
@@ -576,14 +589,15 @@ def train_model(train_loader, val_loader, hp: dict, section_ratio, section_neg_p
     save_path = 'model.pt'
 
     for epoch in range(1, hp.get("max_epoch", 50) + 1):
-        tr = train_one_epoch(model, train_loader, optimizer, criterion_fn, DEVICE)
-        va = evaluate(model, val_loader, eval_criterion, DEVICE, ignore_sec=hp.get('ignore_sec', -1))
+        tr = train_one_epoch(model, train_loader, optimizer, criterion, DEVICE)
+        va = evaluate(model, val_loader, criterion, DEVICE, ignore_sec=hp.get('ignore_sec', -1))
         lr_now = optimizer.param_groups[0]["lr"]
 
         print(
             f"Epoch {epoch:02d} | lr={lr_now:.2e} | "
             f"train loss={tr['loss']:.4f} acc={tr['accuracy']:.4f} "
-            f"prec={tr['precision']:.4f} rec={tr['recall']:.4f} f1={tr['f1']:.4f} | "
+            f"prec={tr['precision']:.4f} rec={tr['recall']:.4f} f1={tr['f1']:.4f} "
+            f"aupr={tr['aupr']:.4f} | "
             f"val   loss={va['loss']:.4f} acc={va['accuracy']:.4f} "
             f"prec={va['precision']:.4f} rec={va['recall']:.4f} f1={va['f1']:.4f} "
             f"aupr={va['aupr']:.4f}",
@@ -653,7 +667,7 @@ def _stratified_group_split(indices, labels_a, groups_a, test_frac, seed):
     return train_idx, test_idx
 
 
-def make_dataset(sequences, labels, groups, sections, batch_size=8):
+def make_dataset(sequences, labels, groups, sections, batch_size=8, training=True):
     assert len(sequences) == len(labels) == len(groups) == len(sections)
     print("labels:", dict(Counter(labels)))
 
@@ -689,46 +703,54 @@ def make_dataset(sequences, labels, groups, sections, batch_size=8):
     val_ds   = Subset(dataset, val_idx.tolist())
     test_ds  = Subset(dataset, test_idx.tolist())
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  collate_fn=collate_fn)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=training,  collate_fn=collate_fn)
     val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
     test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
-    # determine section weight (from training data only)
-    train_labels   = labels_a[train_idx]
-    train_sections = sections_a[train_idx]
+    # # determine section weight (from training data only)
+    # train_labels   = labels_a[train_idx]
+    # train_sections = sections_a[train_idx]
 
-    section_counts = Counter(train_sections)
-    total_train    = len(train_idx)
+    # section_counts = Counter(train_sections)
+    # total_train    = len(train_idx)
 
-    section_ratio = {
-        section: total_train / count
-        for section, count in section_counts.items()
-    }
+    # section_ratio = {
+    #     section: total_train / count
+    #     for section, count in section_counts.items()
+    # }
 
-    section_label_counts = defaultdict(lambda: Counter())
-    for section, label in zip(train_sections, train_labels):
-        section_label_counts[int(section)][int(label)] += 1
+    # section_label_counts = defaultdict(lambda: Counter())
+    # for section, label in zip(train_sections, train_labels):
+    #     section_label_counts[int(section)][int(label)] += 1
 
-    section_neg_pos_ratio = {}
-    for section in section_counts:
-        neg_count = section_label_counts[section][0]
-        pos_count = section_label_counts[section][1]
-        if pos_count == 0:
-            section_neg_pos_ratio[int(section)] = 1.0
-        else:
-            section_neg_pos_ratio[int(section)] = neg_count / pos_count
+    # section_neg_pos_ratio = {}
+    # for section in section_counts:
+    #     neg_count = section_label_counts[section][0]
+    #     pos_count = section_label_counts[section][1]
+    #     if pos_count == 0:
+    #         section_neg_pos_ratio[int(section)] = 1.0
+    #     else:
+    #         section_neg_pos_ratio[int(section)] = neg_count / pos_count
 
+    train_labels = labels_a[train_idx]
+    num_pos  = (train_labels == 1).sum()
+    num_neg  = (train_labels == 0).sum()
+    pos_weight = torch.tensor(
+        [num_neg / max(num_pos, 1)], dtype=torch.float32, device=DEVICE
+    )
     print("train labels:", dict(Counter(train_labels)))
     print("val labels:",   dict(Counter(labels_a[val_idx])))
     print("test labels:",  dict(Counter(labels_a[test_idx])))
 
-    print("train sections:", dict(section_counts))
-    print("section_ratio:",  section_ratio)
-    print("section_neg_pos_ratio:", section_neg_pos_ratio)
+    # print("train sections:", dict(section_counts))
+    # print("section_ratio:",  section_ratio)
+    # print("section_neg_pos_ratio:", section_neg_pos_ratio)
+    print("pos_weight:", pos_weight)
 
     return (
         train_loader, val_loader, test_loader,
-        section_ratio, section_neg_pos_ratio,
+        # section_ratio, section_neg_pos_ratio,
+        pos_weight,
         train_idx, val_idx, test_idx,
     )
 
@@ -779,27 +801,28 @@ def hyperparameters_queryer(*args):
         "pooling_mode": "attention",
         "batch_size":   16,
         "max_epoch":    50,
-        "section_scaling": 0,
-        "section_weight_fold": {
-            "0": 1,
-            "1": 10,
-            "2": 10,
-            "3": 10,
-            "4": 10
-        },
-        "section_label_scaling": 1,
-        "section_pos_weight_fold": {
-            "0": 1,
-            "1": 2,
-            "2": 5,
-            "3": 2,
-            "4": 5
-        },
-        "max_weight": 200,
+        # "section_scaling": 0,
+        # "section_weight_fold": {
+        #     "0": 1,
+        #     "1": 1,
+        #     "2": 1,
+        #     "3": 1,
+        #     "4": 1
+        # },
+        # "section_label_scaling": 0,
+        # "section_pos_weight_fold": {
+        #     "0": 1,
+        #     "1": 10,
+        #     "2": 1,
+        #     "3": 1,
+        #     "4": 10
+        # },
+        'weight_fold': 0.5,
+        "max_weight": 300,
         "lr":           1e-4,
-        "left_window":  411,    # RiNALMo trained up to ~1024; safe upper limit
-        "right_window": 101,
-        'ignore_sec': 0,  # controling which dev metric to select
+        "left_window":  300,
+        "right_window": 500,
+        'ignore_sec': -1
     }
     if not args:
         return hp
@@ -839,7 +862,7 @@ def centralize_transcript(left_window: int, right_window: int, seq: str, positio
     return left_padding + seq[lb:rb] + right_padding
 
 
-def get_dataset(df, hp):
+def get_dataset(df, hp, training=True):
     df = df.copy()
     print(df.shape, flush=True)
 
@@ -868,8 +891,19 @@ def get_dataset(df, hp):
 
     return make_dataset(
         sequences, labels, genes, sections,
-        batch_size=hp["batch_size"],
+        batch_size=hp["batch_size"], training=training
     )
+
+def select_best_cu_on_fscore(y, yhat_prob, beta=2):
+    best_cu = 0.5
+    best_score = -1
+    for cu in yhat_prob.unique():
+        yhat = [(1 if x > cu else 0) for x in yhat_prob]
+        score = fbeta_score(y, yhat, zero_division=0, beta=beta)
+        if score > best_score:
+            best_cu = cu
+            best_score = score
+    return best_cu
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -878,29 +912,60 @@ def get_dataset(df, hp):
 
 def main():
     import sys
-    print("run at:", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    print("run at:", datetime.now().strftime("%Y%m%d_%H%M%S"), flush=True)
 
     hp = hyperparameters_queryer()
     df = pd.read_csv("../../input_data/df_data.csv").reset_index(drop=True)
 
-    (
-        train_loader, val_loader, test_loader,
-        section_ratio, section_neg_pos_ratio,
-        train_idx, val_idx, test_idx,
-    ) = get_dataset(df, hp)
-    
     if len(sys.argv) > 1 and sys.argv[1] == 'train':  # train mode
+        (
+            train_loader, val_loader, test_loader,
+            # section_ratio, section_neg_pos_ratio,
+            pos_weight,
+            train_idx, val_idx, test_idx,
+        ) = get_dataset(df, hp)
         train_model(
-            train_loader, val_loader, hp, section_ratio, section_neg_pos_ratio, patience=5,
+            train_loader, val_loader, hp, pos_weight, patience=5,
         )
+        model = load_model('model.pt', hp, DEVICE)
+    else:
+        (
+            train_loader, val_loader, test_loader,
+            # section_ratio, section_neg_pos_ratio,
+            pos_weight,
+            train_idx, val_idx, test_idx,
+        ) = get_dataset(df, hp, False)
 
-    model = load_model('model.pt', hp, DEVICE)
+        model = load_model('model.pt', hp, DEVICE)
 
-    print('========== non-indicated sites ==========')
-    yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=0)
-    pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
-
-    print('========== all sites ==========')
+        # training set
+        print('========== training set: all sites ==========', flush=True)
+        yhat_prob, yhat, labels_t = predict_batch(model, train_loader, DEVICE, ignore_sec=-1)
+        df_train = df.iloc[train_idx].copy()
+        df_train['yhat_prob'] = yhat_prob.numpy()
+        df_train['yhat'] = yhat.numpy()
+        print(evaluate_group(df_train).to_string(), flush=True)
+    
+    # val set
+    print('========== val set: all sites ==========', flush=True)
+    yhat_prob, yhat, labels_t = predict_batch(model, val_loader, DEVICE, ignore_sec=-1)
+    df_val = df.iloc[val_idx].copy()
+    df_val['yhat_prob'] = yhat_prob.numpy()
+    df_val['yhat'] = yhat.numpy()
+    print(evaluate_group(df_val).to_string(), flush=True)
+    sect_best_cut = {
+        sec: select_best_cu_on_fscore(
+            df_val.label[df_val.section == sec],
+            df_val.yhat_prob[df_val.section == sec],
+            beta=2)
+        for sec in df_val.section.unique()
+    }
+    print('sect_best_cut:', sect_best_cut, flush=True)
+    print('--- cutoff adj ---', flush=True)
+    print(evaluate_group(df_val, sec_cutoff=sect_best_cut).to_string(), flush=True)
+       
+    # test set
+    print('========== test set: all sites ==========', flush=True)
     yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=-1)
     pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
 
@@ -908,7 +973,10 @@ def main():
     df_test['yhat_prob'] = yhat_prob.numpy()
     df_test['yhat'] = yhat.numpy()
     
-    print(evaluate_group(df_test).to_string())
-    
+    print(evaluate_group(df_test).to_string(), flush=True)
+    print('--- cutoff adj ---', flush=True)
+    print(evaluate_group(df_test, sec_cutoff=sect_best_cut).to_string(), flush=True)
+
+
 if __name__ == "__main__":
     main()

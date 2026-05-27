@@ -39,8 +39,8 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
 # ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo-giga (650M) ─
-# RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
-RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
+RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
+# RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 
 # ── 全域只載入一次 tokenizer ──────────────────────────────────────────────────
@@ -941,7 +941,7 @@ def main():
         sec: select_best_cu_on_fscore(
             df_val.label[df_val.section == sec],
             df_val.yhat_prob[df_val.section == sec],
-            beta=4)
+            beta=2)
         for sec in df_val.section.unique()
     }
     print('sect_best_cut:', sect_best_cut)

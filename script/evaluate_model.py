@@ -2,6 +2,7 @@ import sys
     
 import pandas as pd
 import numpy as np
+from pprint import pprint
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -34,7 +35,7 @@ from imblearn.under_sampling import RandomUnderSampler
 def load_model_script(script_name):
     import sys
     from pathlib import Path
-    lib_path = Path(__file__).resolve().parent.parent / "model"
+    lib_path = Path(__file__).resolve().parent.parent / "model/prev_experiments"
 
     sys.path.append(str(lib_path))
 
@@ -236,13 +237,19 @@ def main():
     print(df_test.shape, df_val.shape)
     
     model = load_model(sys.argv[2], hp, DEVICE)
+    print('======== test set ========')
     yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE)
-    print(compute_binary_metrics(labels_t.numpy(), yhat_prob.numpy()))
-    
+    pprint(compute_binary_metrics(labels_t.numpy(), yhat_prob.numpy()))
     df_test['yhat_prob'] = yhat_prob.numpy().tolist()
     df_test['yhat'] = yhat.numpy().tolist()
-    
     print(evaluate_group(df_test).to_string())
+    
+    print('======== val set ========')
+    yhat_prob, yhat, labels_t = predict_batch(model, val_loader, DEVICE)
+    pprint(compute_binary_metrics(labels_t.numpy(), yhat_prob.numpy()))
+    df_val['yhat_prob'] = yhat_prob.numpy().tolist()
+    df_val['yhat'] = yhat.numpy().tolist()
+    print(evaluate_group(df_val).to_string())
     
 
 if __name__ == '__main__':
