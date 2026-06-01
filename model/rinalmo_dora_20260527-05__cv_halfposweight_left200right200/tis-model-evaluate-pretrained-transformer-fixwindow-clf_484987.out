@@ -1,0 +1,324 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260529_110719
+mode=eval | n_splits=5 | n_repeats=5
+(34271, 6)
+labels (full): {1: 4394, 0: 29877}
+
+=== repeat 1/5 | fold 1/5 ===
+train labels: {np.int64(1): 3515, np.int64(0): 23871}
+val   labels: {np.int64(1): 879, np.int64(0): 6006}
+pos_weight: tensor([6.7912], device='cuda:1')
+model not exist:  model_r0_f0.pt
+
+=== repeat 1/5 | fold 2/5 ===
+train labels: {np.int64(1): 3520, np.int64(0): 24712}
+val   labels: {np.int64(1): 874, np.int64(0): 5165}
+pos_weight: tensor([7.0205], device='cuda:1')
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33961.22it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+[r0 f1] val all-section: aupr=0.9877 auc=0.9970 f1=0.9159 mcc=0.9027
+
+=== repeat 1/5 | fold 3/5 ===
+train labels: {np.int64(1): 3524, np.int64(0): 23682}
+val   labels: {np.int64(1): 870, np.int64(0): 6195}
+pos_weight: tensor([6.7202], device='cuda:1')
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32866.22it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:2466: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+[r0 f2] val all-section: aupr=0.9769 auc=0.9943 f1=0.9096 mcc=0.8971
+
+=== repeat 1/5 | fold 4/5 ===
+train labels: {np.int64(1): 3502, np.int64(0): 24054}
+val   labels: {np.int64(1): 892, np.int64(0): 5823}
+pos_weight: tensor([6.8686], device='cuda:1')
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33108.64it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+[r0 f3] val all-section: aupr=0.9760 auc=0.9941 f1=0.9251 mcc=0.9136
+
+=== repeat 1/5 | fold 5/5 ===
+train labels: {np.int64(1): 3515, np.int64(0): 23189}
+val   labels: {np.int64(1): 879, np.int64(0): 6688}
+pos_weight: tensor([6.5972], device='cuda:1')
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33408.38it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+[r0 f4] val all-section: aupr=0.9669 auc=0.9886 f1=0.9044 mcc=0.8922
+
+=== repeat 2/5 | fold 1/5 ===
+train labels: {np.int64(1): 3496, np.int64(0): 23494}
+val   labels: {np.int64(1): 898, np.int64(0): 6383}
+pos_weight: tensor([6.7203], device='cuda:1')
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32777.80it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+[r1 f0] val all-section: aupr=0.9741 auc=0.9941 f1=0.9103 mcc=0.8977
+
+=== repeat 2/5 | fold 2/5 ===
+train labels: {np.int64(1): 3518, np.int64(0): 24599}
+val   labels: {np.int64(1): 876, np.int64(0): 5278}
+pos_weight: tensor([6.9923], device='cuda:1')
+model not exist:  model_r1_f1.pt
+
+=== repeat 2/5 | fold 3/5 ===
+train labels: {np.int64(1): 3513, np.int64(0): 22885}
+val   labels: {np.int64(1): 881, np.int64(0): 6992}
+pos_weight: tensor([6.5144], device='cuda:1')
+model not exist:  model_r1_f2.pt
+
+=== repeat 2/5 | fold 4/5 ===
+train labels: {np.int64(1): 3528, np.int64(0): 25185}
+val   labels: {np.int64(1): 866, np.int64(0): 4692}
+pos_weight: tensor([7.1386], device='cuda:1')
+model not exist:  model_r1_f3.pt
+
+=== repeat 2/5 | fold 5/5 ===
+train labels: {np.int64(1): 3521, np.int64(0): 23345}
+val   labels: {np.int64(1): 873, np.int64(0): 6532}
+pos_weight: tensor([6.6302], device='cuda:1')
+model not exist:  model_r1_f4.pt
+
+=== repeat 3/5 | fold 1/5 ===
+train labels: {np.int64(1): 3511, np.int64(0): 25072}
+val   labels: {np.int64(1): 883, np.int64(0): 4805}
+pos_weight: tensor([7.1410], device='cuda:1')
+model not exist:  model_r2_f0.pt
+
+=== repeat 3/5 | fold 2/5 ===
+train labels: {np.int64(1): 3544, np.int64(0): 22697}
+val   labels: {np.int64(1): 850, np.int64(0): 7180}
+pos_weight: tensor([6.4043], device='cuda:1')
+model not exist:  model_r2_f1.pt
+
+=== repeat 3/5 | fold 3/5 ===
+train labels: {np.int64(1): 3503, np.int64(0): 23859}
+val   labels: {np.int64(1): 891, np.int64(0): 6018}
+pos_weight: tensor([6.8110], device='cuda:1')
+model not exist:  model_r2_f2.pt
+
+=== repeat 3/5 | fold 4/5 ===
+train labels: {np.int64(1): 3500, np.int64(0): 23322}
+val   labels: {np.int64(1): 894, np.int64(0): 6555}
+pos_weight: tensor([6.6634], device='cuda:1')
+model not exist:  model_r2_f3.pt
+
+=== repeat 3/5 | fold 5/5 ===
+train labels: {np.int64(1): 3518, np.int64(0): 24558}
+val   labels: {np.int64(1): 876, np.int64(0): 5319}
+pos_weight: tensor([6.9807], device='cuda:1')
+model not exist:  model_r2_f4.pt
+
+=== repeat 4/5 | fold 1/5 ===
+train labels: {np.int64(1): 3495, np.int64(0): 22934}
+val   labels: {np.int64(1): 899, np.int64(0): 6943}
+pos_weight: tensor([6.5619], device='cuda:1')
+model not exist:  model_r3_f0.pt
+
+=== repeat 4/5 | fold 2/5 ===
+train labels: {np.int64(1): 3525, np.int64(0): 24962}
+val   labels: {np.int64(1): 869, np.int64(0): 4915}
+pos_weight: tensor([7.0814], device='cuda:1')
+model not exist:  model_r3_f1.pt
+
+=== repeat 4/5 | fold 3/5 ===
+train labels: {np.int64(1): 3555, np.int64(0): 23607}
+val   labels: {np.int64(1): 839, np.int64(0): 6270}
+pos_weight: tensor([6.6405], device='cuda:1')
+model not exist:  model_r3_f2.pt
+
+=== repeat 4/5 | fold 4/5 ===
+train labels: {np.int64(1): 3506, np.int64(0): 23726}
+val   labels: {np.int64(1): 888, np.int64(0): 6151}
+pos_weight: tensor([6.7673], device='cuda:1')
+model not exist:  model_r3_f3.pt
+
+=== repeat 4/5 | fold 5/5 ===
+train labels: {np.int64(1): 3495, np.int64(0): 24279}
+val   labels: {np.int64(1): 899, np.int64(0): 5598}
+pos_weight: tensor([6.9468], device='cuda:1')
+model not exist:  model_r3_f4.pt
+
+=== repeat 5/5 | fold 1/5 ===
+train labels: {np.int64(1): 3538, np.int64(0): 23743}
+val   labels: {np.int64(1): 856, np.int64(0): 6134}
+pos_weight: tensor([6.7109], device='cuda:1')
+model not exist:  model_r4_f0.pt
+
+=== repeat 5/5 | fold 2/5 ===
+train labels: {np.int64(1): 3519, np.int64(0): 24345}
+val   labels: {np.int64(1): 875, np.int64(0): 5532}
+pos_weight: tensor([6.9182], device='cuda:1')
+model not exist:  model_r4_f1.pt
+
+=== repeat 5/5 | fold 3/5 ===
+train labels: {np.int64(1): 3515, np.int64(0): 23909}
+val   labels: {np.int64(1): 879, np.int64(0): 5968}
+pos_weight: tensor([6.8020], device='cuda:1')
+model not exist:  model_r4_f2.pt
+
+=== repeat 5/5 | fold 4/5 ===
+train labels: {np.int64(1): 3513, np.int64(0): 24803}
+val   labels: {np.int64(1): 881, np.int64(0): 5074}
+pos_weight: tensor([7.0603], device='cuda:1')
+model not exist:  model_r4_f3.pt
+
+=== repeat 5/5 | fold 5/5 ===
+train labels: {np.int64(1): 3491, np.int64(0): 22708}
+val   labels: {np.int64(1): 903, np.int64(0): 7169}
+pos_weight: tensor([6.5047], device='cuda:1')
+model not exist:  model_r4_f4.pt
+
+per-fold detail saved to: cv_results_5fold_5repeat.csv
+
+========== per-fold summary (all-section) ==========
+ repeat  fold     aupr      auc       f1      mcc
+      0     1 0.987740 0.997033 0.915858 0.902717
+      0     2 0.976872 0.994342 0.909595 0.897110
+      0     3 0.975989 0.994100 0.925110 0.913594
+      0     4 0.966922 0.988626 0.904424 0.892210
+      1     0 0.974123 0.994125 0.910270 0.897726
+
+========== mean across 5x5 folds ==========
+               accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr        f1       mcc     tp           tn          fp         fn   total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+section                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+3UTRATG        0.895238           0.899711   0.555556  0.666667     0.894661  1.000000  1.000000  0.600000  0.601343    1.0    22.333333    1.666667   0.000000    25.0                           0.996250                      2.143083e-02                                    0.996250                               2.143083e-02                            0.995000                       2.857443e-02                         1.000000                    0.000000e+00                              0.992500                         4.286165e-02                      1.000000                     0.000000                       1.000000                      0.000000                     0.997000                1.714466e-02                      0.993660                 3.623093e-02                        1.500                    0.000000                        1.485                    0.085723                        0.015                    0.085723                        0.000                    0.000000                             3.0                            0.0
+3UTRnonATG     0.991493           0.664751   0.000000  0.000000     0.996169  0.611803  0.016653  0.000000 -0.003831    0.0   232.000000    0.333333   0.666667   233.0                           0.495000                      3.517632e-02                                    0.495000                               3.517632e-02                            0.000000                       0.000000e+00                         0.000000                    0.000000e+00                              0.990000                         7.035265e-02                      0.575000                     0.435186                       0.787500                      0.217593                     0.000000                0.000000e+00                     -0.010000                 7.035265e-02                        0.000                    0.000000                        0.990                    0.070353                        0.010                    0.070353                        1.000                    0.000000                             2.0                            0.0
+5UTRATG        0.877941           0.884120   0.802326  0.970233     0.798008  0.969503  0.963305  0.878137  0.770321  172.0   167.000000   42.200000   5.200000   386.4                           0.884214                      5.956243e-03                                    0.884214                               5.956243e-03                            0.828173                       8.101532e-03                         0.970247                    7.866962e-04                              0.798181                         1.112579e-02                      0.969625                     0.002410                       0.969308                      0.002735                     0.893465                4.998018e-03                      0.780334                 1.077601e-02                      166.906                    0.137672                      137.098                    1.873464                       34.902                    1.873464                        5.094                    0.137672                           344.0                            0.0
+5UTRnonATG     0.985709           0.843298   0.539604  0.696309     0.990287  0.976369  0.692501  0.598393  0.601135   52.4  4821.600000   46.800000  23.600000  4944.4                           0.843025                      5.831421e-03                                    0.843025                               5.831421e-03                            0.986203                       1.590898e-02                         0.696309                    8.926529e-17                              0.989740                         1.166284e-02                      0.975739                     0.006529                       0.978144                      0.007816                     0.811269                5.506253e-03                      0.720357                 1.457955e-02                       52.400                    0.000000                       75.236                    0.865325                        0.764                    0.865325                       23.600                    0.000000                           152.0                            0.0
+Annotated      0.997770           0.683147   0.998140  0.999627     0.166667  0.940673  0.999738  0.998882  0.256172  536.8     0.400000    1.000000   0.200000   538.4                           0.604167                      5.579081e-17                                    0.604167                               5.579081e-17                            0.566667                       5.579081e-17                         1.000000                    0.000000e+00                              0.208333                         2.789540e-17                      0.948333                     0.106051                       0.969194                      0.061045                     0.720833                1.673724e-16                      0.256141                 4.184310e-17                        1.750                    0.000000                        0.500                    0.000000                        1.250                    0.000000                        0.000                    0.000000                             3.5                            0.0
+CDSATG         0.876745           0.867607   0.825749  0.960200     0.775014  0.970976  0.974634  0.886833  0.753031   69.0    66.400000   14.400000   3.200000   153.0                           0.867120                      6.041728e-03                                    0.867120                               6.041728e-03                            0.819704                       7.066461e-03                         0.959922                    4.399700e-03                              0.774317                         7.683756e-03                      0.970750                     0.003580                       0.972658                      0.003320                     0.881353                5.813242e-03                      0.753090                 1.191306e-02                       60.870                    0.302599                       51.030                    0.486650                       12.770                    0.486650                        2.930                    0.302599                           127.6                            0.0
+CDSnonATG      0.969872           0.622398   0.425641  0.254108     0.990688  0.791916  0.300642  0.314259  0.312608    5.0   730.400000    6.800000  14.200000   756.4                           0.622791                      1.042392e-02                                    0.622791                               1.042392e-02                            0.972941                       6.656273e-02                         0.254108                    3.905356e-17                              0.991473                         2.084783e-02                      0.790743                     0.046900                       0.823398                      0.041161                     0.399851                6.326628e-03                      0.363955                 3.966674e-02                        5.000                    0.000000                       19.036                    0.394657                        0.164                    0.394657                       14.200                    0.000000                            38.4                            0.0
+all            0.976983           0.964144   0.881701  0.947049     0.981239  0.993645  0.976329  0.913051  0.900672  835.8  5938.400000  112.400000  46.800000  6933.4                           0.964093                      2.199782e-03                                    0.964093                               2.199782e-03                            0.980544                       4.458298e-03                         0.947049                    1.338979e-16                              0.981137                         4.399564e-03                      0.993637                     0.000540                       0.994528                      0.000537                     0.963438                2.154999e-03                      0.928848                 4.535280e-03                      835.800                    0.000000                      865.972                    3.879419                       16.628                    3.879419                       46.800                    0.000000                          1765.2                            0.0
+non-annotated  0.975218           0.923474   0.729564  0.865542     0.981406  0.984073  0.891922  0.790966  0.781578  299.0  5938.000000  111.400000  46.600000  6395.0                           0.923509                      3.638077e-03                                    0.923509                               3.638077e-03                            0.979216                       8.008771e-03                         0.865542                    3.347448e-16                              0.981476                         7.276153e-03                      0.984131                     0.002052                       0.985820                      0.002267                     0.918541                3.542503e-03                      0.853215                 8.015802e-03                      299.000                    0.000000                      339.216                    2.507584                        6.384                    2.507584                       46.600                    0.000000                           691.2                            0.0
+
+========== std across 5x5 folds ==========
+               accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr        f1       mcc         tp          tn         fp         fn       total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+section                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+3UTRATG        0.157359           0.160762   0.509175  0.577350     0.156943  0.000000  0.000000  0.529150  0.529916   1.000000   11.239810   2.081666   0.000000   10.535654                           0.005303                      3.030776e-02                                    0.005303                               3.030776e-02                            0.007071                       4.041035e-02                         0.000000                    0.000000e+00                              0.010607                         6.061553e-02                      0.000000                     0.000000                       0.000000                      0.000000                     0.004243                2.424621e-02                      0.008966                 5.123827e-02                     0.707107                    0.000000                     0.685894                    0.121231                     0.021213                    0.121231                     0.000000                    0.000000                        1.414214                            0.0
+3UTRnonATG     0.012394           0.290348   0.000000  0.000000     0.006636  0.263773  0.004178  0.000000  0.006636   0.000000  136.715032   0.577350   0.577350  136.106576                           0.007071                      4.974683e-02                                    0.007071                               4.974683e-02                            0.000000                       0.000000e+00                         0.000000                    0.000000e+00                              0.014142                         9.949367e-02                      0.332340                     0.057854                       0.166170                      0.028927                     0.000000                0.000000e+00                      0.014142                 9.949367e-02                     0.000000                    0.000000                     0.014142                    0.099494                     0.014142                    0.099494                     0.000000                    0.000000                        0.000000                            0.0
+5UTRATG        0.013653           0.009463   0.031551  0.010979     0.020521  0.010343  0.015923  0.022146  0.023196  19.104973   23.505319   7.155418   1.788854   24.130893                           0.010117                      3.526106e-03                                    0.010117                               3.526106e-03                            0.014954                       5.821865e-03                         0.010995                    1.759106e-03                              0.021734                         8.277729e-03                      0.010395                     0.001075                       0.011175                      0.001369                     0.008487                2.839731e-03                      0.018503                 5.984963e-03                    13.280406                    0.307844                     7.755267                    1.347599                     6.158666                    1.347599                     1.890550                    0.307844                       26.419690                            0.0
+5UTRnonATG     0.003360           0.059497   0.088361  0.122022     0.004195  0.014830  0.063192  0.055454  0.054229   9.864076  209.127473  18.539148  10.089599  202.370452                           0.058857                      1.897108e-03                                    0.058857                               1.897108e-03                            0.005111                       3.690780e-03                         0.122022                    9.335587e-17                              0.005340                         3.794216e-03                      0.014333                     0.001506                       0.010191                      0.001576                     0.081556                1.888253e-03                      0.096396                 3.588634e-03                     9.864076                    0.000000                    13.317155                    0.218178                     0.362808                    0.218178                    10.089599                    0.000000                       26.795522                            0.0
+Annotated      0.001553           0.207705   0.001312  0.000834     0.235702  0.067466  0.000401  0.000779  0.354629   1.923538    0.547723   0.707107   0.447214    1.516575                           0.125000                      1.115816e-16                                    0.125000                               1.115816e-16                            0.081650                       1.115816e-16                         0.000000                    0.000000e+00                              0.250000                         5.579081e-17                      0.065574                     0.127694                       0.041682                      0.070666                     0.065793                1.115816e-16                      0.300500                 8.368621e-17                     0.957427                    0.000000                     0.577350                    0.000000                     0.500000                    0.000000                     0.000000                    0.000000                        1.914854                            0.0
+CDSATG         0.049449           0.075911   0.042566  0.040970     0.155936  0.020537  0.016805  0.024323  0.098033   9.899495   38.030251   3.361547   3.271085   36.090165                           0.075449                      5.447484e-03                                    0.075449                               5.447484e-03                            0.093772                       1.008156e-02                         0.041299                    6.367428e-03                              0.155233                         1.275428e-02                      0.020444                     0.001879                       0.018312                      0.001497                     0.058909                4.967199e-03                      0.126100                 9.973897e-03                    16.469189                    0.425051                    20.061510                    0.741347                     5.301339                    0.741347                     2.961284                    0.425051                       36.698774                            0.0
+CDSnonATG      0.009536           0.029162   0.110093  0.057904     0.001297  0.057373  0.048022  0.070039  0.071588   2.000000  255.494227   2.588436   2.167948  257.818347                           0.028148                      2.360995e-03                                    0.028148                               2.360995e-03                            0.009608                       1.707770e-02                         0.057904                    4.230547e-17                              0.003678                         4.721990e-03                      0.057561                     0.011888                       0.029291                      0.009625                     0.073367                1.877397e-03                      0.049160                 8.429542e-03                     2.000000                    0.000000                     3.869448                    0.089918                     0.075033                    0.089918                     2.167948                    0.000000                        7.797435                            0.0
+all            0.001976           0.005108   0.016919  0.013748     0.004032  0.003066  0.007483  0.007865  0.008126  11.627553  587.718725  17.980545  12.397580  588.906444                           0.005030                      2.222571e-04                                    0.005030                               2.222571e-04                            0.003750                       3.653398e-04                         0.013748                    1.454846e-16                              0.004026                         4.445142e-04                      0.003093                     0.000126                       0.002190                      0.000126                     0.005379                2.109434e-04                      0.009701                 3.922139e-04                    11.627553                    0.000000                    13.947380                    0.348669                     3.422341                    0.348669                    12.397580                    0.000000                       23.899791                            0.0
+non-annotated  0.002299           0.015217   0.035212  0.033982     0.004069  0.007969  0.028896  0.020033  0.020010  12.020815  588.188320  18.541845  12.340989  588.759289                           0.015240                      6.348675e-04                                    0.015240                               6.348675e-04                            0.003551                       1.042240e-03                         0.033982                    1.764260e-16                              0.003976                         1.269735e-03                      0.008144                     0.000327                       0.005983                      0.000323                     0.017350                6.100598e-04                      0.027646                 1.142988e-03                    12.020815                    0.000000                    12.660100                    0.392065                     1.269697                    0.392065                    12.340989                    0.000000                       24.355697                            0.0

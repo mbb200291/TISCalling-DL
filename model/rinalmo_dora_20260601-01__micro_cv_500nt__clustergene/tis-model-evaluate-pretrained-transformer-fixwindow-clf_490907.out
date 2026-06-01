@@ -1,0 +1,46 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260601_110945
+mode=train | n_splits=4 | n_repeats=1
+(34271, 7)
+labels (full): {1: 4394, 0: 29877}
+
+=== repeat 1/1 | fold 1/4 ===
+train labels: {np.int64(1): 3276, np.int64(0): 23199}
+val   labels: {np.int64(1): 1118, np.int64(0): 6678}
+pos_weight: tensor([7.0815], device='cuda:0')
+hyperparameters: {'lora_r': 4, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'weight_fold': 0.5, 'max_weight': 300, 'lr': 0.0001, 'left_window': 300, 'right_window': 200, 'ignore_sec': -1}
+Loading backbone: multimolecule/rinalmo-micro
+  tokenizer vocab_size=28, len(tokenizer)=28
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32769.40it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 480])
+trainable params: 301,920 || all params: 33,784,332 || trainable%: 0.8937
+Total params: 34,708,813  |  Trainable: 1,226,401
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+Epoch 01 | lr=1.00e-04 | train loss=0.4143 acc=0.9004 prec=0.5772 rec=0.7305 f1=0.6448 aupr=0.7516 | val   loss=0.1910 acc=0.9619 prec=0.8319 rec=0.9204 f1=0.8739 aupr=0.9546
+  -> saved best model to model_r0_f0.pt
+Epoch 02 | lr=1.00e-04 | train loss=0.1440 acc=0.9721 prec=0.8576 rec=0.9286 f1=0.8917 aupr=0.9613 | val   loss=0.1677 acc=0.9752 prec=0.9089 rec=0.9195 f1=0.9142 aupr=0.9661
+  -> saved best model to model_r0_f0.pt
+Epoch 03 | lr=1.00e-04 | train loss=0.1083 acc=0.9793 prec=0.8906 rec=0.9496 f1=0.9192 aupr=0.9762 | val   loss=0.1484 acc=0.9715 prec=0.8709 rec=0.9410 f1=0.9046 aupr=0.9697
+  -> saved best model to model_r0_f0.pt
+Epoch 04 | lr=1.00e-04 | train loss=0.0849 acc=0.9824 prec=0.9033 rec=0.9609 f1=0.9312 aupr=0.9837 | val   loss=0.1565 acc=0.9792 prec=0.9410 rec=0.9123 f1=0.9264 aupr=0.9702
+  -> saved best model to model_r0_f0.pt
+Epoch 05 | lr=1.00e-04 | train loss=0.0686 acc=0.9864 prec=0.9243 rec=0.9692 f1=0.9462 aupr=0.9889 | val   loss=0.1634 acc=0.9768 prec=0.9187 rec=0.9195 f1=0.9191 aupr=0.9729
+  -> saved best model to model_r0_f0.pt

@@ -1,0 +1,79 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260520_172412
+(34271, 6)
+labels: {1: 4394, 0: 29877}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 31873.99it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260520-2/temp.py:497: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(path, map_location=device)
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260520-2/temp.py:903: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_test['yhat_prob'] = yhat_prob.numpy().tolist()
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260520-2/temp.py:904: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_test['yhat'] = yhat.numpy().tolist()
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:395: UserWarning: A single label was found in 'y_true' and 'y_pred'. For the confusion matrix to have the correct shape, use the 'labels' parameter to pass all known labels.
+  warnings.warn(
+================= all site =================
+{'accuracy': 0.9725681854012297,
+ 'auc': np.float64(0.9720012542748233),
+ 'aupr': np.float64(0.8417636021868142),
+ 'f1': np.float64(0.747093023255814),
+ 'fn': np.int64(83),
+ 'fp': np.int64(91),
+ 'mcc': np.float64(0.7326480539646647),
+ 'precision': np.float64(0.7385057471264368),
+ 'recall': np.float64(0.7558823529411764),
+ 'specificity': np.float64(0.9848409128768949),
+ 'tn': np.int64(5912),
+ 'total': np.int64(6343),
+ 'tp': np.int64(257)}
+================= only non-indicated site =================
+{'accuracy': 0.9729847494553376,
+ 'auc': np.float64(0.9881813294782579),
+ 'aupr': np.float64(0.9584528330728225),
+ 'f1': np.float64(0.8940774487471527),
+ 'fn': np.int64(94),
+ 'fp': np.int64(92),
+ 'mcc': np.float64(0.8785962826493187),
+ 'precision': np.float64(0.895096921322691),
+ 'recall': np.float64(0.8930602957906713),
+ 'specificity': np.float64(0.9846819846819846),
+ 'tn': np.int64(5914),
+ 'total': np.int64(6885),
+ 'tp': np.int64(785)}
+      section  accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr        f1       mcc   tp    tn  fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+5     3UTRATG  0.944444           0.970588   0.500000  1.000000     0.941176  1.000000  1.000000  0.666667  0.685994    1    16   1   0     18                           0.950000                          0.150756                                    0.950000                                   0.150756                            0.950000                           0.150756                         1.000000                    0.000000e+00                              0.900000                         3.015113e-01                      1.000000                     0.000000                       1.000000                      0.000000                     0.966667                    0.100504                      0.900000                     0.301511                         1.00                    0.000000                         0.90                    0.301511                         0.10                    0.301511                         0.00                    0.000000                             2.0                            0.0
+6  3UTRnonATG  1.000000           1.000000   0.000000  0.000000     1.000000       NaN       NaN  0.000000  0.000000    0   164   0   0    164                                NaN                               NaN                                         NaN                                        NaN                                 NaN                                NaN                              NaN                             NaN                                   NaN                                  NaN                           NaN                          NaN                            NaN                           NaN                          NaN                         NaN                           NaN                          NaN                          NaN                         NaN                          NaN                         NaN                          NaN                         NaN                          NaN                         NaN                             NaN                            NaN
+1     5UTRATG  0.852657           0.841100   0.845161  0.779762     0.902439  0.930943  0.920751  0.811146  0.692180  131   222  24  37    414                           0.841190                          0.006167                                    0.841190                                   0.006167                            0.889154                           0.012515                         0.779762                    1.115816e-16                              0.902619                         1.233355e-02                      0.931305                     0.004129                       0.940912                      0.003485                     0.830832                    0.005461                      0.687664                     0.013492                       131.00                    0.000000                       151.64                    2.072036                        16.36                    2.072036                        37.00                    0.000000                           336.0                            0.0
+2  5UTRnonATG  0.984704           0.785098   0.400000  0.580645     0.989551  0.949918  0.591970  0.473684  0.474546   36  5114  54  26   5230                           0.785323                          0.006563                                    0.785323                                   0.006563                            0.983538                           0.021290                         0.580645                    0.000000e+00                              0.990000                         1.312533e-02                      0.950486                     0.008690                       0.959432                      0.009196                     0.730124                    0.005964                      0.625640                     0.018195                        36.00                    0.000000                        61.38                    0.813770                         0.62                    0.813770                        26.00                    0.000000                           124.0                            0.0
+0   Annotated  0.977860           0.823129   0.998110  0.979592     0.666667  0.969697  0.999824  0.988764  0.313373  528     2   1  11    542                           0.821667                          0.042739                                    0.821667                                   0.042739                            0.744167                           0.021369                         0.976667                    8.547747e-02                              0.666667                         2.231632e-16                      0.975556                     0.051369                       0.981722                      0.038557                     0.843810                    0.048844                      0.680943                     0.095848                         2.93                    0.256432                         2.00                    0.000000                         1.00                    0.000000                         0.07                    0.256432                             6.0                            0.0
+3      CDSATG  0.900826           0.901613   0.964286  0.900000     0.903226  0.965233  0.988142  0.931034  0.761026   81    28   3   9    121                           0.900968                          0.019183                                    0.900968                                   0.019183                            0.902641                           0.003826                         0.898710                    3.836602e-02                              0.903226                         1.115816e-16                      0.963538                     0.011520                       0.968349                      0.009578                     0.900338                    0.021321                      0.802513                     0.038100                        27.86                    1.189347                        28.00                    0.000000                         3.00                    0.000000                         3.14                    1.189347                            62.0                            0.0
+4   CDSnonATG  0.949495           0.698590   0.470588  0.421053     0.976127  0.761832  0.452311  0.444444  0.418785    8   368   9  11    396                           0.697368                          0.018888                                    0.697368                                   0.018888                            0.947273                           0.073147                         0.421053                    1.115816e-16                              0.973684                         3.777582e-02                      0.763934                     0.043366                       0.818121                      0.028064                     0.582199                    0.014738                      0.475913                     0.057109                         8.00                    0.000000                        18.50                    0.717741                         0.50                    0.717741                        11.00                    0.000000                            38.0                            0.0

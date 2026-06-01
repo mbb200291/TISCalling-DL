@@ -1,0 +1,66 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260521_105603
+(24887, 6)
+labels: {1: 370, 0: 24517}
+train labels: {np.int64(1): 257, np.int64(0): 17579}
+val labels: {np.int64(1): 45, np.int64(0): 2007}
+test labels: {np.int64(1): 68, np.int64(0): 4931}
+train sections: {np.int64(1): 17836}
+section_ratio: {np.int64(1): 1.0}
+section_neg_pos_ratio: {1: 68.40077821011673}
+hyperparameters: {'lora_r': 4, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'section_scaling': 0, 'section_label_scaling': 1, 'max_weight': 300, 'lr': 0.0001, 'left_window': 411, 'right_window': 101, 'ignore_sec': 0}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32236.78it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+Epoch 01 | lr=1.00e-04 | train loss=1.1170 acc=0.7210 prec=0.0356 rec=0.7043 f1=0.0678 | val   loss=0.3628 acc=0.8348 prec=0.0599 rec=0.4444 f1=0.1055 aupr=0.1187
+  -> saved best model to model.pt
+Epoch 02 | lr=1.00e-04 | train loss=0.9121 acc=0.7913 prec=0.0538 rec=0.8132 f1=0.1010 | val   loss=0.9246 acc=0.5195 prec=0.0365 rec=0.8222 f1=0.0698 aupr=0.1335
+  -> saved best model to model.pt
+Epoch 03 | lr=1.00e-04 | train loss=0.7478 acc=0.8241 prec=0.0675 rec=0.8755 f1=0.1254 | val   loss=0.2862 acc=0.8957 prec=0.0957 rec=0.4444 f1=0.1575 aupr=0.1218
+Epoch 04 | lr=1.00e-04 | train loss=0.6088 acc=0.8643 prec=0.0877 rec=0.8949 f1=0.1597 | val   loss=0.4311 acc=0.8143 prec=0.0602 rec=0.5111 f1=0.1077 aupr=0.1539
+  -> saved best model to model.pt
+Epoch 05 | lr=1.00e-04 | train loss=0.4089 acc=0.9046 prec=0.1243 rec=0.9300 f1=0.2193 | val   loss=0.2739 acc=0.8777 prec=0.0913 rec=0.5111 f1=0.1549 aupr=0.1521
+Epoch 06 | lr=1.00e-04 | train loss=0.3404 acc=0.9249 prec=0.1550 rec=0.9455 f1=0.2663 | val   loss=0.3233 acc=0.8787 prec=0.0920 rec=0.5111 f1=0.1559 aupr=0.1564
+  -> saved best model to model.pt
+Epoch 07 | lr=1.00e-04 | train loss=0.2716 acc=0.9383 prec=0.1851 rec=0.9650 f1=0.3106 | val   loss=0.3660 acc=0.8865 prec=0.0983 rec=0.5111 f1=0.1649 aupr=0.1999
+  -> saved best model to model.pt
+Epoch 08 | lr=1.00e-04 | train loss=0.2224 acc=0.9535 prec=0.2332 rec=0.9728 f1=0.3762 | val   loss=0.3408 acc=0.8865 prec=0.1050 rec=0.5556 f1=0.1767 aupr=0.1598
+Epoch 09 | lr=1.00e-04 | train loss=0.1820 acc=0.9604 prec=0.2644 rec=0.9805 f1=0.4165 | val   loss=0.2104 acc=0.9401 prec=0.1455 rec=0.3556 f1=0.2065 aupr=0.1479
+Epoch 10 | lr=1.00e-04 | train loss=0.1762 acc=0.9645 prec=0.2851 rec=0.9728 f1=0.4409 | val   loss=0.2188 acc=0.9327 prec=0.1504 rec=0.4444 f1=0.2247 aupr=0.2094
+  -> saved best model to model.pt
+Epoch 11 | lr=1.00e-04 | train loss=0.1364 acc=0.9705 prec=0.3265 rec=0.9883 f1=0.4908 | val   loss=0.1724 acc=0.9576 prec=0.2000 rec=0.3111 f1=0.2435 aupr=0.2089
+Epoch 12 | lr=1.00e-04 | train loss=0.1108 acc=0.9759 prec=0.3730 rec=0.9883 f1=0.5416 | val   loss=0.2511 acc=0.9522 prec=0.1807 rec=0.3333 f1=0.2344 aupr=0.1870
+Epoch 13 | lr=1.00e-04 | train loss=0.1595 acc=0.9672 prec=0.3019 rec=0.9728 f1=0.4608 | val   loss=0.1581 acc=0.9566 prec=0.1857 rec=0.2889 f1=0.2261 aupr=0.1912
+Epoch 14 | lr=1.00e-04 | train loss=0.1158 acc=0.9752 prec=0.3652 rec=0.9805 f1=0.5322 | val   loss=0.1812 acc=0.9518 prec=0.1932 rec=0.3778 f1=0.2556 aupr=0.2310
+  -> saved best model to model.pt
+Epoch 15 | lr=1.00e-04 | train loss=0.1044 acc=0.9775 prec=0.3890 rec=0.9883 f1=0.5582 | val   loss=0.2814 acc=0.9152 prec=0.1356 rec=0.5333 f1=0.2162 aupr=0.3308
+  -> saved best model to model.pt
+Epoch 16 | lr=1.00e-04 | train loss=0.0760 acc=0.9846 prec=0.4830 rec=0.9961 f1=0.6506 | val   loss=0.1896 acc=0.9576 prec=0.2308 rec=0.4000 f1=0.2927 aupr=0.2557
+Epoch 17 | lr=1.00e-04 | train loss=0.1262 acc=0.9742 prec=0.3567 rec=0.9883 f1=0.5243 | val   loss=0.1707 acc=0.9576 prec=0.2237 rec=0.3778 f1=0.2810 aupr=0.2825
+Epoch 18 | lr=1.00e-04 | train loss=0.1088 acc=0.9790 prec=0.4058 rec=0.9805 f1=0.5740 | val   loss=0.1446 acc=0.9688 prec=0.3208 rec=0.3778 f1=0.3469 aupr=0.3338
+  -> saved best model to model.pt
+Epoch 19 | lr=1.00e-04 | train loss=0.0646 acc=0.9864 prec=0.5141 rec=0.9922 f1=0.6773 | val   loss=0.1346 acc=0.9654 prec=0.2759 rec=0.3556 f1=0.3107 aupr=0.3683
+  -> saved best model to model.pt
+Epoch 20 | lr=1.00e-04 | train loss=0.0865 acc=0.9837 prec=0.4686 rec=0.9883 f1=0.6358 | val   loss=0.1596 acc=0.9742 prec=0.3750 rec=0.2667 f1=0.3117 aupr=0.3242
+Epoch 21 | lr=1.00e-04 | train loss=0.0616 acc=0.9867 prec=0.5193 rec=0.9961 f1=0.6827 | val   loss=0.1601 acc=0.9693 prec=0.3393 rec=0.4222 f1=0.3762 aupr=0.3640
+Epoch 22 | lr=1.00e-04 | train loss=0.0507 acc=0.9904 prec=0.6014 rec=0.9922 f1=0.7489 | val   loss=0.1687 acc=0.9712 prec=0.3600 rec=0.4000 f1=0.3789 aupr=0.3711
+  -> saved best model to model.pt
+slurmstepd: error: *** JOB 443902 ON haydn CANCELLED AT 2026-05-21T14:35:01 ***

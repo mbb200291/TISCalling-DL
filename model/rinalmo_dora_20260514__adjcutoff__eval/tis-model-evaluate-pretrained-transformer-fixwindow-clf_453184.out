@@ -1,0 +1,158 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+(34271, 6)
+(34271, 6)
+labels: {1: 4394, 0: 29877}
+train labels: {np.int64(1): 3080, np.int64(0): 21095}
+val labels: {np.int64(1): 435, np.int64(0): 2776}
+test labels: {np.int64(1): 879, np.int64(0): 6006}
+pos_weight: tensor([6.8490], device='cuda:1')
+(6885, 6) (3211, 6)
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33725.46it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+/nas/cluster_data/homes/bangchi/TISCalling/model/prev_experiments/rinalmo_dora_20260514_140724.py:514: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+/nas/cluster_data/homes/bangchi/TISCalling/script/evaluate_model.py:243: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_test['yhat_prob'] = yhat_prob.numpy().tolist()
+/nas/cluster_data/homes/bangchi/TISCalling/script/evaluate_model.py:244: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_test['yhat'] = yhat.numpy().tolist()
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/sklearn/metrics/_classification.py:2466: UserWarning: y_pred contains classes not in y_true
+  warnings.warn("y_pred contains classes not in y_true")
+/nas/cluster_data/homes/bangchi/TISCalling/script/evaluate_model.py:250: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_val['yhat_prob'] = yhat_prob.numpy().tolist()
+/nas/cluster_data/homes/bangchi/TISCalling/script/evaluate_model.py:251: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  df_val['yhat'] = yhat.numpy().tolist()
+======== test set ========
+{'accuracy': 0.9798111837327523,
+ 'auc': np.float64(0.9932217952695769),
+ 'aupr': np.float64(0.9764285378898),
+ 'balanced_accuracy': np.float64(0.969976269464324),
+ 'balanced_downsample_accuracy_mean': np.float64(0.9697212741751993),
+ 'balanced_downsample_accuracy_std': np.float64(0.0021142704653886596),
+ 'balanced_downsample_auc_mean': np.float64(0.9931785136952349),
+ 'balanced_downsample_auc_std': np.float64(0.0005495776649166002),
+ 'balanced_downsample_aupr_mean': np.float64(0.9941936321079667),
+ 'balanced_downsample_aupr_std': np.float64(0.0005644634021326111),
+ 'balanced_downsample_balanced_accuracy_mean': np.float64(0.9697212741751992),
+ 'balanced_downsample_balanced_accuracy_std': np.float64(0.0021142704653886613),
+ 'balanced_downsample_f1_mean': np.float64(0.9693283503844649),
+ 'balanced_downsample_f1_std': np.float64(0.0020744703141825347),
+ 'balanced_downsample_fn_mean': np.float64(38.0),
+ 'balanced_downsample_fn_std': np.float64(0.0),
+ 'balanced_downsample_fp_mean': np.float64(15.23),
+ 'balanced_downsample_fp_std': np.float64(3.7168874781532635),
+ 'balanced_downsample_mcc_mean': np.float64(0.9397666912288044),
+ 'balanced_downsample_mcc_std': np.float64(0.004329361314285569),
+ 'balanced_downsample_precision_mean': np.float64(0.9822310146741131),
+ 'balanced_downsample_precision_std': np.float64(0.004256287691035127),
+ 'balanced_downsample_recall_mean': np.float64(0.9567690557451648),
+ 'balanced_downsample_recall_std': np.float64(1.1158161231197418e-16),
+ 'balanced_downsample_specificity_mean': np.float64(0.9826734926052335),
+ 'balanced_downsample_specificity_std': np.float64(0.004228540930777315),
+ 'balanced_downsample_tn_mean': np.float64(863.77),
+ 'balanced_downsample_tn_std': np.float64(3.716887478153263),
+ 'balanced_downsample_total_mean': np.float64(1758.0),
+ 'balanced_downsample_total_std': np.float64(0.0),
+ 'balanced_downsample_tp_mean': np.float64(841.0),
+ 'balanced_downsample_tp_std': np.float64(0.0),
+ 'f1': np.float64(0.9236683141131247),
+ 'fn': 38,
+ 'fp': 101,
+ 'mcc': np.float64(0.9127770461825642),
+ 'precision': np.float64(0.8927813163481954),
+ 'recall': np.float64(0.9567690557451649),
+ 'specificity': np.float64(0.9831834831834831),
+ 'tn': 5905,
+ 'total': 6885,
+ 'tp': 841}
+      section  accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr        f1       mcc   tp    tn  fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+5     3UTRATG  0.944444           0.970588   0.500000  1.000000     0.941176  1.000000  1.000000  0.666667  0.685994    1    16   1   0     18                           0.975000                          0.109521                                    0.975000                                   0.109521                            0.975000                           0.109521                         1.000000                    0.000000e+00                              0.950000                         2.190429e-01                      1.000000                     0.000000                       1.000000                      0.000000                     0.983333                    0.073014                      0.950000                     0.219043                         1.00                    0.000000                         0.95                    0.219043                         0.05                    0.219043                         0.00                    0.000000                             2.0                            0.0
+6  3UTRnonATG  0.993902           0.993902   0.000000  0.000000     0.993902       NaN       NaN  0.000000  0.000000    0   163   1   0    164                                NaN                               NaN                                         NaN                                        NaN                                 NaN                                NaN                              NaN                             NaN                                   NaN                                  NaN                           NaN                          NaN                            NaN                           NaN                          NaN                         NaN                           NaN                          NaN                          NaN                         NaN                          NaN                         NaN                          NaN                         NaN                          NaN                         NaN                             NaN                            NaN
+1     5UTRATG  0.850242           0.867378   0.745370  0.958333     0.776423  0.956010  0.941828  0.838542  0.722281  161   191  55   7    414                           0.867649                          0.008766                                    0.867649                                   0.008766                            0.811382                           0.012003                         0.958333                    1.115816e-16                              0.776964                         1.753263e-02                      0.956442                     0.003970                       0.958270                      0.004850                     0.878709                    0.007049                      0.747769                     0.015357                       161.00                    0.000000                       130.53                    2.945481                        37.47                    2.945481                         7.00                    0.000000                           336.0                            0.0
+2  5UTRnonATG  0.990249           0.875549   0.566265  0.758065     0.993034  0.970261  0.698042  0.648276  0.650486   47  5132  36  15   5230                           0.875323                          0.005892                                    0.875323                                   0.005892                            0.990534                           0.014869                         0.758065                    2.231632e-16                              0.992581                         1.178344e-02                      0.970715                     0.006193                       0.975532                      0.007210                     0.858799                    0.005669                      0.772278                     0.014216                        47.00                    0.000000                        61.54                    0.730573                         0.46                    0.730573                        15.00                    0.000000                           124.0                            0.0
+0   Annotated  0.996310           0.832406   0.998145  0.998145     0.666667  0.995671  0.999976  0.998145  0.664811  538     2   1   1    542                           0.831667                          0.016667                                    0.831667                                   0.016667                            0.749167                           0.008333                         0.996667                    3.333333e-02                              0.666667                         2.231632e-16                      0.996667                     0.019050                       0.997500                      0.014287                     0.855238                    0.019048                      0.703369                     0.037377                         2.99                    0.100000                         2.00                    0.000000                         1.00                    0.000000                         0.01                    0.100000                             6.0                            0.0
+3      CDSATG  0.933884           0.902688   0.945652  0.966667     0.838710  0.972760  0.990290  0.956044  0.823584   87    26   5   3    121                           0.901129                          0.014253                                    0.901129                                   0.014253                            0.856519                           0.003657                         0.963548                    2.850615e-02                              0.838710                         0.000000e+00                      0.972685                     0.008649                       0.974286                      0.008675                     0.906743                    0.014707                      0.809030                     0.031606                        29.87                    0.883691                        26.00                    0.000000                         5.00                    0.000000                         1.13                    0.883691                            62.0                            0.0
+4   CDSnonATG  0.964646           0.681558   0.777778  0.368421     0.994695  0.733910  0.489427  0.500000  0.520734    7   375   2  12    396                           0.681842                          0.007569                                    0.681842                                   0.007569                            0.988750                           0.035953                         0.368421                    5.579081e-17                              0.995263                         1.513808e-02                      0.737036                     0.044828                       0.805726                      0.024398                     0.536667                    0.005736                      0.467281                     0.025280                         7.00                    0.000000                        18.91                    0.287623                         0.09                    0.287623                        12.00                    0.000000                            38.0                            0.0
+======== val set ========
+{'accuracy': 0.9841170974774214,
+ 'auc': np.float64(0.9959099340819504),
+ 'aupr': np.float64(0.9836370839017359),
+ 'balanced_accuracy': np.float64(0.972397230779423),
+ 'balanced_downsample_accuracy_mean': np.float64(0.9729885057471265),
+ 'balanced_downsample_accuracy_std': np.float64(0.0022608020435570552),
+ 'balanced_downsample_auc_mean': np.float64(0.9959796010040957),
+ 'balanced_downsample_auc_std': np.float64(0.0005495127824078023),
+ 'balanced_downsample_aupr_mean': np.float64(0.9963663142917757),
+ 'balanced_downsample_aupr_std': np.float64(0.0005796070843342035),
+ 'balanced_downsample_balanced_accuracy_mean': np.float64(0.9729885057471265),
+ 'balanced_downsample_balanced_accuracy_std': np.float64(0.002260802043557063),
+ 'balanced_downsample_f1_mean': np.float64(0.9725357715120408),
+ 'balanced_downsample_f1_std': np.float64(0.0022352537656084217),
+ 'balanced_downsample_fn_mean': np.float64(19.0),
+ 'balanced_downsample_fn_std': np.float64(0.0),
+ 'balanced_downsample_fp_mean': np.float64(4.5),
+ 'balanced_downsample_fp_std': np.float64(1.966897777894639),
+ 'balanced_downsample_mcc_mean': np.float64(0.9465132830028599),
+ 'balanced_downsample_mcc_std': np.float64(0.00466557178053218),
+ 'balanced_downsample_precision_mean': np.float64(0.9893198694346174),
+ 'balanced_downsample_precision_std': np.float64(0.004624667054733292),
+ 'balanced_downsample_recall_mean': np.float64(0.9563218390804594),
+ 'balanced_downsample_recall_std': np.float64(3.3474483693592255e-16),
+ 'balanced_downsample_specificity_mean': np.float64(0.9896551724137933),
+ 'balanced_downsample_specificity_std': np.float64(0.004521604087114107),
+ 'balanced_downsample_tn_mean': np.float64(430.5),
+ 'balanced_downsample_tn_std': np.float64(1.966897777894639),
+ 'balanced_downsample_total_mean': np.float64(870.0),
+ 'balanced_downsample_total_std': np.float64(0.0),
+ 'balanced_downsample_tp_mean': np.float64(416.0),
+ 'balanced_downsample_tp_std': np.float64(0.0),
+ 'f1': np.float64(0.942242355605889),
+ 'fn': 19,
+ 'fp': 32,
+ 'mcc': np.float64(0.9331731805741117),
+ 'precision': np.float64(0.9285714285714286),
+ 'recall': np.float64(0.9563218390804598),
+ 'specificity': np.float64(0.9884726224783862),
+ 'tn': 2744,
+ 'total': 3211,
+ 'tp': 416}
+      section  accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr        f1       mcc   tp    tn  fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+1     5UTRATG  0.938776           0.943392   0.887755  0.988636     0.898148  0.985901  0.980141  0.935484  0.882156   87    97  11   1    196                           0.943580                      6.816986e-03                                    0.943580                               6.816986e-03                            0.907052                           0.011395                         0.988636                    3.347448e-16                              0.898523                         1.363397e-02                      0.985757                     0.002863                       0.983470                      0.003746                     0.946052                6.184818e-03                      0.890851                 1.261146e-02                        87.00                    0.000000                        79.07                    1.199790                         8.93                    1.199790                         1.00                    0.000000                           176.0                            0.0
+2  5UTRnonATG  0.989183           0.871737   0.673469  0.750000     0.993475  0.985346  0.767845  0.709677  0.705241   33  2436  16  11   2496                           0.872614                      5.182364e-03                                    0.872614                               5.182364e-03                            0.993857                           0.013281                         0.750000                    0.000000e+00                              0.995227                         1.036473e-02                      0.985589                     0.006532                       0.986133                      0.007562                     0.854841                4.989562e-03                      0.768777                 1.261186e-02                        33.00                    0.000000                        43.79                    0.456048                         0.21                    0.456048                        11.00                    0.000000                            88.0                            0.0
+0   Annotated  0.996198           0.998092   1.000000  0.996183     1.000000  1.000000  1.000000  0.998088  0.705756  261     1   0   1    263                           0.990000                      7.035265e-02                                    0.990000                               7.035265e-02                            0.980000                           0.140705                         0.980000                    1.407053e-01                              1.000000                         0.000000e+00                      1.000000                     0.000000                       1.000000                      0.000000                     0.980000                1.407053e-01                      0.980000                 1.407053e-01                         0.98                    0.140705                         1.00                    0.000000                         0.00                    0.000000                         0.02                    0.140705                             2.0                            0.0
+3      CDSATG  0.945455           0.931818   0.916667  1.000000     0.863636  0.993113  0.995692  0.956522  0.889757   33    19   3   0     55                           0.931818                      2.231632e-16                                    0.931818                               1.115816e-16                            0.880000                           0.000000                         1.000000                    0.000000e+00                              0.863636                         3.347448e-16                      0.992934                     0.003376                       0.993597                      0.003080                     0.936170                3.347448e-16                      0.871780                 1.115816e-16                        22.00                    0.000000                        19.00                    0.000000                         3.00                    0.000000                         0.00                    0.000000                            44.0                            0.0
+4   CDSnonATG  0.960199           0.619819   0.500000  0.250000     0.989637  0.782383  0.286605  0.333333  0.335440    2   191   2   6    201                           0.621875                      1.369018e-02                                    0.621875                               1.369018e-02                            0.983333                           0.073014                         0.250000                    0.000000e+00                              0.993750                         2.738036e-02                      0.784219                     0.095281                       0.813961                      0.086155                     0.398182                7.965197e-03                      0.367073                 4.771550e-02                         2.00                    0.000000                         7.95                    0.219043                         0.05                    0.219043                         6.00                    0.000000                            16.0                            0.0

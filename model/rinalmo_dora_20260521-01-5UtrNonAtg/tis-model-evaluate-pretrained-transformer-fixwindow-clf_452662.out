@@ -1,0 +1,55 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260521_142011
+(24887, 6)
+labels: {1: 370, 0: 24517}
+train labels: {np.int64(1): 257, np.int64(0): 17579}
+val labels: {np.int64(1): 45, np.int64(0): 2007}
+test labels: {np.int64(1): 68, np.int64(0): 4931}
+train sections: {np.int64(1): 17836}
+section_ratio: {np.int64(1): 1.0}
+section_neg_pos_ratio: {1: 68.40077821011673}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33516.34it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260521-5UtrNonAtg/main.py:635: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+========== all sites ==========
+{'accuracy': 0.9719943988797759,
+ 'auc': np.float64(0.91075965977549),
+ 'aupr': np.float64(0.29524304801358386),
+ 'f1': np.float64(0.27835051546391754),
+ 'fn': np.int64(41),
+ 'fp': np.int64(99),
+ 'mcc': np.float64(0.2785856981333736),
+ 'precision': np.float64(0.21428571428571427),
+ 'recall': np.float64(0.39705882352941174),
+ 'specificity': np.float64(0.9799229365240316),
+ 'tn': np.int64(4832),
+ 'total': np.int64(4999),
+ 'tp': np.int64(27)}
+      section  accuracy  balanced_accuracy  precision    recall  specificity      auc      aupr        f1       mcc  tp    tn  fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+0  5UTRnonATG  0.971994           0.688491   0.214286  0.397059     0.979923  0.91076  0.295243  0.278351  0.278586  27  4832  99  41   4999                           0.689485                          0.006761                                    0.689485                                   0.006761                            0.957419                           0.030716                         0.397059                    5.579081e-17                              0.981912                             0.013523                      0.913633                      0.01608                       0.916374                      0.019094                     0.561206                    0.005336                      0.467566                      0.02212                         27.0                         0.0                        66.77                    0.919541                         1.23                    0.919541                         41.0                         0.0                           136.0                            0.0
+========== training set: all sites ==========
+      section  accuracy  balanced_accuracy  precision  recall  specificity      auc      aupr        f1       mcc   tp     tn   fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+0  5UTRnonATG  0.991254           0.995563   0.622276     1.0     0.991126  0.99992  0.994408  0.767164  0.785337  257  17423  156   0  17836                           0.995175                          0.003183                                    0.995175                                   0.003183                            0.990481                           0.006222                              1.0                             0.0                               0.99035                             0.006366                      0.999884                      0.00029                       0.999874                      0.000329                     0.995208                    0.003147                      0.990416                     0.006294                        257.0                         0.0                       254.52                     1.63596                         2.48                     1.63596                          0.0                         0.0                           514.0                            0.0
+========== val set: all sites ==========
+      section  accuracy  balanced_accuracy  precision    recall  specificity       auc      aupr       f1      mcc  tp    tn  fp  fn  total  balanced_downsample_accuracy_mean  balanced_downsample_accuracy_std  balanced_downsample_balanced_accuracy_mean  balanced_downsample_balanced_accuracy_std  balanced_downsample_precision_mean  balanced_downsample_precision_std  balanced_downsample_recall_mean  balanced_downsample_recall_std  balanced_downsample_specificity_mean  balanced_downsample_specificity_std  balanced_downsample_auc_mean  balanced_downsample_auc_std  balanced_downsample_aupr_mean  balanced_downsample_aupr_std  balanced_downsample_f1_mean  balanced_downsample_f1_std  balanced_downsample_mcc_mean  balanced_downsample_mcc_std  balanced_downsample_tp_mean  balanced_downsample_tp_std  balanced_downsample_tn_mean  balanced_downsample_tn_std  balanced_downsample_fp_mean  balanced_downsample_fp_std  balanced_downsample_fn_mean  balanced_downsample_fn_std  balanced_downsample_total_mean  balanced_downsample_total_std
+0  5UTRnonATG    0.9654           0.667314   0.275862  0.355556     0.979073  0.879212  0.368331  0.31068  0.29571  16  1965  42  29   2052                           0.668111                           0.01007                                    0.668111                                    0.01007                            0.951031                           0.049013                         0.355556                    5.579081e-17                              0.980667                             0.020139                      0.880099                     0.021437                       0.894704                      0.023522                     0.517322                    0.007482                      0.431668                     0.033991                         16.0                         0.0                        44.13                    0.906263                         0.87                    0.906263                         29.0                         0.0                            90.0                            0.0

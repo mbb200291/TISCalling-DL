@@ -1,0 +1,88 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260522_121747
+(24887, 6)
+labels: {1: 370, 0: 24517}
+train labels: {np.int64(1): 257, np.int64(0): 17579}
+val labels: {np.int64(1): 45, np.int64(0): 2007}
+test labels: {np.int64(1): 68, np.int64(0): 4931}
+train sections: {np.int64(1): 17836}
+section_ratio: {np.int64(1): 1.0}
+section_neg_pos_ratio: {1: 68.40077821011673}
+hyperparameters: {'lora_r': 4, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'section_scaling': 0, 'section_label_scaling': 0, 'max_weight': 300, 'lr': 0.0001, 'left_window': 411, 'right_window': 101, 'ignore_sec': 0}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 31138.24it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+Traceback (most recent call last):
+  File "/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-03-5UtrNonAtg-noadj/main.py", line 967, in <module>
+    main()
+  File "/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-03-5UtrNonAtg-noadj/main.py", line 913, in main
+    train_model(
+  File "/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-03-5UtrNonAtg-noadj/main.py", line 588, in train_model
+    tr = train_one_epoch(model, train_loader, optimizer, criterion_fn, DEVICE)
+  File "/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-03-5UtrNonAtg-noadj/main.py", line 481, in train_one_epoch
+    logits = model(input_ids, attention_mask, lengths)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-03-5UtrNonAtg-noadj/main.py", line 338, in forward
+    outputs = self.backbone(
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/peft/peft_model.py", line 2568, in forward
+    return self.base_model(
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/peft/tuners/tuners_utils.py", line 197, in forward
+    return self.model.forward(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/transformers/utils/generic.py", line 963, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/multimolecule/models/rinalmo/modeling_rinalmo.py", line 216, in forward
+    encoder_outputs = self.encoder(
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/multimolecule/models/rinalmo/modeling_rinalmo.py", line 681, in forward
+    hidden_states = layer_module(
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/multimolecule/models/rinalmo/modeling_rinalmo.py", line 756, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/transformers/pytorch_utils.py", line 201, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/multimolecule/models/rinalmo/modeling_rinalmo.py", line 763, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output_ln)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/multimolecule/models/rinalmo/modeling_rinalmo.py", line 1087, in forward
+    return swish_out * self.linear_gate(x)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 42.00 MiB. GPU 0 has a total capacity of 15.77 GiB of which 27.12 MiB is free. Process 25117 has 7.87 GiB memory in use. Including non-PyTorch memory, this process has 7.88 GiB memory in use. Of the allocated memory 7.43 GiB is allocated by PyTorch, and 85.10 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
