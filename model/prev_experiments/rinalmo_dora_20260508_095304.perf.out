@@ -1,0 +1,81 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-mega
+pad token id = 0
+run at: 20260508_095248
+(34271, 6)
+labels: {1: 4394, 0: 29877}
+train labels: {np.int64(1): 3113, np.int64(0): 21074}
+val labels: {np.int64(1): 629, np.int64(0): 4277}
+test labels: {np.int64(1): 652, np.int64(0): 4526}
+train sections: {np.int64(0): 2125, np.int64(2): 1411, np.int64(1): 17736, np.int64(4): 2400, np.int64(3): 515}
+section_ratio: {np.int64(0): 11.382117647058823, np.int64(2): 17.141743444365698, np.int64(1): 1.36372350022553, np.int64(4): 10.077916666666667, np.int64(3): 46.96504854368932}
+section_neg_pos_ratio: {np.int64(0): 0.114900314795383, np.int64(2): 1.2758064516129033, np.int64(1): 67.74418604651163, np.int64(4): 31.876712328767123, np.int64(3): 1.01171875}
+hyperparameters: {'lora_r': 4, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'section_scaling': 0, 'section_label_scaling': 0, 'max_weight': 100, 'lr': 0.0001, 'left_window': 411, 'right_window': 101, 'ignore_sec': -1}
+Loading backbone: multimolecule/rinalmo-mega
+Loading weights:   0%|          | 0/453 [00:00<?, ?it/s]Loading weights: 100%|██████████| 453/453 [00:00<00:00, 17538.05it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-mega
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 997,680 || all params: 149,041,830 || trainable%: 0.6694
+Total params: 150,684,071  |  Trainable: 2,639,921
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+Epoch 01 | lr=1.00e-04 | train loss=0.1334 acc=0.9549 prec=0.8961 rec=0.7343 f1=0.8072 | val   loss=0.0767 acc=0.9786 prec=0.9580 rec=0.8712 f1=0.9126 aupr=0.9590
+  -> saved best model to model/rinalmo_dora_20260508_095304.pt
+Epoch 02 | lr=1.00e-04 | train loss=0.0583 acc=0.9819 prec=0.9460 rec=0.9117 f1=0.9285 | val   loss=0.0675 acc=0.9774 prec=0.8866 rec=0.9444 f1=0.9145 aupr=0.9732
+  -> saved best model to model/rinalmo_dora_20260508_095304.pt
+Epoch 03 | lr=1.00e-04 | train loss=0.0437 acc=0.9855 prec=0.9549 rec=0.9313 f1=0.9429 | val   loss=0.0699 acc=0.9792 prec=0.8986 rec=0.9444 f1=0.9209 aupr=0.9746
+  -> saved best model to model/rinalmo_dora_20260508_095304.pt
+Epoch 04 | lr=1.00e-04 | train loss=0.0320 acc=0.9901 prec=0.9730 rec=0.9496 f1=0.9611 | val   loss=0.0710 acc=0.9802 prec=0.9080 rec=0.9412 f1=0.9243 aupr=0.9723
+Epoch 05 | lr=1.00e-04 | train loss=0.0237 acc=0.9936 prec=0.9827 rec=0.9669 f1=0.9747 | val   loss=0.0939 acc=0.9757 prec=0.8750 rec=0.9459 f1=0.9091 aupr=0.9724
+Epoch 06 | lr=1.00e-04 | train loss=0.0207 acc=0.9938 prec=0.9824 rec=0.9695 f1=0.9759 | val   loss=0.0771 acc=0.9792 prec=0.9011 rec=0.9412 f1=0.9207 aupr=0.9716
+Epoch 07 | lr=1.00e-04 | train loss=0.0157 acc=0.9950 prec=0.9857 rec=0.9749 f1=0.9803 | val   loss=0.0980 acc=0.9747 prec=0.8675 rec=0.9475 f1=0.9058 aupr=0.9728
+Epoch 08 | lr=5.00e-05 | train loss=0.0081 acc=0.9971 prec=0.9913 rec=0.9862 f1=0.9887 | val   loss=0.0995 acc=0.9796 prec=0.9152 rec=0.9269 f1=0.9210 aupr=0.9725
+  -> early stopping at epoch 8
+Best val AUPR: 0.9746
+Loading backbone: multimolecule/rinalmo-mega
+Loading weights:   0%|          | 0/453 [00:00<?, ?it/s]Loading weights: 100%|██████████| 453/453 [00:00<00:00, 34115.34it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-mega
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 997,680 || all params: 149,041,830 || trainable%: 0.6694
+Total params: 150,684,071  |  Trainable: 2,639,921
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_rnafm_transformer_RiNALMo_noncanonicaltis_fixwindow.py:508: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+{'accuracy': 0.9793356508304365,
+ 'auc': np.float64(0.9863371210375499),
+ 'aupr': np.float64(0.9622289206292971),
+ 'f1': np.float64(0.9178818112049117),
+ 'fn': np.int64(54),
+ 'fp': np.int64(53),
+ 'mcc': np.float64(0.9060628819153043),
+ 'precision': np.float64(0.9185867895545314),
+ 'recall': np.float64(0.9171779141104295),
+ 'specificity': np.float64(0.9882898806893504),
+ 'tn': np.int64(4473),
+ 'total': np.int64(5178),
+ 'tp': np.int64(598)}

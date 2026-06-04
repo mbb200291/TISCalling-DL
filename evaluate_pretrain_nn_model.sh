@@ -27,4 +27,11 @@ conda activate TIScalling
 # python script/evaluate_model.py rinalmo_dora_20260515_090055 model/rinalmo_dora_20260515_090055.pt
 # python script/evaluate_model.py rinalmo_dora_20260514_114253 model/rinalmo_dora_20260514_114253.pt
 # python script/evaluate_model.py rinalmo_dora_20260515_134516 model/rinalmo_dora_20260515_134516.pt
-python script/evaluate_model.py rinalmo_dora_20260515_134516 model/rinalmo_dora_20260515_134516.pt
+# # python script/evaluate_model.py rinalmo_dora_20260515_134516 model/rinalmo_dora_20260515_134516.pt
+# # python script/evaluate_model.py rinalmo_dora_20260515_090055 model/rinalmo_dora_20260515_090055.pt
+# python script/evaluate_model.py rinalmo_dora_20260514_114253 model/rinalmo_dora_20260514_114253.pt
+# python script/evaluate_model.py rinalmo_dora_20260505_132022 model/rinalmo_dora_20260505_132022.pt
+# python script/evaluate_model.py rinalmo_dora_20260505_132022_debug model/rinalmo_dora_20260505_132022.pt
+# python script/evaluate_model.py rinalmo_dora_20260505_100930 model/rinalmo_dora_20260505_100930.pt
+# python script/evaluate_model.py rinalmo_dora_20260514_140724 model/prev_experiments/rinalmo_dora_20260514_140724.pt
+python script/evaluate_model.py rinalmo_dora_20260505_100930_fix model/prev_experiments/rinalmo_dora_20260505_100930.pt

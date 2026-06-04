@@ -1,0 +1,85 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260513_132021
+(34271, 6)
+labels: {1: 4394, 0: 29877}
+train labels: {np.int64(1): 3080, np.int64(0): 21095}
+val labels: {np.int64(1): 435, np.int64(0): 2776}
+test labels: {np.int64(1): 879, np.int64(0): 6006}
+pos_weight: tensor([6.8490], device='cuda:0')
+hyperparameters: {'lora_r': 4, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'weight_fold': 0.1, 'max_weight': 100, 'lr': 0.0001, 'left_window': 411, 'right_window': 101, 'ignore_sec': -1}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32326.38it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+Epoch 01 | lr=1.00e-04 | train loss=0.2006 acc=0.9025 prec=0.7772 rec=0.3295 f1=0.4628 | val   loss=0.1132 acc=0.9477 prec=0.9185 rec=0.6736 f1=0.7772 aupr=0.8785
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 02 | lr=1.00e-04 | train loss=0.0704 acc=0.9715 prec=0.9436 rec=0.8253 f1=0.8805 | val   loss=0.0512 acc=0.9791 prec=0.9718 rec=0.8713 f1=0.9188 aupr=0.9685
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 03 | lr=1.00e-04 | train loss=0.0508 acc=0.9795 prec=0.9591 rec=0.8766 f1=0.9160 | val   loss=0.0488 acc=0.9829 prec=0.9419 rec=0.9310 f1=0.9364 aupr=0.9741
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 04 | lr=1.00e-04 | train loss=0.0415 acc=0.9832 prec=0.9646 rec=0.9013 f1=0.9319 | val   loss=0.0446 acc=0.9829 prec=0.9567 rec=0.9149 f1=0.9354 aupr=0.9754
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 05 | lr=1.00e-04 | train loss=0.0347 acc=0.9861 prec=0.9692 rec=0.9201 f1=0.9440 | val   loss=0.0467 acc=0.9847 prec=0.9730 rec=0.9126 f1=0.9419 aupr=0.9758
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 06 | lr=1.00e-04 | train loss=0.0288 acc=0.9880 prec=0.9748 rec=0.9302 f1=0.9520 | val   loss=0.0530 acc=0.9826 prec=0.9797 rec=0.8897 f1=0.9325 aupr=0.9731
+Epoch 07 | lr=1.00e-04 | train loss=0.0247 acc=0.9902 prec=0.9801 rec=0.9419 f1=0.9606 | val   loss=0.0564 acc=0.9822 prec=0.9458 rec=0.9218 f1=0.9336 aupr=0.9732
+Epoch 08 | lr=1.00e-04 | train loss=0.0216 acc=0.9909 prec=0.9808 rec=0.9468 f1=0.9635 | val   loss=0.0520 acc=0.9829 prec=0.9460 rec=0.9264 f1=0.9361 aupr=0.9778
+  -> saved best model to model/rinalmo_dora_20260513_132026.pt
+Epoch 09 | lr=1.00e-04 | train loss=0.0184 acc=0.9923 prec=0.9846 rec=0.9542 f1=0.9692 | val   loss=0.0602 acc=0.9841 prec=0.9683 rec=0.9126 f1=0.9396 aupr=0.9731
+Epoch 10 | lr=1.00e-04 | train loss=0.0175 acc=0.9922 prec=0.9843 rec=0.9542 f1=0.9690 | val   loss=0.0521 acc=0.9844 prec=0.9777 rec=0.9057 f1=0.9403 aupr=0.9714
+Epoch 11 | lr=1.00e-04 | train loss=0.0144 acc=0.9943 prec=0.9890 rec=0.9656 f1=0.9772 | val   loss=0.0644 acc=0.9838 prec=0.9848 rec=0.8943 f1=0.9373 aupr=0.9697
+Epoch 12 | lr=1.00e-04 | train loss=0.0145 acc=0.9938 prec=0.9877 rec=0.9636 f1=0.9755 | val   loss=0.0574 acc=0.9829 prec=0.9524 rec=0.9195 f1=0.9357 aupr=0.9740
+Epoch 13 | lr=5.00e-05 | train loss=0.0095 acc=0.9957 prec=0.9917 rec=0.9740 f1=0.9828 | val   loss=0.0705 acc=0.9832 prec=0.9658 rec=0.9080 f1=0.9360 aupr=0.9710
+  -> early stopping at epoch 13
+Best val AUPR: 0.9778
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 31295.67it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 301,920 || all params: 33,783,372 || trainable%: 0.8937
+Total params: 34,707,853  |  Trainable: 1,226,401
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_rnafm_transformer_RiNALMo_fixwindow.py:514: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+{'accuracy': 0.9790849673202614,
+ 'auc': np.float64(0.9924724498103337),
+ 'aupr': np.float64(0.9742957483263246),
+ 'f1': np.float64(0.9190101237345332),
+ 'fn': np.int64(62),
+ 'fp': np.int64(82),
+ 'mcc': np.float64(0.9070795285904033),
+ 'precision': np.float64(0.9087875417130145),
+ 'recall': np.float64(0.9294653014789533),
+ 'specificity': np.float64(0.9863469863469864),
+ 'tn': np.int64(5924),
+ 'total': np.int64(6885),
+ 'tp': np.int64(817)}

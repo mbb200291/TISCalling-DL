@@ -7,6 +7,16 @@ import ml_util
 from icecream import ic
 
 
+map_gene_cluster = None
+def cluster_seq_grp(gene) -> str:
+    global map_gene_cluster
+    if map_gene_cluster is None:
+        with open('input_data/Tomato_seq_clustered.csv', 'r', encoding='utf8') as f:
+            f.readline()
+            map_gene_cluster = dict([(x.split(',')[0].strip(), x.split(',')[-1].strip()) for x in f.readlines()])
+    return map_gene_cluster[gene]
+
+
 def main(args):
 
     features_file_path = args.feature
@@ -46,7 +56,15 @@ def main(args):
     X_df = features.drop(columns='ID')
     y = np.array(tags['y'].tolist())
     # ml_util.ml_training_and_testing(X_df, y, model_name, model_dir)
-    ml_util.ml_training_and_testing(X_df, y, features.ID.tolist(), model_name, model_dir)
+    # ml_util.ml_training_and_testing(X_df, y, features.ID.tolist(), model_name, model_dir)
+    # ml_util.ml_training_and_testing(X_df, y, tags.Gene, model_name, model_dir)
+    ml_util.ml_training_and_testing(
+        X_df, y, 
+        list(map(cluster_seq_grp, tags.Gene)),
+        # tags.Gene,
+        model_name, model_dir
+    )
+
 
 if __name__ == '__main__':
     

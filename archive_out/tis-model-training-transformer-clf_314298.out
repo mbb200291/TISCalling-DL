@@ -1,0 +1,33 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_164748
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 3, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=0.6818 train_accuracy=0.4000 train_precision=1.0000 train_recall=0.2500 train_loss=0.6818 train_f1=0.4000 | val_loss=0.9606 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_164748.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.3710 train_accuracy=0.8000 train_precision=0.8000 train_recall=1.0000 train_loss=0.3710 train_f1=0.8889 | val_loss=1.2888 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.1302 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.1302 train_f1=1.0000 | val_loss=1.5638 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1402 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.1402 train_f1=1.0000 | val_loss=1.7813 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0413 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.0413 train_f1=1.0000 | val_loss=1.9687 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0277 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.0277 train_f1=1.0000 | val_loss=2.1291 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 4394, 0: 29877}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 3, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=1.6698 train_accuracy=0.3956 train_precision=0.1664 train_recall=0.9418 train_loss=1.6698 train_f1=0.2828 | val_loss=1.5629 val_accuracy=0.4338 val_precision=0.2166 val_recall=0.9742 val_f1=0.3544
+  -> saved best model to model/transformer_clf_20260421_164751.pt
+Epoch 02 | lr=1.00e-03 | train_loss=1.3985 train_accuracy=0.5448 train_precision=0.2097 train_recall=0.9385 train_loss=1.3985 train_f1=0.3428 | val_loss=1.4767 val_accuracy=0.5698 val_precision=0.2649 val_recall=0.9561 val_f1=0.4149
+  -> saved best model to model/transformer_clf_20260421_164751.pt
+Epoch 03 | lr=1.00e-03 | train_loss=1.2107 train_accuracy=0.6404 train_precision=0.2518 train_recall=0.9346 train_loss=1.2107 train_f1=0.3967 | val_loss=1.1404 val_accuracy=0.7061 val_precision=0.3457 val_recall=0.9439 val_f1=0.5061
+  -> saved best model to model/transformer_clf_20260421_164751.pt
+slurmstepd: error: *** JOB 314298 ON handel CANCELLED AT 2026-04-21T16:49:16 ***

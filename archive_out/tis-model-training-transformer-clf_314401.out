@@ -1,0 +1,75 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260423_091547
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 0.5, 'max_len': 2048, 'pooling_mode': 'attention'}
+Using 2 GPUs
+total parameters: 469313
+total trainable parameters: 469313
+Epoch 01 | lr=1.00e-03 | train_loss=0.3246 train_accuracy=0.2000 train_precision=0.0000 train_recall=0.0000 train_f1=0.0000 | val_loss=0.2631 val_accuracy=0.5000 val_precision=0.0000 val_recall=0.0000 val_f1=0.0000
+  -> saved best model to model/test-run_20260423_091547.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.1981 train_accuracy=0.2000 train_precision=0.0000 train_recall=0.0000 train_f1=0.0000 | val_loss=0.3340 val_accuracy=0.5000 val_precision=0.0000 val_recall=0.0000 val_f1=0.0000
+Epoch 03 | lr=1.00e-03 | train_loss=0.1402 train_accuracy=0.4000 train_precision=1.0000 train_recall=0.2500 train_f1=0.4000 | val_loss=0.4379 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> saved best model to model/test-run_20260423_091547.pt
+Epoch 04 | lr=1.00e-03 | train_loss=0.0691 train_accuracy=0.8000 train_precision=1.0000 train_recall=0.7500 train_f1=0.8571 | val_loss=0.5870 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0509 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=0.7557 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0363 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=0.9385 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 07 | lr=1.00e-03 | train_loss=0.0278 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.0948 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 08 | lr=1.00e-03 | train_loss=0.0200 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.2311 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 09 | lr=1.00e-03 | train_loss=0.0222 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.3224 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 10 | lr=1.00e-03 | train_loss=0.0131 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.3753 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 11 | lr=1.00e-03 | train_loss=0.0047 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.4135 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 12 | lr=1.00e-03 | train_loss=0.0036 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.4396 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 13 | lr=1.00e-03 | train_loss=0.0051 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_f1=1.0000 | val_loss=1.4624 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> early stopping at epoch 13 (no improvement for 10 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 4394, 0: 29877}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 0.5, 'max_len': 2048, 'pooling_mode': 'attention'}
+Using 2 GPUs
+total parameters: 469313
+total trainable parameters: 469313
+Epoch 01 | lr=1.00e-03 | train_loss=0.7077 train_accuracy=0.7979 train_precision=0.2974 train_recall=0.4383 train_f1=0.3543 | val_loss=1.1198 val_accuracy=0.3337 val_precision=0.1915 val_recall=0.9864 val_f1=0.3208
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.5439 train_accuracy=0.8478 train_precision=0.4360 train_recall=0.6925 train_f1=0.5351 | val_loss=0.5538 val_accuracy=0.8550 val_precision=0.5350 val_recall=0.6939 val_f1=0.6042
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 03 | lr=1.00e-03 | train_loss=0.4590 train_accuracy=0.8716 train_precision=0.4954 train_recall=0.7800 train_f1=0.6059 | val_loss=0.5312 val_accuracy=0.9024 val_precision=0.7013 val_recall=0.6758 val_f1=0.6883
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 04 | lr=1.00e-03 | train_loss=0.4309 train_accuracy=0.8820 train_precision=0.5222 train_recall=0.7927 train_f1=0.6296 | val_loss=0.4896 val_accuracy=0.8412 val_precision=0.5013 val_recall=0.8727 val_f1=0.6368
+Epoch 05 | lr=1.00e-03 | train_loss=0.4000 train_accuracy=0.8926 train_precision=0.5522 train_recall=0.7986 train_f1=0.6529 | val_loss=0.4866 val_accuracy=0.8961 val_precision=0.6448 val_recall=0.7758 val_f1=0.7043
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 06 | lr=1.00e-03 | train_loss=0.3303 train_accuracy=0.9245 train_precision=0.6586 train_recall=0.8370 train_f1=0.7372 | val_loss=0.2464 val_accuracy=0.9560 val_precision=0.8310 val_recall=0.9091 val_f1=0.8683
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 07 | lr=1.00e-03 | train_loss=0.2327 train_accuracy=0.9604 train_precision=0.8165 train_recall=0.8864 train_f1=0.8501 | val_loss=0.2551 val_accuracy=0.9582 val_precision=0.8415 val_recall=0.9091 val_f1=0.8740
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 08 | lr=1.00e-03 | train_loss=0.2173 train_accuracy=0.9625 train_precision=0.8226 train_recall=0.8965 train_f1=0.8580 | val_loss=0.2328 val_accuracy=0.9570 val_precision=0.8329 val_recall=0.9136 val_f1=0.8714
+Epoch 09 | lr=1.00e-03 | train_loss=0.1946 train_accuracy=0.9641 train_precision=0.8265 train_recall=0.9066 train_f1=0.8647 | val_loss=0.2440 val_accuracy=0.9630 val_precision=0.8701 val_recall=0.9030 val_f1=0.8862
+  -> saved best model to model/transformer_clf_20260423_091556.pt
+Epoch 10 | lr=1.00e-03 | train_loss=0.1907 train_accuracy=0.9646 train_precision=0.8288 train_recall=0.9076 train_f1=0.8664 | val_loss=0.2398 val_accuracy=0.9432 val_precision=0.7614 val_recall=0.9379 val_f1=0.8405
+Epoch 11 | lr=1.00e-03 | train_loss=0.1836 train_accuracy=0.9647 train_precision=0.8282 train_recall=0.9099 train_f1=0.8671 | val_loss=0.2534 val_accuracy=0.9425 val_precision=0.7624 val_recall=0.9288 val_f1=0.8374
+Epoch 12 | lr=1.00e-03 | train_loss=0.1742 train_accuracy=0.9670 train_precision=0.8365 train_recall=0.9190 train_f1=0.8758 | val_loss=0.2493 val_accuracy=0.9604 val_precision=0.8594 val_recall=0.8985 val_f1=0.8785
+Epoch 13 | lr=1.00e-03 | train_loss=0.1679 train_accuracy=0.9676 train_precision=0.8369 train_recall=0.9235 train_f1=0.8781 | val_loss=0.2176 val_accuracy=0.9512 val_precision=0.8053 val_recall=0.9152 val_f1=0.8567
+Epoch 14 | lr=1.00e-03 | train_loss=0.1544 train_accuracy=0.9691 train_precision=0.8453 train_recall=0.9248 train_f1=0.8833 | val_loss=0.2912 val_accuracy=0.9638 val_precision=0.9048 val_recall=0.8636 val_f1=0.8837
+Epoch 15 | lr=1.00e-03 | train_loss=0.1489 train_accuracy=0.9701 train_precision=0.8489 train_recall=0.9291 train_f1=0.8872 | val_loss=0.3298 val_accuracy=0.9618 val_precision=0.9142 val_recall=0.8394 val_f1=0.8752
+Epoch 16 | lr=1.00e-03 | train_loss=0.1394 train_accuracy=0.9708 train_precision=0.8460 train_recall=0.9401 train_f1=0.8906 | val_loss=0.2596 val_accuracy=0.9601 val_precision=0.8541 val_recall=0.9045 val_f1=0.8786
+Epoch 17 | lr=1.00e-03 | train_loss=0.1325 train_accuracy=0.9710 train_precision=0.8489 train_recall=0.9375 train_f1=0.8910 | val_loss=0.2715 val_accuracy=0.9589 val_precision=0.8460 val_recall=0.9076 val_f1=0.8757
+Epoch 18 | lr=1.00e-03 | train_loss=0.1223 train_accuracy=0.9731 train_precision=0.8573 train_recall=0.9444 train_f1=0.8987 | val_loss=0.3712 val_accuracy=0.9652 val_precision=0.9314 val_recall=0.8439 val_f1=0.8855
+Epoch 19 | lr=1.00e-03 | train_loss=0.1181 train_accuracy=0.9731 train_precision=0.8538 train_recall=0.9502 train_f1=0.8994 | val_loss=0.2432 val_accuracy=0.9389 val_precision=0.7491 val_recall=0.9273 val_f1=0.8287
+  -> early stopping at epoch 19 (no improvement for 10 epochs)
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer_relatvie_pos_label.py:686: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state_dict = torch.load(path, map_location=device)
+Best validation F1: 0.8862
+{'accuracy': 0.9592535524738914,
+ 'f1': np.float64(0.8297567954220315),
+ 'fn': np.int64(81),
+ 'fp': np.int64(157),
+ 'mcc': np.float64(0.8082330396075947),
+ 'precision': np.float64(0.7869742198100407),
+ 'recall': np.float64(0.8774583963691377),
+ 'specificity': np.float64(0.9696911196911197),
+ 'tn': np.int64(5023),
+ 'tp': np.int64(580)}
+

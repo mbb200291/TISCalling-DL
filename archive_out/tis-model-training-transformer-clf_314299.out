@@ -1,0 +1,55 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_164924
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 2, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=0.4894 train_accuracy=0.4000 train_precision=1.0000 train_recall=0.2500 train_loss=0.4894 train_f1=0.4000 | val_loss=0.9091 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_164924.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.2948 train_accuracy=0.8000 train_precision=0.8000 train_recall=1.0000 train_loss=0.2948 train_f1=0.8889 | val_loss=1.1968 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.0975 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.0975 train_f1=1.0000 | val_loss=1.4425 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1045 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.1045 train_f1=1.0000 | val_loss=1.6434 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0284 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.0284 train_f1=1.0000 | val_loss=1.8267 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0190 train_accuracy=1.0000 train_precision=1.0000 train_recall=1.0000 train_loss=0.0190 train_f1=1.0000 | val_loss=1.9936 val_accuracy=0.5000 val_precision=0.5000 val_recall=1.0000 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 4394, 0: 29877}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 2, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=1.4128 train_accuracy=0.4793 train_precision=0.1823 train_recall=0.8942 train_loss=1.4128 train_f1=0.3029 | val_loss=1.4647 val_accuracy=0.5404 val_precision=0.2406 val_recall=0.8727 val_f1=0.3772
+  -> saved best model to model/transformer_clf_20260421_164927.pt
+Epoch 02 | lr=1.00e-03 | train_loss=1.0831 train_accuracy=0.6646 train_precision=0.2611 train_recall=0.9021 train_loss=1.0831 train_f1=0.4049 | val_loss=0.9629 val_accuracy=0.7516 val_precision=0.3835 val_recall=0.9182 val_f1=0.5411
+  -> saved best model to model/transformer_clf_20260421_164927.pt
+Epoch 03 | lr=1.00e-03 | train_loss=0.8735 train_accuracy=0.7656 train_precision=0.3407 train_recall=0.9125 train_loss=0.8735 train_f1=0.4962 | val_loss=0.9271 val_accuracy=0.7736 val_precision=0.4061 val_recall=0.9076 val_f1=0.5611
+  -> saved best model to model/transformer_clf_20260421_164927.pt
+Epoch 04 | lr=1.00e-03 | train_loss=0.8331 train_accuracy=0.7750 train_precision=0.3506 train_recall=0.9141 train_loss=0.8331 train_f1=0.5069 | val_loss=0.9045 val_accuracy=0.7690 val_precision=0.4024 val_recall=0.9242 val_f1=0.5607
+Epoch 05 | lr=1.00e-03 | train_loss=0.8015 train_accuracy=0.7878 train_precision=0.3653 train_recall=0.9183 train_loss=0.8015 train_f1=0.5227 | val_loss=0.8822 val_accuracy=0.8021 val_precision=0.4406 val_recall=0.8939 val_f1=0.5903
+  -> saved best model to model/transformer_clf_20260421_164927.pt
+Epoch 06 | lr=1.00e-03 | train_loss=0.7862 train_accuracy=0.7952 train_precision=0.3743 train_recall=0.9212 train_loss=0.7862 train_f1=0.5323 | val_loss=0.8587 val_accuracy=0.7434 val_precision=0.3774 val_recall=0.9379 val_f1=0.5383
+Epoch 07 | lr=1.00e-03 | train_loss=0.7687 train_accuracy=0.7966 train_precision=0.3763 train_recall=0.9252 train_loss=0.7687 train_f1=0.5350 | val_loss=0.8401 val_accuracy=0.7803 val_precision=0.4150 val_recall=0.9212 val_f1=0.5722
+Epoch 08 | lr=1.00e-03 | train_loss=0.7416 train_accuracy=0.8022 train_precision=0.3835 train_recall=0.9268 train_loss=0.7416 train_f1=0.5425 | val_loss=0.8500 val_accuracy=0.7675 val_precision=0.4008 val_recall=0.9242 val_f1=0.5591
+Epoch 09 | lr=1.00e-03 | train_loss=0.7441 train_accuracy=0.7936 train_precision=0.3734 train_recall=0.9310 train_loss=0.7441 train_f1=0.5330 | val_loss=0.8200 val_accuracy=0.7373 val_precision=0.3734 val_recall=0.9545 val_f1=0.5369
+Epoch 10 | lr=1.00e-03 | train_loss=0.7353 train_accuracy=0.8028 train_precision=0.3840 train_recall=0.9245 train_loss=0.7353 train_f1=0.5426 | val_loss=0.8263 val_accuracy=0.7811 val_precision=0.4155 val_recall=0.9167 val_f1=0.5718
+  -> early stopping at epoch 10 (no improvement for 5 epochs)
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py:685: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state_dict = torch.load(path, map_location=device)
+Best validation F1: 0.5903
+{'accuracy': 0.8070535867146037,
+ 'f1': np.float64(0.510212950890917),
+ 'fn': np.int64(74),
+ 'fp': np.int64(1053),
+ 'mcc': np.float64(0.48273622227228713),
+ 'precision': np.float64(0.35792682926829267),
+ 'recall': np.float64(0.8880484114977307),
+ 'specificity': np.float64(0.7967181467181467),
+ 'tn': np.int64(4127),
+ 'tp': np.int64(587)}
+

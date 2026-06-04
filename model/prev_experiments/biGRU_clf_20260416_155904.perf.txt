@@ -1,0 +1,17 @@
+{'accuracy': 0.9693545625749016,
+ 'f1': np.float64(0.8709444844989185),
+ 'fn': np.int64(122),
+ 'fp': np.int64(57),
+ 'precision': np.float64(0.913767019667171),
+ 'recall': np.float64(0.8319559228650137),
+ 'specificity': np.float64(0.9888563049853373),
+ 'tn': np.int64(5058),
+ 'tp': np.int64(604)}
+
+
+h_bs = 2**5
+h_emb_dim = 8 # 16
+h_hidden_dim = 8  #16 #32 # 64
+h_num_layers = 2
+h_dropout = 0.2
+h_epoch = 10

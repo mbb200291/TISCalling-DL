@@ -1,5 +1,5 @@
 input_data/df_data.csv
-*.out
+/*.out
 *.tsv
 
 model/**/*.pt

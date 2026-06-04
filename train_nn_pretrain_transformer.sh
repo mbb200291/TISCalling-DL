@@ -14,5 +14,6 @@ conda activate TIScalling
 # python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_nonannotatedtis.py  # pretrain model AIDO.RNA and select non-canonical tis 
 # python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_nonannotatedtis_fixwindow.py  # pretrain model AIDO.RNA and select non-canonical tis, fixed window
 # python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_fixwindow.py  # pretrain model AIDO.RNA and fixed window
-python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_nonannotatedtis_fixwindow_fixw.py  # pretrain model AIDO.RNA and fixed window
+# python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_nonannotatedtis_fixwindow_fixw.py  # pretrain model AIDO.RNA and fixed window
 # python script/train_nn_model_by_site_rnafm_transformer_RiNALMo_nonannotatedtis_fixwindow_adjidv.py  # pretrain model AIDO.RNA and fixed window and reasonable wei adj
+python script/rinalmo_dora_20260505_132022_grpperf.py

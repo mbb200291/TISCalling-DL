@@ -8,4 +8,4 @@ source $HOME/miniconda3/etc/profile.d/conda.sh
 
 conda activate TIScalling
 
-python script.py train 5 3
+python main.py train

@@ -24,37 +24,28 @@ from multimolecule import RnaTokenizer, RiNALMoModel
 from peft import get_peft_model, LoraConfig, TaskType
 
 import os
-os.environ["PYTORCH_CUDAsb_ALLOC_CONF"] = "expandable_segments:True"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-SEED = 23
+SEED = 42
 random.seed(SEED)
 torch.manual_seed(SEED)
 
 # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+# DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
 # ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo (650M) ─
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
 RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
 
-
 # ── 全域只載入一次 tokenizer ──────────────────────────────────────────────────
 print(f"Loading tokenizer: {RINALMO_MODEL_ID}", flush=True)
 _tokenizer = RnaTokenizer.from_pretrained(RINALMO_MODEL_ID)
 
-# RiNALMo tokenizer adds [CLS] at front and [EOS] at the end, so nucleotide
-# position should add 1 offset.
+# RiNALMo tokenizer will add [CLS] at front and [EOS] at the end, so nucleotide position should add 1 offset
 _CLS_OFFSET = 1
 
-# Pad token: RnaTokenizer recognises the literal string "<pad>" (lowercase!) and
-# tokenises it to a single pad token. We use this for left/right padding around
-# the marker so the marker nucleotide always lands at a known token index.
-_PAD_STR = "<pad>"
-_PAD_ID  = _tokenizer.pad_token_id
-assert _PAD_ID is not None, "Tokenizer has no pad_token_id"
-print(f"pad token id = {_PAD_ID}", flush=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Dataset
@@ -62,19 +53,19 @@ print(f"pad token id = {_PAD_ID}", flush=True)
 
 class RNADataset(Dataset):
     """
-    Fixed-window sequences (already padded with `<pad>` literals around the
-    marker by `centralize_transcript`) + binary labels.
+    Raw sequences + nucleotide-space positions + binary labels.
     Tokenisation is deferred to collate_fn.
     """
 
     def __init__(
-        self,
-        sequences: List[str],
-        labels: List[int],
-        sections: List[int],
-    ):
-        assert len(sequences) == len(labels) == len(sections)
+        self, sequences: List[str], positions: List[int],
+        labels: List[int], sections: List[int],
+        ):
+        assert len(sequences) == len(positions) == len(labels) #== len(sections)
+        for seq, pos in zip(sequences, positions):
+            assert len(seq) > pos, f"position {pos} out of range for seq len {len(seq)}"
         self.sequences = sequences
+        self.positions = positions
         self.labels = labels
         self.sections = sections
 
@@ -84,13 +75,13 @@ class RNADataset(Dataset):
     def __getitem__(self, idx):
         return (
             self.sequences[idx],
+            self.positions[idx],
             torch.tensor(self.labels[idx], dtype=torch.float),
             self.sections[idx],
         )
 
-
 def collate_fn(batch):
-    seqs, labels, sections = zip(*batch)
+    seqs, positions, labels, sections = zip(*batch)
 
     encoding = _tokenizer(
         list(seqs),
@@ -101,15 +92,19 @@ def collate_fn(batch):
     input_ids      = encoding["input_ids"]       # [B, L]
     attention_mask = encoding["attention_mask"]  # [B, L]
 
-    # The tokenizer treats embedded <pad> tokens as real tokens (mask = 1).
-    # We want the model to ignore them, so zero out attention on every pad id.
-    attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
+    B, L = input_ids.shape
+    pos_features = torch.zeros(B, L, dtype=torch.float)
+    for i, pos in enumerate(positions):
+        token_idx = pos + _CLS_OFFSET  # +1 for [CLS]
+        if token_idx < L:
+            pos_features[i, token_idx] = 1.0
+        else:
+            pos_features[i, int(attention_mask[i].sum()) - 1] = 1.0
 
-    # lengths    = attention_mask.sum(dim=1)
-    labels_t   = torch.stack(list(labels))
+    lengths = attention_mask.sum(dim=1)
+    labels_t = torch.stack(list(labels))
     sections_t = torch.tensor(sections, dtype=torch.float)
-    return input_ids, attention_mask, labels_t, sections_t
-
+    return input_ids, attention_mask, pos_features, lengths, labels_t, sections_t
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -159,36 +154,43 @@ class RiNALMoClassifier(nn.Module):
         self,
         input_ids:      torch.Tensor,   # [B, L]
         attention_mask: torch.Tensor,   # [B, L]
+        pos_features:   torch.Tensor,   # [B, L]  one-hot token-space marker
+        lengths:        torch.Tensor,   # [B]  (unused, kept for API compat)
     ) -> torch.Tensor:                  # [B]  raw logits
 
+        # ── backbone ──────────────────────────────────────────────────────────
         outputs = self.backbone(
             input_ids=input_ids,
             attention_mask=attention_mask,
         )
         hidden = outputs.last_hidden_state   # [B, L, D]
 
-        # [CLS] token sits at position 0
+        # ── extract marker token ───────────────────────────────────────────────
         B = hidden.size(0)
-        batch_idx = torch.arange(B, device=hidden.device)
-        cls_h = hidden[batch_idx, 0]  # [B, D]
+        batch_idx  = torch.arange(B, device=hidden.device)
+        marker_idx = pos_features.argmax(dim=1)        # [B]
+        marker_h   = hidden[batch_idx, marker_idx]     # [B, D]
 
+        # ── pooling ───────────────────────────────────────────────────────────
         if self.pooling_mode == "marker":
-            h = cls_h                                   # [B, D]
+            h = marker_h                               # [B, D]
+
         elif self.pooling_mode == "attention":
-            padding_mask = (attention_mask == 0)        # [B, L]  True = pad
+            padding_mask = (attention_mask == 0)       # [B, L]  True = pad
             global_h, _ = self.marker_attention(
-                query=cls_h.unsqueeze(1),               # [B, 1, D]
+                query=marker_h.unsqueeze(1),           # [B, 1, D]
                 key=hidden,
                 value=hidden,
                 key_padding_mask=padding_mask,
                 need_weights=False,
             )
-            global_h = global_h.squeeze(1)              # [B, D]
-            h = torch.cat([cls_h, global_h], dim=-1)    # [B, 2D]
+            global_h = global_h.squeeze(1)            # [B, D]
+            h = torch.cat([marker_h, global_h], dim=-1)  # [B, 2D]
 
-        logits = self.classifier(self.dropout(h))       # [B, 1]
-        return logits.squeeze(-1)                       # [B]
-    
+        logits = self.classifier(self.dropout(h))      # [B, 1]
+        return logits.squeeze(-1)                      # [B]
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Build backbone with DoRA
 # ══════════════════════════════════════════════════════════════════════════════
@@ -212,7 +214,7 @@ def build_dora_backbone(lora_r=16, lora_alpha=32, lora_dropout=0.05):
         target_modules=["query", "key", "value", "dense"],
     )
     peft_model = get_peft_model(base_model, lora_cfg)
-    peft_model.gradient_checkpointing_enable()  # 
+    # peft_model.gradient_checkpointing_enable()  # 
     peft_model.print_trainable_parameters()
     return peft_model
 
@@ -300,14 +302,16 @@ def train_one_epoch(model, dataloader, optimizer, criterion_fn, device, threshol
     total_loss = total_samples = 0
     all_logits, all_labels = [], []
  
-    for input_ids, attention_mask, labels, sections in dataloader:
+    for input_ids, attention_mask, pos_features, lengths, labels, sections in dataloader:
         input_ids      = input_ids.to(device)
         attention_mask = attention_mask.to(device)
+        pos_features   = pos_features.to(device)
+        lengths        = lengths.to(device)
         labels         = labels.to(device).float()
         sections = sections.to(device).float()
  
         optimizer.zero_grad()
-        logits = model(input_ids, attention_mask)
+        logits = model(input_ids, attention_mask, pos_features, lengths)
         loss   = criterion_fn(logits, labels, sections)
         loss.backward()
         optimizer.step()
@@ -330,13 +334,15 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
     total_loss = total_samples = 0
     all_logits, all_labels = [], []
  
-    for input_ids, attention_mask, labels, sections in dataloader:
+    for input_ids, attention_mask, pos_features, lengths, labels, sections in dataloader:
         input_ids      = input_ids.to(device)
         attention_mask = attention_mask.to(device)
+        pos_features   = pos_features.to(device)
+        lengths        = lengths.to(device)
         labels         = labels.to(device).float()
         sections       = sections.to(device).float()
  
-        logits = model(input_ids, attention_mask)
+        logits = model(input_ids, attention_mask, pos_features, lengths)
         
         # filter out non canoical tis
         keep = (sections != ignore_sec)
@@ -461,11 +467,13 @@ def predict_batch(model, dataloader, device, threshold=0.5, ignore_sec=-1):
     model.eval()
     all_probs, all_preds, all_labels = [], [], []
 
-    for input_ids, attention_mask, labels, sections in dataloader:
+    for input_ids, attention_mask, pos_features, lengths, labels, sections in dataloader:
         input_ids      = input_ids.to(device)
         attention_mask = attention_mask.to(device)
+        pos_features   = pos_features.to(device)
+        lengths        = lengths.to(device)
 
-        logits = model(input_ids, attention_mask)
+        logits = model(input_ids, attention_mask, pos_features, lengths)
         probs  = torch.sigmoid(logits).cpu()
         preds  = (probs >= threshold).float()
 
@@ -489,11 +497,11 @@ def load_model(path: str, hp: dict, device: torch.device = DEVICE) -> RiNALMoCla
 # Dataset factory
 # ══════════════════════════════════════════════════════════════════════════════
 
-def make_dataset(sequences, labels, groups, sections, batch_size=8):
-    assert len(sequences) == len(labels) == len(groups) == len(sections)
+def make_dataset(sequences, positions, labels, groups, sections, batch_size=8):
+    assert len(sequences) == len(positions) == len(labels) == len(groups) == len(sections)
     print("labels:", dict(Counter(labels)))
 
-    dataset = RNADataset(sequences, labels, sections)
+    dataset  = RNADataset(sequences, positions, labels, sections)
     indices  = np.arange(len(dataset))
     groups_a = np.array(groups)
     labels_a = np.array(labels)
@@ -575,17 +583,16 @@ def hyperparameters_queryer(*args):
     hp = {
         "lora_r":       4, #2, #16,
         "lora_alpha":   32,
-        "lora_dropout": 0.1, #0.05,
+        "lora_dropout": 0.05,
         "num_heads":    8,      # must divide d_model (giga=1280: ok; micro=480: use 8 or 6)
         "dropout":      0.1,
         "pooling_mode": "attention",
         "batch_size":   16, #8,
         "max_epoch":    50,
-        "pos_weight_fold":  0.5,
-        "noncanonical_weight_fold":  10,
+        "pos_weight_fold":  0.1,
+        "noncanonical_weight_fold":  4,
         "lr":           1e-4,
-        "left_window":  411,
-        "right_window": 101,
+        "max_len":      512,    # RiNALMo trained up to ~1024; safe upper limit
     }
     if not args:
         return hp
@@ -598,52 +605,48 @@ def hyperparameters_queryer(*args):
 # Sequence length control
 # ══════════════════════════════════════════════════════════════════════════════
 
-def centralize_transcript(left_window: int, right_window: int, seq: str, position: int):
-    """
-    Build a fixed-length window around `position` (0-indexed nucleotide) by
-    cropping the sequence and padding the missing sides with the literal
-    '<pad>' token string. RnaTokenizer recognises '<pad>' (lowercase) and maps
-    it to the pad token id, so the marker nucleotide always lands at a known
-    token index after tokenisation.
-    """
-    if position > left_window:
-        left_padding = ""
-        lb = position - left_window
-    else:
-        left_padding = _PAD_STR * (left_window - position)
-        lb = 0
+def cut_transcript(length_limit: int, seq: str, position: int, buffer: int = 100):
+    assert buffer >= 1
 
-    if len(seq) - position > right_window:
-        right_padding = ""
-        rb = position + right_window
-    else:
-        rb = len(seq)
-        right_padding = _PAD_STR * (right_window - (len(seq) - position))
+    if len(seq) <= length_limit:
+        return seq, position
 
-    return left_padding + seq[lb:rb] + right_padding
+    if position < length_limit - buffer:          # keep 5' end
+        return seq[:length_limit], position
 
+    if len(seq) - position < buffer:              # too close to 3' end
+        start = len(seq) - length_limit
+        return seq[-length_limit:], position - start
+
+    start = position - (length_limit - buffer)    # centre around marker
+    return seq[start: position + buffer], position - start
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Main
+# ══════════════════════════════════════════════════════════════════════════════
 
 def get_dataset(hp):
 
     df = pd.read_csv("input_data/df_data.csv")
     print(df.shape, flush=True)
 
-    left_window  = hp["left_window"]
-    right_window = hp["right_window"]
+    length_limit = hp["max_len"]
+    buffer_size  = 100
 
-    df["seq"] = df.apply(
-        lambda r: centralize_transcript(left_window, right_window, r["seq"], r["position"]),
-        axis=1,
+    df[["seq", "position"]] = df.apply(
+        lambda r: cut_transcript(length_limit, r["seq"], r["position"], buffer_size),
+        axis=1, result_type="expand",
     )
 
-    sequences, labels, genes, sections = (
-        df.seq.tolist(),
+    sequences, positions, labels, genes, sections = (
+        df.seq.tolist(), df.position.tolist(),
         df.label.tolist(), df.gene_id.tolist(),
         list(map(lambda x: int(x != 'Annotated'), df.section)),
     )
 
     train_loader, val_loader, test_loader, pos_weight, train_idx, val_idx, test_idx = make_dataset(
-        sequences, labels, genes, sections,
+        sequences, positions, labels, genes, sections,
         batch_size=hp["batch_size"],
     )
     
@@ -667,11 +670,7 @@ def main():
     )
 
     model = load_model(best_model_path, hp, DEVICE)
-    print('================= only non-indicated site =================')
     yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=0)
-    pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
-    print('================= all site =================')
-    yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=-1)
     pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
 
 

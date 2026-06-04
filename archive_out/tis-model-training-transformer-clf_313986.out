@@ -1,0 +1,47 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_163917
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 5, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=1.0665 train_f1=0.4000 | val_loss=1.0151 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_163918.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.5086 train_f1=0.8889 | val_loss=1.3640 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.1825 train_f1=1.0000 | val_loss=1.6712 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1960 train_f1=0.8889 | val_loss=1.9182 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0680 train_f1=1.0000 | val_loss=2.1233 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0507 train_f1=1.0000 | val_loss=2.2892 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 4394, 0: 29877}
+hyperparameters: {'embed_dim': 64, 'd_model': 64, 'num_layers': 3, 'num_heads': 8, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 5, 'max_len': 201}
+Using 2 GPUs
+total parameters: 109569
+total trainable parameters: 109569
+Epoch 01 | lr=1.00e-03 | train_loss=2.0169 train_f1=0.2660 | val_loss=1.8758 val_f1=0.3315
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 02 | lr=1.00e-03 | train_loss=1.7035 train_f1=0.3170 | val_loss=1.7898 val_f1=0.3786
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 03 | lr=1.00e-03 | train_loss=1.6127 train_f1=0.3340 | val_loss=1.4816 val_f1=0.4673
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 04 | lr=1.00e-03 | train_loss=1.3328 train_f1=0.3974 | val_loss=1.4579 val_f1=0.3831
+Epoch 05 | lr=1.00e-03 | train_loss=1.2315 train_f1=0.4206 | val_loss=1.3029 val_f1=0.4917
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 06 | lr=1.00e-03 | train_loss=1.2194 train_f1=0.4253 | val_loss=1.2608 val_f1=0.4575
+Epoch 07 | lr=1.00e-03 | train_loss=1.2077 train_f1=0.4268 | val_loss=1.2948 val_f1=0.4583
+Epoch 08 | lr=1.00e-03 | train_loss=1.1525 train_f1=0.4413 | val_loss=1.2705 val_f1=0.4819
+Epoch 09 | lr=1.00e-03 | train_loss=1.1455 train_f1=0.4370 | val_loss=1.2281 val_f1=0.5022
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 10 | lr=1.00e-03 | train_loss=1.1114 train_f1=0.4484 | val_loss=1.2191 val_f1=0.4393
+Epoch 11 | lr=1.00e-03 | train_loss=1.0922 train_f1=0.4586 | val_loss=1.3406 val_f1=0.5227
+  -> saved best model to model/transformer_clf_20260421_163921.pt
+Epoch 12 | lr=1.00e-03 | train_loss=1.1257 train_f1=0.4415 | val_loss=1.2162 val_f1=0.5195
+Epoch 13 | lr=1.00e-03 | train_loss=1.0789 train_f1=0.4567 | val_loss=1.1943 val_f1=0.4867
+Epoch 14 | lr=1.00e-03 | train_loss=1.0662 train_f1=0.4543 | val_loss=1.4419 val_f1=0.4815
+slurmstepd: error: *** JOB 313986 ON handel CANCELLED AT 2026-04-21T16:45:48 ***

@@ -1,0 +1,31 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_095956
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 2, 'num_heads': 4, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 1}
+Using 2 GPUs
+total parameters: 69505
+total trainable parameters: 69505
+Epoch 01 | lr=1.00e-03 | train_loss=0.1858 train_f1=0.8889 | val_loss=0.9622 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_095956.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.1701 train_f1=0.8889 | val_loss=0.9271 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.1016 train_f1=1.0000 | val_loss=0.9473 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.0718 train_f1=1.0000 | val_loss=0.9983 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0302 train_f1=1.0000 | val_loss=1.0812 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0421 train_f1=1.0000 | val_loss=1.2373 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+(32772, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 5216, 0: 27556}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 2, 'num_heads': 4, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 1}
+Using 2 GPUs
+total parameters: 69505
+total trainable parameters: 69505
+Epoch 01 | lr=1.00e-03 | train_loss=0.9744 train_f1=0.3544 | val_loss=0.9439 val_f1=0.3962
+  -> saved best model to model/transformer_clf_20260421_100005.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.9389 train_f1=0.3651 | val_loss=0.9743 val_f1=0.3899
+slurmstepd: error: *** JOB 309755 ON handel CANCELLED AT 2026-04-21T10:08:26 ***

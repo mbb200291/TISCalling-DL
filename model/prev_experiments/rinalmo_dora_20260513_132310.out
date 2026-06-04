@@ -1,0 +1,80 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-micro
+pad token id = 0
+run at: 20260513_132303
+(34271, 6)
+labels: {1: 4394, 0: 29877}
+train labels: {np.int64(1): 3080, np.int64(0): 21095}
+val labels: {np.int64(1): 435, np.int64(0): 2776}
+test labels: {np.int64(1): 879, np.int64(0): 6006}
+pos_weight: tensor([6.8490], device='cuda:0')
+hyperparameters: {'lora_r': 2, 'lora_alpha': 32, 'lora_dropout': 0.1, 'num_heads': 8, 'dropout': 0.1, 'pooling_mode': 'attention', 'batch_size': 16, 'max_epoch': 50, 'weight_fold': 0.1, 'max_weight': 100, 'lr': 0.0001, 'left_window': 512, 'right_window': 511, 'ignore_sec': -1}
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 32142.28it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 165,600 || all params: 33,647,052 || trainable%: 0.4922
+Total params: 34,571,533  |  Trainable: 1,090,081
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+Epoch 01 | lr=1.00e-04 | train loss=0.1320 acc=0.9417 prec=0.9014 rec=0.6088 f1=0.7267 | val   loss=0.0591 acc=0.9763 prec=0.9812 rec=0.8414 f1=0.9059 aupr=0.9558
+  -> saved best model to model/rinalmo_dora_20260513_132310.pt
+Epoch 02 | lr=1.00e-04 | train loss=0.0588 acc=0.9771 prec=0.9556 rec=0.8601 f1=0.9053 | val   loss=0.0494 acc=0.9816 prec=0.9434 rec=0.9195 f1=0.9313 aupr=0.9715
+  -> saved best model to model/rinalmo_dora_20260513_132310.pt
+Epoch 03 | lr=1.00e-04 | train loss=0.0472 acc=0.9810 prec=0.9622 rec=0.8854 f1=0.9222 | val   loss=0.0510 acc=0.9835 prec=0.9569 rec=0.9195 f1=0.9379 aupr=0.9679
+Epoch 04 | lr=1.00e-04 | train loss=0.0396 acc=0.9842 prec=0.9665 rec=0.9078 f1=0.9362 | val   loss=0.0495 acc=0.9816 prec=0.9372 rec=0.9264 f1=0.9318 aupr=0.9729
+  -> saved best model to model/rinalmo_dora_20260513_132310.pt
+Epoch 05 | lr=1.00e-04 | train loss=0.0322 acc=0.9875 prec=0.9734 rec=0.9269 f1=0.9496 | val   loss=0.0392 acc=0.9851 prec=0.9596 rec=0.9287 f1=0.9439 aupr=0.9812
+  -> saved best model to model/rinalmo_dora_20260513_132310.pt
+Epoch 06 | lr=1.00e-04 | train loss=0.0289 acc=0.9888 prec=0.9769 rec=0.9344 f1=0.9552 | val   loss=0.0495 acc=0.9847 prec=0.9730 rec=0.9126 f1=0.9419 aupr=0.9765
+Epoch 07 | lr=1.00e-04 | train loss=0.0263 acc=0.9891 prec=0.9773 rec=0.9364 f1=0.9564 | val   loss=0.0409 acc=0.9857 prec=0.9687 rec=0.9241 f1=0.9459 aupr=0.9794
+Epoch 08 | lr=1.00e-04 | train loss=0.0225 acc=0.9908 prec=0.9834 rec=0.9438 f1=0.9632 | val   loss=0.0471 acc=0.9841 prec=0.9752 rec=0.9057 f1=0.9392 aupr=0.9762
+Epoch 09 | lr=1.00e-04 | train loss=0.0191 acc=0.9923 prec=0.9852 rec=0.9539 f1=0.9693 | val   loss=0.0533 acc=0.9841 prec=0.9507 rec=0.9310 f1=0.9408 aupr=0.9782
+Epoch 10 | lr=5.00e-05 | train loss=0.0147 acc=0.9941 prec=0.9871 rec=0.9666 f1=0.9767 | val   loss=0.0476 acc=0.9847 prec=0.9531 rec=0.9333 f1=0.9431 aupr=0.9798
+  -> early stopping at epoch 10
+Best val AUPR: 0.9812
+Loading backbone: multimolecule/rinalmo-micro
+Loading weights:   0%|          | 0/183 [00:00<?, ?it/s]Loading weights: 100%|██████████| 183/183 [00:00<00:00, 33383.68it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-micro
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 165,600 || all params: 33,647,052 || trainable%: 0.4922
+Total params: 34,571,533  |  Trainable: 1,090,081
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_rnafm_transformer_RiNALMo_fixwindow.py:514: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+{'accuracy': 0.9847494553376906,
+ 'auc': np.float64(0.9944181718925746),
+ 'aupr': np.float64(0.9822365518594365),
+ 'f1': np.float64(0.9397590361445783),
+ 'fn': np.int64(60),
+ 'fp': np.int64(45),
+ 'mcc': np.float64(0.9310746153775363),
+ 'precision': np.float64(0.9479166666666666),
+ 'recall': np.float64(0.931740614334471),
+ 'specificity': np.float64(0.9925074925074925),
+ 'tn': np.int64(5961),
+ 'total': np.int64(6885),
+ 'tp': np.int64(819)}

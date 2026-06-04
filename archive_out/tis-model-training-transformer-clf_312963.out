@@ -1,0 +1,30 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_161515
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 2, 'num_heads': 4, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 1, 'max_len': 201}
+Using 2 GPUs
+total parameters: 73857
+total trainable parameters: 73857
+Epoch 01 | lr=1.00e-03 | train_loss=0.3196 train_f1=0.0000 | val_loss=0.4860 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_161515.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.2515 train_f1=0.4000 | val_loss=0.5633 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.2231 train_f1=1.0000 | val_loss=0.6362 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1005 train_f1=1.0000 | val_loss=0.7353 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0660 train_f1=1.0000 | val_loss=0.8503 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0577 train_f1=1.0000 | val_loss=0.9787 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+labels: {1: 5395, 0: 28876}
+Traceback (most recent call last):
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 764, in <module>
+    main()
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 748, in main
+    train_loader, val_loader, test_loader, pos_weight = make_dataset(sequences, positions, labels, genes, **hyperparameters_queryer('batch_size'))
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 509, in make_dataset
+    dataset = RNADataset(sequences, pos_features, labels)
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 72, in __init__
+    assert len(seq) > pos, 'position out of sequence'
+AssertionError: position out of sequence

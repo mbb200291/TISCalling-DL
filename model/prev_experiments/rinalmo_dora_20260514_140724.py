@@ -1,6 +1,5 @@
 import random
 import math
-import shutil
 from typing import List, Tuple
 from datetime import datetime
 from collections import Counter, defaultdict
@@ -12,10 +11,8 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, Subset
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
-    f1_score, confusion_matrix, roc_auc_score, average_precision_score,
-    balanced_accuracy_score, matthews_corrcoef
+    f1_score, confusion_matrix, roc_auc_score, average_precision_score
 )
-from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import StratifiedGroupKFold
 import pandas as pd
 from pprint import pprint
@@ -35,22 +32,21 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 
 # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+# DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 print("DEVICE:", DEVICE)
 
-# ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo-giga (650M) ─
-RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
+# ── Model variant: rinalmo-micro (30M) | rinalmo-mega (150M) | rinalmo (650M) ─
 # RINALMO_MODEL_ID = "multimolecule/rinalmo-mega"
-# RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
+RINALMO_MODEL_ID = "multimolecule/rinalmo-micro"
 
-# ── load tokenizer once ──────────────────────────────────────────────────
+# ── 全域只載入一次 tokenizer ──────────────────────────────────────────────────
 print(f"Loading tokenizer: {RINALMO_MODEL_ID}", flush=True)
 _tokenizer = RnaTokenizer.from_pretrained(RINALMO_MODEL_ID)
 
-# # RiNALMo tokenizer adds [CLS] at front and [EOS] at the end, so nucleotide
-# # position should add 1 offset.
-# _CLS_OFFSET = 1
+# RiNALMo tokenizer adds [CLS] at front and [EOS] at the end, so nucleotide
+# position should add 1 offset.
+_CLS_OFFSET = 1
 
 # Pad token: RnaTokenizer recognises the literal string "<pad>" (lowercase!) and
 # tokenises it to a single pad token. We use this for left/right padding around
@@ -59,176 +55,6 @@ _PAD_STR = "<pad>"
 _PAD_ID  = _tokenizer.pad_token_id
 assert _PAD_ID is not None, "Tokenizer has no pad_token_id"
 print(f"pad token id = {_PAD_ID}", flush=True)
-
-
-
-def _compute_metrics(y_true: np.ndarray, y_pred_prob: np.ndarray, cutoff=0.5):
-    """
-    Compute binary classification metrics from true labels and predicted probabilities.
-    """
-
-    y_true = np.asarray(y_true).astype(int)
-    y_pred_prob = np.asarray(y_pred_prob)
-
-    y_pred = (y_pred_prob > cutoff).astype(int)
-
-    acc = accuracy_score(y_true, y_pred)
-    balanced_acc = balanced_accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, zero_division=0)
-    recall = recall_score(y_true, y_pred, zero_division=0)
-    f1 = f1_score(y_true, y_pred, zero_division=0)
-    mcc = matthews_corrcoef(y_true, y_pred)
-
-    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
-    tn, fp, fn, tp = cm.ravel()
-
-    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
-
-    if len(np.unique(y_true)) < 2:
-        auc = float("nan")
-        aupr = float("nan")
-    else:
-        auc = roc_auc_score(y_true, y_pred_prob)
-        aupr = average_precision_score(y_true, y_pred_prob)
-
-    return {
-        "accuracy": acc,
-        "balanced_accuracy": balanced_acc,
-        "precision": precision,
-        "recall": recall,
-        "specificity": specificity,
-        "auc": auc,
-        "aupr": aupr,
-        "f1": f1,
-        "mcc": mcc,
-        "tp": int(tp),
-        "tn": int(tn),
-        "fp": int(fp),
-        "fn": int(fn),
-        "total": int(tp + tn + fp + fn),
-    }
-
-
-def _nan_downsample_summary(metric_keys):
-    """
-    Return NaN mean/std for balanced downsample metrics.
-    """
-
-    out = {}
-
-    for key in metric_keys:
-        out[f"balanced_downsample_{key}_mean"] = float("nan")
-        out[f"balanced_downsample_{key}_std"] = float("nan")
-
-    return out
-
-def compute_downsample_binary_metrics(
-    y_true: np.ndarray,
-    y_pred_prob: np.ndarray,
-    cutoff=0.5,
-    n_downsample_runs: int = 100,
-    random_state: int = 42,
-):
-    """
-    Compute binary classification metrics.
-
-    This function returns:
-    1. Metrics on the original data distribution.
-    2. Repeated random downsampling metrics, summarized by mean and standard deviation.
-
-    Downsampling is applied only for auxiliary balanced evaluation.
-    It should not replace metrics computed on the original validation/test distribution.
-    """
-
-    y_true = np.asarray(y_true).astype(int)
-    y_pred_prob = np.asarray(y_pred_prob)
-
-    if y_true.shape[0] != y_pred_prob.shape[0]:
-        raise ValueError("y_true and y_pred_prob must have the same length.")
-
-    # Metrics on the original distribution
-    metrics = _compute_metrics(
-        y_true=y_true,
-        y_pred_prob=y_pred_prob,
-        cutoff=cutoff,
-    )
-
-    metric_keys = list(metrics.keys())
-
-    # If only one class exists, downsampling is impossible
-    if len(np.unique(y_true)) < 2:
-        metrics.update(_nan_downsample_summary(metric_keys))
-        return metrics
-
-    # Repeated random downsampling
-    downsampled_results = []
-
-    for i in range(n_downsample_runs):
-        try:
-            X = y_pred_prob.reshape(-1, 1)
-            y = y_true
-
-            rus = RandomUnderSampler(
-                random_state=random_state + i,
-            )
-
-            X_resampled, y_resampled = rus.fit_resample(X, y)
-
-            y_pred_prob_resampled = X_resampled.ravel()
-            y_true_resampled = y_resampled
-
-            run_metrics = _compute_metrics(
-                y_true=y_true_resampled,
-                y_pred_prob=y_pred_prob_resampled,
-                cutoff=cutoff,
-            )
-
-            downsampled_results.append(run_metrics)
-
-        except Exception:
-            metrics.update(_nan_downsample_summary(metric_keys))
-            return metrics
-
-    # Summarize downsample metrics by mean and std
-    for key in metric_keys:
-        values = np.array(
-            [run[key] for run in downsampled_results],
-            dtype=float,
-        )
-
-        metrics[f"balanced_downsample_{key}_mean"] = np.nanmean(values)
-        metrics[f"balanced_downsample_{key}_std"] = np.nanstd(values, ddof=1)
-
-    return metrics
-
-
-def evaluate_group(df, cutoff_default=0.5, sec_cutoff=None):
-    if sec_cutoff is None:
-        sec_cutoff = {}
-    rows = [
-        {'section': 'all'} | compute_downsample_binary_metrics(
-            df.label.values,
-            df.yhat_prob.values,
-            cutoff_default),
-        {'section': 'non-annotated'} | compute_downsample_binary_metrics(
-            df.label[df.section != 'Annotated'].values,
-            df.yhat_prob[df.section != 'Annotated'].values,
-            cutoff_default),
-        ]
-    for sec in df.section.unique():
-        df_temp = df.loc[df.section == sec]
-        cutoff = sec_cutoff.get(sec, cutoff_default)  # select specified cutoff by section
-        perf_result = compute_downsample_binary_metrics(
-            df_temp.label.values,
-            df_temp.yhat_prob.values,
-            cutoff
-        )
-        # df_temp.label, df_temp.yhat, df_temp.yhat_prob)
-        # pprint(perf_result)
-        perf_result = {'section': sec} | perf_result
-        rows.append(perf_result)
-        # print('----')
-    return pd.DataFrame.from_dict(rows, ).sort_values(by='section')
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -388,7 +214,7 @@ def build_dora_backbone(lora_r=16, lora_alpha=32, lora_dropout=0.05):
     )
     peft_model = get_peft_model(base_model, lora_cfg)
     peft_model.enable_input_require_grads()
-    peft_model.gradient_checkpointing_enable()
+    # peft_model.gradient_checkpointing_enable()  # will slow when enable
     peft_model.print_trainable_parameters()
     return peft_model
 
@@ -480,6 +306,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion, device, threshold=0
 
         optimizer.zero_grad()
         logits = model(input_ids, attention_mask, lengths)
+        # loss   = criterion_fn(logits, labels, sections)
         loss   = criterion(logits, labels)
         loss.backward()
         optimizer.step()
@@ -532,6 +359,62 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
     )
 
 
+# def get_criterion_fn(
+#     section_ratio,
+#     section_neg_pos_ratio,
+#     section_scaling=0.0,
+#     section_label_scaling=0.0,
+#     max_weight=None,
+# ):
+#     """
+#     Returns a per-batch loss function.
+
+#     section_ratio[section]:
+#         #total / #section
+
+#     section_neg_pos_ratio[section]:
+#         #negative_in_section / #positive_in_section
+
+#     sample_weight =
+#         (#total / #section) ** section_scaling
+#         *
+#         (
+#             (#negative_in_section / #positive_in_section) ** section_label_scaling
+#             if label == 1
+#             else 1
+#         )
+#     """
+
+#     def criterion_fn(logits, labels, sections):
+#         device = logits.device
+
+#         labels = labels.float()
+#         sample_w = torch.ones_like(labels, dtype=torch.float32, device=device)
+
+#         for section in torch.unique(sections):
+#             section_key = section.item()
+#             section_mask = sections == section
+
+#             sec_w = float(section_ratio[section_key]) ** section_scaling
+#             pos_w = float(section_neg_pos_ratio[section_key]) ** section_label_scaling
+
+#             sample_w[section_mask] *= sec_w
+
+#             pos_mask = section_mask & (labels == 1)
+#             sample_w[pos_mask] *= pos_w
+
+#         if max_weight is not None:
+#             sample_w = torch.clamp(sample_w, max=max_weight)
+
+#         return F.binary_cross_entropy_with_logits(
+#             logits,
+#             labels,
+#             weight=sample_w,
+#         )
+
+#     return criterion_fn
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Train loop
 # ══════════════════════════════════════════════════════════════════════════════
@@ -539,16 +422,22 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5, ignore_sec=-1)
 def train_model(train_loader, val_loader, hp: dict,
                 # section_ratio, section_neg_pos_ratio,
                 pos_weight,
-                patience=15,
-                save_path: str = "model.pt"):
+                naming_prefix="model", patience=15):
 
     print("hyperparameters:", hp)
     model = build_model(hp, DEVICE)
-
+    
+    # criterion_fn = get_criterion_fn(
+    #     section_ratio,
+    #     section_neg_pos_ratio,
+    #     section_scaling=hp.get('section_scaling', 0.0),
+    #     section_label_scaling=hp.get('section_label_scaling', 0.0),
+    #     max_weight=hp.get('max_weight'),
+    # )
+    # eval_criterion = nn.BCEWithLogitsLoss()
     criterion = nn.BCEWithLogitsLoss(
         pos_weight=pos_weight * hp.get("weight_fold", 1.0)
     )
-    # eval_criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=hp.get("lr", 1e-4),
@@ -559,6 +448,9 @@ def train_model(train_loader, val_loader, hp: dict,
 
     best_score = -1
     no_improve = 0
+    run_id     = datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_path  = f"model/{naming_prefix}_{run_id}.pt"
+    os.makedirs("model", exist_ok=True)
 
     for epoch in range(1, hp.get("max_epoch", 50) + 1):
         tr = train_one_epoch(model, train_loader, optimizer, criterion, DEVICE)
@@ -568,8 +460,7 @@ def train_model(train_loader, val_loader, hp: dict,
         print(
             f"Epoch {epoch:02d} | lr={lr_now:.2e} | "
             f"train loss={tr['loss']:.4f} acc={tr['accuracy']:.4f} "
-            f"prec={tr['precision']:.4f} rec={tr['recall']:.4f} f1={tr['f1']:.4f} "
-            f"aupr={tr['aupr']:.4f} | "
+            f"prec={tr['precision']:.4f} rec={tr['recall']:.4f} f1={tr['f1']:.4f} | "
             f"val   loss={va['loss']:.4f} acc={va['accuracy']:.4f} "
             f"prec={va['precision']:.4f} rec={va['recall']:.4f} f1={va['f1']:.4f} "
             f"aupr={va['aupr']:.4f}",
@@ -589,12 +480,13 @@ def train_model(train_loader, val_loader, hp: dict,
                 break
 
     print(f"Best val AUPR: {best_score:.4f}")
-    return model
+    return model, save_path
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Inference
 # ══════════════════════════════════════════════════════════════════════════════
+
 @torch.no_grad()
 def predict_batch(model, dataloader, device, threshold=0.5, ignore_sec=-1):
     model.eval()
@@ -605,8 +497,8 @@ def predict_batch(model, dataloader, device, threshold=0.5, ignore_sec=-1):
         attention_mask = attention_mask.to(device)
         lengths        = lengths.to(device)
 
-        logits = model(input_ids, attention_mask, lengths).cpu()
-        probs  = torch.sigmoid(logits)
+        logits = model(input_ids, attention_mask, lengths)
+        probs  = torch.sigmoid(logits).cpu()
         preds  = (probs >= threshold).float()
 
         keep = (sections != ignore_sec)
@@ -615,6 +507,7 @@ def predict_batch(model, dataloader, device, threshold=0.5, ignore_sec=-1):
         all_labels.append(labels[keep])
 
     return torch.cat(all_probs), torch.cat(all_preds), torch.cat(all_labels)
+
 
 def load_model(path: str, hp: dict, device: torch.device = DEVICE) -> RiNALMoClassifier:
     model = build_model(hp, device)
@@ -625,128 +518,117 @@ def load_model(path: str, hp: dict, device: torch.device = DEVICE) -> RiNALMoCla
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Repeated CV dataset factory
+# Dataset factory
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _build_loaders_from_indices(dataset, train_idx, val_idx, batch_size, training):
+def _stratified_group_split(indices, labels_a, groups_a, test_frac, seed):
+    """
+    StratifiedGroupKFold has no `test_size` arg — it's controlled via n_splits.
+    We pick the closest n_splits to the requested fraction and take the first fold.
+    """
+    n_splits = max(2, round(1.0 / test_frac))
+    sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    train_idx, test_idx = next(sgkf.split(indices, labels_a, groups=groups_a))
+    return train_idx, test_idx
+
+
+def make_dataset(sequences, labels, groups, sections, batch_size=8):
+    assert len(sequences) == len(labels) == len(groups) == len(sections)
+    print("labels:", dict(Counter(labels)))
+
+    dataset = RNADataset(sequences, labels, sections)
+
+    indices    = np.arange(len(dataset))
+    groups_a   = np.array(groups)
+    labels_a   = np.array(labels)
+    sections_a = np.array(sections)
+
+    # outer split: ~15% test, group-disjoint, label-stratified
+    train_val_idx, test_idx = _stratified_group_split(
+        indices, labels_a, groups_a, test_frac=0.2, seed=SEED,
+    )
+
+    # inner split: take ~15/85 of the inner pool as val
+    inner_indices = indices[train_val_idx]
+    inner_labels  = labels_a[train_val_idx]
+    inner_groups  = groups_a[train_val_idx]
+    train_rel, val_rel = _stratified_group_split(
+        inner_indices, inner_labels, inner_groups,
+        test_frac=0.1 / 0.8, seed=SEED,
+    )
+    train_idx = train_val_idx[train_rel]
+    val_idx   = train_val_idx[val_rel]
+
+    # sanity: no group overlap across splits
+    assert set(groups_a[train_idx]).isdisjoint(set(groups_a[val_idx]))
+    assert set(groups_a[train_idx]).isdisjoint(set(groups_a[test_idx]))
+    assert set(groups_a[val_idx]).isdisjoint(set(groups_a[test_idx]))
+
     train_ds = Subset(dataset, train_idx.tolist())
     val_ds   = Subset(dataset, val_idx.tolist())
+    test_ds  = Subset(dataset, test_idx.tolist())
 
-    train_loader = DataLoader(
-        train_ds, batch_size=batch_size,
-        shuffle=training, collate_fn=collate_fn,
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  collate_fn=collate_fn)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+
+    # # determine section weight (from training data only)
+    # train_labels   = labels_a[train_idx]
+    # train_sections = sections_a[train_idx]
+
+    # section_counts = Counter(train_sections)
+    # total_train    = len(train_idx)
+
+    # section_ratio = {
+    #     section: total_train / count
+    #     for section, count in section_counts.items()
+    # }
+
+    # section_label_counts = defaultdict(lambda: Counter())
+    # for section, label in zip(train_sections, train_labels):
+    #     section_label_counts[section][int(label)] += 1
+
+    # # section_neg_pos_ratio = {}
+    # # for section in section_counts:
+    # #     neg_count = section_label_counts[section][0]
+    # #     pos_count = section_label_counts[section][1]
+    # #     if pos_count == 0:
+    # #         section_neg_pos_ratio[section] = 1.0
+    # #     else:
+    # #         section_neg_pos_ratio[section] = neg_count / pos_count
+
+    # # global_neg_count = int((train_labels == 0).sum())
+    # # global_pos_count = int((train_labels == 1).sum())
+
+    # # global_neg_pos_ratio = (
+    # #     global_neg_count / global_pos_count
+    # #     if global_pos_count > 0
+    # #     else 1.0
+    # # )
+    # # section_neg_pos_ratio = {
+    # #     section: global_neg_pos_ratio
+    # #     for section in section_counts
+    # # }
+    train_labels = labels_a[train_idx]
+    num_pos  = (train_labels == 1).sum()
+    num_neg  = (train_labels == 0).sum()
+    pos_weight = torch.tensor(
+        [num_neg / max(num_pos, 1)], dtype=torch.float32, device=DEVICE
     )
-    val_loader = DataLoader(
-        val_ds, batch_size=batch_size,
-        shuffle=False, collate_fn=collate_fn,
-    )
-    return train_loader, val_loader
+    print("train labels:", dict(Counter(train_labels)))
+    print("val labels:",   dict(Counter(labels_a[val_idx])))
+    print("test labels:",  dict(Counter(labels_a[test_idx])))
 
+    # print("train sections:", dict(section_counts))
+    # print("section_ratio:",  section_ratio)
+    # print("section_neg_pos_ratio:", section_neg_pos_ratio)
+    print("pos_weight:", pos_weight)
 
-def make_cv_folds(
-    sequences, labels, groups, sections,
-    n_splits: int = 5,
-    n_repeats: int = 5,
-    batch_size: int = 8,
-    training: bool = True,
-):
-    """
-    Generator over repeated StratifiedGroupKFold splits.
-
-    Yields per fold:
-        repeat_idx, fold_idx,
-        train_loader, val_loader,
+    return (
+        train_loader, val_loader, test_loader,
+        # section_ratio, section_neg_pos_ratio,
         pos_weight,
-        train_idx, val_idx
-    """
-    assert len(sequences) == len(labels) == len(groups) == len(sections)
-    print("labels (full):", dict(Counter(labels)), flush=True)
-
-    dataset    = RNADataset(sequences, labels, sections)
-    indices    = np.arange(len(dataset))
-    labels_a   = np.array(labels)
-    groups_a   = np.array(groups)
-
-    for repeat_idx in range(n_repeats):
-        seed = SEED + repeat_idx
-        sgkf = StratifiedGroupKFold(
-            n_splits=n_splits, shuffle=True, random_state=seed,
-        )
-
-        for fold_idx, (train_rel, val_rel) in enumerate(
-            sgkf.split(indices, labels_a, groups=groups_a)
-        ):
-            train_idx = indices[train_rel]
-            val_idx   = indices[val_rel]
-
-            # sanity: group-disjoint
-            assert set(groups_a[train_idx]).isdisjoint(set(groups_a[val_idx])), \
-                f"group leak at repeat={repeat_idx} fold={fold_idx}"
-
-            train_loader, val_loader = _build_loaders_from_indices(
-                dataset, train_idx, val_idx, batch_size, training,
-            )
-
-            train_labels = labels_a[train_idx]
-            num_pos = (train_labels == 1).sum()
-            num_neg = (train_labels == 0).sum()
-            pos_weight = torch.tensor(
-                [num_neg / max(num_pos, 1)],
-                dtype=torch.float32, device=DEVICE,
-            )
-
-            print(
-                f"\n=== repeat {repeat_idx+1}/{n_repeats} | "
-                f"fold {fold_idx+1}/{n_splits} ===", flush=True,
-            )
-            print("train labels:", dict(Counter(train_labels)), flush=True)
-            print("val   labels:", dict(Counter(labels_a[val_idx])), flush=True)
-            print("pos_weight:", pos_weight, flush=True)
-
-            yield (
-                repeat_idx, fold_idx,
-                train_loader, val_loader,
-                pos_weight,
-                train_idx, val_idx,
-            )
-
-
-def get_cv_dataset(df, hp, n_splits=5, n_repeats=5, training=True):
-    """
-    Returns a generator over (repeat, fold) splits.
-    """
-    df = df.copy()
-    print(df.shape, flush=True)
-
-    left_window  = hp["left_window"]
-    right_window = hp["right_window"]
-
-    df["seq"] = [
-        centralize_transcript(left_window, right_window, s, p)
-        for s, p in zip(df["seq"].values, df["position"].values)
-    ]
-
-    section_idx = {
-        'Annotated':   0,
-        '5UTRnonATG':  1,
-        '5UTRATG':     2,
-        'CDSATG':      3,
-        'CDSnonATG':   4,
-        '3UTRATG':     0,  # too small, merge to annotated
-        '3UTRnonATG':  0,  # too small, merge to annotated
-    }
-
-    sequences = df.seq.tolist()
-    labels    = df.label.tolist()
-    genes     = df.gene_id.tolist()
-    sections  = list(map(lambda x: section_idx[x], df.section))
-
-    return make_cv_folds(
-        sequences, labels, genes, sections,
-        n_splits=n_splits,
-        n_repeats=n_repeats,
-        batch_size=hp["batch_size"],
-        training=training,
+        train_idx, val_idx, test_idx,
     )
 
 
@@ -782,21 +664,6 @@ def compute_binary_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_pred_prob: 
     }
 
 
-def summarize_cv_results(df_all: pd.DataFrame, metric_cols=None):
-    """
-    df_all 須含欄位：repeat, fold, section, 以及各 metric 欄位。
-    回傳 (mean_df, std_df)，以 section 為列。
-    """
-    if metric_cols is None:
-        skip = {"repeat", "fold", "section"}
-        metric_cols = [c for c in df_all.columns if c not in skip]
-
-    grouped = df_all.groupby("section", as_index=True)[metric_cols]
-    mean_df = grouped.mean(numeric_only=True)
-    std_df  = grouped.std(numeric_only=True, ddof=1)
-    return mean_df, std_df
-
-
 # ══════════════════════════════════════════════════════════════════════════════
 # Hyperparameters
 # ══════════════════════════════════════════════════════════════════════════════
@@ -811,12 +678,14 @@ def hyperparameters_queryer(*args):
         "pooling_mode": "attention",
         "batch_size":   16,
         "max_epoch":    50,
+        # "section_scaling":       0, #0.5,
+        # "section_label_scaling": 1, #1, #0.5,
         'weight_fold': 0.5,
-        "max_weight": 300,
+        "max_weight":            100,
         "lr":           1e-4,
-        "left_window":  200,
-        "right_window": 200,
-        'ignore_sec': -1
+        "left_window":  411,    # RiNALMo trained up to ~1024; safe upper limit
+        "right_window": 101,
+        'ignore_sec': -1,
     }
     if not args:
         return hp
@@ -828,130 +697,99 @@ def hyperparameters_queryer(*args):
 # ══════════════════════════════════════════════════════════════════════════════
 # Sequence length control
 # ══════════════════════════════════════════════════════════════════════════════
+
 def centralize_transcript(left_window: int, right_window: int, seq: str, position: int):
-    # left side: `left_window` nt before the marker
-    nt_before = position
-    if nt_before >= left_window:
+    """
+    Build a fixed-length window around `position` (0-indexed nucleotide) by
+    cropping the sequence and padding the missing sides with the literal
+    '<pad>' token string. RnaTokenizer recognises '<pad>' (lowercase) and maps
+    it to the pad token id, so the marker nucleotide always lands at a known
+    token index after tokenisation.
+    """
+    if position > left_window:
         left_padding = ""
         lb = position - left_window
     else:
-        left_padding = _PAD_STR * (left_window - nt_before)
+        left_padding = _PAD_STR * (left_window - position)
         lb = 0
 
-    # right side: `right_window` nt after the marker
-    nt_after = len(seq) - 1 - position
-    if nt_after >= right_window:
+    if len(seq) - position > right_window:
         right_padding = ""
-        rb = position + right_window + 1   # +1 because slice is exclusive
+        rb = position + right_window
     else:
-        right_padding = _PAD_STR * (right_window - nt_after)
         rb = len(seq)
+        right_padding = _PAD_STR * (right_window - (len(seq) - position))
 
     return left_padding + seq[lb:rb] + right_padding
 
 
+def get_dataset(hp):
+    df = pd.read_csv("input_data/df_data.csv")
+    print(df.shape, flush=True)
+
+    left_window  = hp["left_window"]
+    right_window = hp["right_window"]
+
+    df["seq"] = df.apply(
+        lambda r: centralize_transcript(left_window, right_window, r["seq"], r["position"]),
+        axis=1,
+    )
+
+    section_idx = {
+        'Annotated':   0,
+        '5UTRnonATG':  1,
+        '5UTRATG':     2,
+        'CDSATG':      3,
+        'CDSnonATG':   4,
+        '3UTRATG':     0,  # too small, merge to annotated
+        '3UTRnonATG':  0,  # too small, merge to annotated
+    }
+
+    sequences = df.seq.tolist()
+    labels    = df.label.tolist()
+    genes     = df.gene_id.tolist()
+    sections  = list(map(lambda x: section_idx[x], df.section))
+
+    return make_dataset(
+        sequences, labels, genes, sections,
+        batch_size=hp["batch_size"],
+    )
+
+
 # ══════════════════════════════════════════════════════════════════════════════
-# Main (CV version)
+# Main
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main():
-    import sys
-    print("run at:", datetime.now().strftime("%Y%m%d_%H%M%S"), flush=True)
-
-    # CLI: python script.py [train|eval] [n_splits] [n_repeats]
-    mode      = sys.argv[1] if len(sys.argv) > 1 else "train"
-    n_splits  = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-    n_repeats = int(sys.argv[3]) if len(sys.argv) > 3 else 5
-    print(f"mode={mode} | n_splits={n_splits} | n_repeats={n_repeats}", flush=True)
+    print("run at:", datetime.now().strftime("%Y%m%d_%H%M%S"))
 
     hp = hyperparameters_queryer()
-    df = pd.read_csv("../../input_data/df_data.csv").reset_index(drop=True)
 
-    all_val_rows   = []   # 每折 val set 的 evaluate_group 結果
-    fold_summaries = []   # 每折一行的精簡 summary
+    (
+        train_loader, val_loader, test_loader,
+        # section_ratio, section_neg_pos_ratio,
+        pos_weight,
+        train_idx, val_idx, test_idx,
+    ) = get_dataset(hp)
+    
+    # section_ratio = {
+    #     0: 1,
+    #     1: 10,
+    #     2: 10,
+    #     3: 10,
+    #     4: 10,
+    # }
 
-    cv_iter = get_cv_dataset(
-        df, hp,
-        n_splits=n_splits,
-        n_repeats=n_repeats,
-        training=(mode == "train"),
+    _, best_model_path = train_model(
+        train_loader, val_loader, hp, 
+        # section_ratio, section_neg_pos_ratio,
+        pos_weight,
+        naming_prefix="rinalmo_dora", patience=5,
     )
 
-    for (
-        repeat_idx, fold_idx,
-        train_loader, val_loader,
-        pos_weight,
-        train_idx, val_idx,
-    ) in cv_iter:
-
-        save_path = f"model_r{repeat_idx}_f{fold_idx}.pt"
-
-        if mode == "train":
-            # 每折獨立訓練；直接把 best checkpoint 寫到 per-fold 路徑
-            model = train_model(
-                train_loader, val_loader, hp, pos_weight,
-                patience=5, save_path=save_path,
-            )
-            # 重新載入 best
-            model = load_model(save_path, hp, DEVICE)
-        else:
-            model = load_model(save_path, hp, DEVICE)
-
-        # ── val set evaluation ────────────────────────────────────────────
-        yhat_prob, yhat, labels_t = predict_batch(
-            model, val_loader, DEVICE, ignore_sec=-1,
-        )
-        df_val = df.iloc[val_idx].copy()
-        df_val["yhat_prob"] = yhat_prob.numpy()
-        df_val["yhat"]      = yhat.numpy()
-
-        df_grp = evaluate_group(df_val)
-        df_grp["repeat"] = repeat_idx
-        df_grp["fold"]   = fold_idx
-        all_val_rows.append(df_grp)
-
-        # quick per-fold log
-        all_row = df_grp[df_grp.section == "all"].iloc[0]
-        fold_summaries.append({
-            "repeat": repeat_idx, "fold": fold_idx,
-            "aupr": all_row.get("aupr", float("nan")),
-            "auc":  all_row.get("auc",  float("nan")),
-            "f1":   all_row.get("f1",   float("nan")),
-            "mcc":  all_row.get("mcc",  float("nan")),
-        })
-        print(
-            f"[r{repeat_idx} f{fold_idx}] val all-section: "
-            f"aupr={all_row.get('aupr', float('nan')):.4f} "
-            f"auc={all_row.get('auc',  float('nan')):.4f} "
-            f"f1={all_row.get('f1',    float('nan')):.4f} "
-            f"mcc={all_row.get('mcc',  float('nan')):.4f}",
-            flush=True,
-        )
-
-        # 釋放 GPU memory
-        del model
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-
-    # ── aggregate across folds & repeats ─────────────────────────────────────
-    df_all = pd.concat(all_val_rows, ignore_index=True)
-
-    out_csv = f"cv_results_{n_splits}fold_{n_repeats}repeat.csv"
-    df_all.to_csv(out_csv, index=False)
-    print(f"\nper-fold detail saved to: {out_csv}", flush=True)
-
-    print("\n========== per-fold summary (all-section) ==========", flush=True)
-    print(pd.DataFrame(fold_summaries).to_string(index=False), flush=True)
-
-    mean_df, std_df = summarize_cv_results(df_all)
-
-    print(f"\n========== mean across {n_splits}x{n_repeats} folds ==========",
-          flush=True)
-    print(mean_df.to_string(), flush=True)
-
-    print(f"\n========== std across {n_splits}x{n_repeats} folds ==========",
-          flush=True)
-    print(std_df.to_string(), flush=True)
+    model = load_model(best_model_path, hp, DEVICE)
+    yhat_prob, yhat, labels_t = predict_batch(model, test_loader, DEVICE, ignore_sec=hp.get('ignore_sec', -1))
+    pprint(compute_binary_metrics(labels_t.numpy(), yhat.numpy(), yhat_prob.numpy()))
 
 
 if __name__ == "__main__":

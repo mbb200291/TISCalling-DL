@@ -1,0 +1,45 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260420_164611
+Using 2 GPUs
+total parameters: 777
+total trainable parameters: 777
+Epoch 01 | lr=1.00e-03 | train_loss=0.6361 train_f1=0.0000 | val_loss=0.4618 val_f1=0.0000
+  -> saved best model to model/test-run_20260420_164611.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.7042 train_f1=0.0000 | val_loss=0.4546 val_f1=0.0000
+Epoch 03 | lr=1.00e-03 | train_loss=0.7551 train_f1=0.0000 | val_loss=0.4471 val_f1=0.0000
+Epoch 04 | lr=1.00e-03 | train_loss=0.7917 train_f1=0.0000 | val_loss=0.4395 val_f1=0.0000
+Epoch 05 | lr=1.00e-03 | train_loss=0.5833 train_f1=0.0000 | val_loss=0.4320 val_f1=0.0000
+Epoch 06 | lr=5.00e-04 | train_loss=0.7304 train_f1=0.0000 | val_loss=0.4283 val_f1=0.0000
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.0000
+(34271, 5)
+(32772, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+Using 2 GPUs
+total parameters: 777
+total trainable parameters: 777
+Epoch 01 | lr=1.00e-03 | train_loss=1.0502 train_f1=0.3259 | val_loss=1.0128 val_f1=0.3779
+  -> saved best model to model/transformer_clf_20260420_164621.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.9910 train_f1=0.3431 | val_loss=0.9970 val_f1=0.4102
+  -> saved best model to model/transformer_clf_20260420_164621.pt
+Epoch 03 | lr=1.00e-03 | train_loss=0.9736 train_f1=0.3512 | val_loss=0.9679 val_f1=0.3886
+Epoch 04 | lr=1.00e-03 | train_loss=0.9645 train_f1=0.3517 | val_loss=0.9583 val_f1=0.3914
+Epoch 05 | lr=1.00e-03 | train_loss=0.9584 train_f1=0.3491 | val_loss=0.9526 val_f1=0.3926
+Epoch 06 | lr=1.00e-03 | train_loss=0.9533 train_f1=0.3565 | val_loss=0.9508 val_f1=0.4004
+Epoch 07 | lr=5.00e-04 | train_loss=0.9493 train_f1=0.3589 | val_loss=0.9515 val_f1=0.3836
+  -> early stopping at epoch 7 (no improvement for 5 epochs)
+Best validation F1: 0.4102
+{'accuracy': 0.5255474452554745,
+ 'f1': np.float64(0.34447983014861994),
+ 'fn': np.int64(137),
+ 'fp': np.int64(2333),
+ 'mcc': np.float64(0.2155909011977653),
+ 'precision': np.float64(0.2176391683433937),
+ 'recall': np.float64(0.8256997455470738),
+ 'specificity': np.float64(0.47217194570135745),
+ 'tn': np.int64(2087),
+ 'tp': np.int64(649)}
+

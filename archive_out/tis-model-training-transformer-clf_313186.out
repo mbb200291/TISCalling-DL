@@ -1,0 +1,56 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260421_162029
+labels: {0: 4, 1: 6}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 2, 'num_heads': 4, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 1, 'max_len': 201}
+Using 2 GPUs
+total parameters: 73857
+total trainable parameters: 73857
+Epoch 01 | lr=1.00e-03 | train_loss=0.3196 train_f1=0.0000 | val_loss=0.4860 val_f1=0.6667
+  -> saved best model to model/test-run_20260421_162029.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.2515 train_f1=0.4000 | val_loss=0.5633 val_f1=0.6667
+Epoch 03 | lr=1.00e-03 | train_loss=0.2231 train_f1=1.0000 | val_loss=0.6362 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1005 train_f1=1.0000 | val_loss=0.7353 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0660 train_f1=1.0000 | val_loss=0.8503 val_f1=0.6667
+Epoch 06 | lr=1.00e-03 | train_loss=0.0577 train_f1=1.0000 | val_loss=0.9787 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 0.6667
+(34271, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+labels: {1: 5395, 0: 28876}
+hyperparameters: {'embed_dim': 32, 'd_model': 64, 'num_layers': 2, 'num_heads': 4, 'ff_dim': 128, 'batch_size': 16, 'max_epoch': 50, 'dropout': 0.2, 'weight_fold': 1, 'max_len': 201}
+Using 2 GPUs
+total parameters: 73857
+total trainable parameters: 73857
+Epoch 01 | lr=1.00e-03 | train_loss=0.6399 train_f1=0.5095 | val_loss=0.3230 val_f1=0.6467
+  -> saved best model to model/transformer_clf_20260421_162033.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.2670 train_f1=0.7632 | val_loss=0.2996 val_f1=0.7393
+  -> saved best model to model/transformer_clf_20260421_162033.pt
+Epoch 03 | lr=1.00e-03 | train_loss=0.2393 train_f1=0.7843 | val_loss=0.3087 val_f1=0.6793
+Epoch 04 | lr=1.00e-03 | train_loss=0.2339 train_f1=0.7847 | val_loss=0.2984 val_f1=0.8112
+  -> saved best model to model/transformer_clf_20260421_162033.pt
+Epoch 05 | lr=1.00e-03 | train_loss=0.2265 train_f1=0.7897 | val_loss=0.2955 val_f1=0.8324
+  -> saved best model to model/transformer_clf_20260421_162033.pt
+Epoch 06 | lr=1.00e-03 | train_loss=0.2271 train_f1=0.7905 | val_loss=0.2990 val_f1=0.7838
+Epoch 07 | lr=1.00e-03 | train_loss=0.2265 train_f1=0.7905 | val_loss=0.2922 val_f1=0.7613
+Epoch 08 | lr=1.00e-03 | train_loss=0.2218 train_f1=0.7952 | val_loss=0.2958 val_f1=0.7603
+Epoch 09 | lr=1.00e-03 | train_loss=0.2107 train_f1=0.7989 | val_loss=0.2875 val_f1=0.7660
+Epoch 10 | lr=1.00e-03 | train_loss=0.2170 train_f1=0.7955 | val_loss=0.2904 val_f1=0.8257
+  -> early stopping at epoch 10 (no improvement for 5 epochs)
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py:677: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state_dict = torch.load(path, map_location=device)
+Best validation F1: 0.8324
+Traceback (most recent call last):
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 763, in <module>
+    main()
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 755, in main
+    model = load_model(best_model_path, hyperparameters_queryer, DEVICE)
+  File "/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py", line 678, in load_model
+    model.load_state_dict(state_dict)
+  File "/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2584, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for RNASequenceBinaryClassifier:
+	size mismatch for frame_embedding.weight: copying a param with shape torch.Size([68, 64]) from checkpoint, the shape in current model is torch.Size([1367, 64]).
+	size mismatch for pos_emb.emb: copying a param with shape torch.Size([201, 64]) from checkpoint, the shape in current model is torch.Size([4096, 64]).

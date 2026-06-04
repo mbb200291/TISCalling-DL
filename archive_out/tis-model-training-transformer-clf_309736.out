@@ -1,0 +1,54 @@
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+DEVICE: cuda
+run at: 20260420_171304
+Using 2 GPUs
+total parameters: 17857
+total trainable parameters: 17857
+Epoch 01 | lr=1.00e-03 | train_loss=0.2545 train_f1=0.6667 | val_loss=0.3554 val_f1=1.0000
+  -> saved best model to model/test-run_20260420_171304.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.1139 train_f1=1.0000 | val_loss=0.3996 val_f1=1.0000
+Epoch 03 | lr=1.00e-03 | train_loss=0.1812 train_f1=0.8571 | val_loss=0.4474 val_f1=0.6667
+Epoch 04 | lr=1.00e-03 | train_loss=0.1029 train_f1=0.8571 | val_loss=0.5033 val_f1=0.6667
+Epoch 05 | lr=1.00e-03 | train_loss=0.0876 train_f1=1.0000 | val_loss=0.5689 val_f1=0.6667
+Epoch 06 | lr=5.00e-04 | train_loss=0.1055 train_f1=1.0000 | val_loss=0.5973 val_f1=0.6667
+  -> early stopping at epoch 6 (no improvement for 5 epochs)
+Best validation F1: 1.0000
+(34271, 5)
+(32772, 5)
+/homes/bangchi/miniconda3/envs/TIScalling/lib/python3.10/site-packages/torch/nn/modules/transformer.py:379: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+Using 2 GPUs
+total parameters: 17857
+total trainable parameters: 17857
+Epoch 01 | lr=1.00e-03 | train_loss=0.9830 train_f1=0.3485 | val_loss=0.9514 val_f1=0.3820
+  -> saved best model to model/transformer_clf_20260420_171313.pt
+Epoch 02 | lr=1.00e-03 | train_loss=0.9437 train_f1=0.3648 | val_loss=0.9618 val_f1=0.3818
+Epoch 03 | lr=1.00e-03 | train_loss=0.9382 train_f1=0.3719 | val_loss=0.9444 val_f1=0.3976
+  -> saved best model to model/transformer_clf_20260420_171313.pt
+Epoch 04 | lr=1.00e-03 | train_loss=0.9382 train_f1=0.3705 | val_loss=0.9440 val_f1=0.4109
+  -> saved best model to model/transformer_clf_20260420_171313.pt
+Epoch 05 | lr=1.00e-03 | train_loss=0.9318 train_f1=0.3731 | val_loss=0.9460 val_f1=0.3857
+Epoch 06 | lr=1.00e-03 | train_loss=0.9311 train_f1=0.3789 | val_loss=0.9408 val_f1=0.3930
+Epoch 07 | lr=1.00e-03 | train_loss=0.9285 train_f1=0.3735 | val_loss=0.9815 val_f1=0.4287
+  -> saved best model to model/transformer_clf_20260420_171313.pt
+Epoch 08 | lr=1.00e-03 | train_loss=0.9280 train_f1=0.3820 | val_loss=0.9364 val_f1=0.4066
+Epoch 09 | lr=1.00e-03 | train_loss=0.9213 train_f1=0.3855 | val_loss=0.9751 val_f1=0.4230
+Epoch 10 | lr=1.00e-03 | train_loss=0.9156 train_f1=0.3902 | val_loss=0.9293 val_f1=0.4140
+Epoch 11 | lr=1.00e-03 | train_loss=0.9131 train_f1=0.3963 | val_loss=0.9348 val_f1=0.4172
+Epoch 12 | lr=5.00e-04 | train_loss=0.9031 train_f1=0.4052 | val_loss=0.9324 val_f1=0.4236
+  -> early stopping at epoch 12 (no improvement for 5 epochs)
+/nas/cluster_data/homes/bangchi/TISCalling/script/train_nn_model_by_site_transformer.py:683: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  state_dict = torch.load(path, map_location=device)
+Best validation F1: 0.4287
+{'accuracy': 0.776219746446408,
+ 'f1': np.float64(0.3665035345296357),
+ 'fn': np.int64(449),
+ 'fp': np.int64(716),
+ 'mcc': np.float64(0.23776701004655215),
+ 'precision': np.float64(0.3200379867046534),
+ 'recall': np.float64(0.4287531806615776),
+ 'specificity': np.float64(0.8380090497737557),
+ 'tn': np.int64(3704),
+ 'tp': np.int64(337)}
+
