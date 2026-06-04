@@ -90,7 +90,8 @@ def run_lig_mask(
 
     enc = tokenizer(sequence, return_tensors="pt", padding=False, truncation=True)
     input_ids      = enc["input_ids"].to(DEVICE)
-    attention_mask = enc["attention_mask"].to(DEVICE)
+    attention_mask = enc["attention_mask"].masked_fill(input_ids == _PAD_ID, 0)
+    attention_mask.to(DEVICE)
 
     baseline_ids = build_baseline(input_ids, baseline_token_id)
 
@@ -201,15 +202,18 @@ def run_lig_dinuc(
 
     enc = tokenizer(sequence, return_tensors="pt", padding=False, truncation=True)
     input_ids      = enc["input_ids"].to(DEVICE)
-    attention_mask = enc["attention_mask"].to(DEVICE)
+    attention_mask = enc["attention_mask"].masked_fill(input_ids == _PAD_ID, 0)
+    attention_mask.to(DEVICE)
 
     forward_func = make_forward_func(model, attention_mask)
     lig = LayerIntegratedGradients(
         forward_func,
         model.backbone.base_model.model.embeddings.word_embeddings,
     )
-
-    shuffled_seqs = dinucleotide_shuffle(sequence, n_shuffles=n_shuffles, seed=seed)
+    lpad = len(sequence) - len(sequence.lstrip('<pad>'))
+    rpad = len(sequence) - len(sequence.lstrip('<pad>'))
+    shuffled_seqs = map(lambda x: "<pad>" * lpad // 5 + x + "<pad>" * rpad // 5,
+                        dinucleotide_shuffle(sequence[lpad:-rpad], n_shuffles=n_shuffles, seed=seed))
     all_attrs = []
     deltas = []
 
@@ -241,9 +245,9 @@ def run_lig_dinuc(
         else:
             raise ValueError(f"unknown: {dim_reduction}")
 
-        all_attrs.append(per_token)
+        all_attrs.append(attrs_per_token)
     
-    print(f"delta mean: {np.mean(deltas):.4f}, max: {np.max(np.abs(deltas)):.4f}")
+    print(f"delta mean: {np.mean(deltas):.4f}, mix: {np.min(np.abs(deltas)):.4f},  max: {np.max(np.abs(deltas)):.4f}")
 
     mean_attrs = np.mean(all_attrs, axis=0)   # (seq_len,)
 
@@ -257,6 +261,7 @@ def run_lig_dinuc(
         pred_prob=prob,
         convergence_delta=float("nan"),   # averaged baseline → no single delta
         baseline_type="dinuc-shuffle",
+        dimension_reduction=dim_reduction,
     )
 
 
@@ -366,8 +371,8 @@ def main():
     lig_result = run_lig_dinuc(
         seq, model, tokenizer, 
         n_shuffles=10,
-        n_steps=50, # 10,
-        dim_reduction=dim_reduction
+        n_steps=500, # 10,
+        dim_reduction='l2-norm'
     )
     
     print(f"P(TIS) = {lig_result.pred_prob:.4f}  |  Δ_conv = {lig_result.convergence_delta:.5f}")
