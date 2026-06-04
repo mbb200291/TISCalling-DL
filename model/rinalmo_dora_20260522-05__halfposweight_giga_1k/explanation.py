@@ -9,7 +9,7 @@ import json
 from ushuffle import Shuffler, set_seed
 
 from main import *
-from main import _tokenizer
+from main import _tokenizer, _PAD_ID
 
 # # ── plug in your model ────────────────────────────────────────────────────────
 # DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -73,7 +73,6 @@ class IGResult:
     baseline_type:     str
     dimension_reduction: str
 
-
 def run_lig_mask(
     sequence: str,
     model,
@@ -90,8 +89,8 @@ def run_lig_mask(
 
     enc = tokenizer(sequence, return_tensors="pt", padding=False, truncation=True)
     input_ids      = enc["input_ids"].to(DEVICE)
-    attention_mask = enc["attention_mask"].masked_fill(input_ids == _PAD_ID, 0)
-    attention_mask.to(DEVICE)
+    attention_mask = enc["attention_mask"].to(DEVICE)
+    attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
 
     baseline_ids = build_baseline(input_ids, baseline_token_id)
 
@@ -108,7 +107,7 @@ def run_lig_mask(
         n_steps=n_steps,
         method="gausslegendre",
         # method="riemann_trapezoid",
-        internal_batch_size=1,  # batch_size / n_steps
+        internal_batch_size=1,
         return_convergence_delta=True,
     )  # attrs: (1, L, D)
 
@@ -116,23 +115,44 @@ def run_lig_mask(
     if dim_reduction == 'l2-norm':
         attrs_per_token = attrs.norm(dim=-1).squeeze(0)[1:-1].detach().cpu().numpy()
     elif dim_reduction == 'sum':
-        attrs_per_token = attrs.sum(dim=-1).squeeze(0)[1:-1].detach().cpu().numpy()   # sum over embedding dim
+        attrs_per_token = attrs.sum(dim=-1).squeeze(0)[1:-1].detach().cpu().numpy()
     else:
         raise ValueError(f"unknown: {dim_reduction}")
 
     with torch.no_grad():
-        logit = forward_func(input_ids).item()
-    prob = torch.sigmoid(torch.tensor(logit)).item()
+        logit = forward_func(input_ids)
+        baseline_logit = forward_func(baseline_ids)
+
+        score_diff = logit - baseline_logit
+
+        abs_delta = delta.abs()
+        relative_delta = abs_delta / score_diff.abs().clamp_min(1e-8)
+
+        logit_value = logit.item()
+        baseline_logit_value = baseline_logit.item()
+        score_diff_value = score_diff.item()
+        delta_value = delta.item()
+        relative_delta_value = relative_delta.item()
+
+    prob = torch.sigmoid(torch.tensor(logit_value)).item()
+
+    print("logit:", logit_value)
+    print("baseline_logit:", baseline_logit_value)
+    print("score_diff:", score_diff_value)
+    print("delta:", delta_value)
+    print("relative_delta:", relative_delta_value)
 
     return IGResult(
         sequence=sequence,
         attributions=attrs_per_token,
         pred_prob=prob,
-        convergence_delta=delta.item(),
+        convergence_delta=delta_value,
         baseline_type="[MASK]",
         dimension_reduction=dim_reduction,
+        # baseline_logit=baseline_logit_value,
+        # score_diff=score_diff_value,
+        # relative_delta=relative_delta_value,
     )
-
 
 def dinucleotide_shuffle(
     seq: str,
@@ -202,8 +222,8 @@ def run_lig_dinuc(
 
     enc = tokenizer(sequence, return_tensors="pt", padding=False, truncation=True)
     input_ids      = enc["input_ids"].to(DEVICE)
-    attention_mask = enc["attention_mask"].masked_fill(input_ids == _PAD_ID, 0)
-    attention_mask.to(DEVICE)
+    attention_mask = enc["attention_mask"].to(DEVICE)
+    attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
 
     forward_func = make_forward_func(model, attention_mask)
     lig = LayerIntegratedGradients(
@@ -247,7 +267,7 @@ def run_lig_dinuc(
 
         all_attrs.append(attrs_per_token)
     
-    print(f"delta mean: {np.mean(deltas):.4f}, mix: {np.min(np.abs(deltas)):.4f},  max: {np.max(np.abs(deltas)):.4f}")
+    print(f"delta mean: {np.mean(deltas):.4f}, min: {np.min(np.abs(deltas)):.4f},  max: {np.max(np.abs(deltas)):.4f}")
 
     mean_attrs = np.mean(all_attrs, axis=0)   # (seq_len,)
 
@@ -259,7 +279,8 @@ def run_lig_dinuc(
         sequence=sequence,
         attributions=mean_attrs,
         pred_prob=prob,
-        convergence_delta=float("nan"),   # averaged baseline → no single delta
+        # convergence_delta=float("nan"),   # averaged baseline → no single delta
+        convergence_delta=np.mean(deltas),
         baseline_type="dinuc-shuffle",
         dimension_reduction=dim_reduction,
     )
@@ -334,8 +355,9 @@ def save_ig_result(result: IGResult, path: str):
         "dim_reduction": result.dimension_reduction,
     }
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+    with open(path, "a") as f:
+        # json.dump(data, f, indent=2)
+        f.write(json.dumps(data, ensure_ascii=False) + "\n")
     print(f"saved → {path}")
 
 
@@ -357,59 +379,55 @@ def main():
     import sys
     # ── example usage (requires real model) ──────────────────────────────────────
     # seq = "GCCACCAUGGCCAAAGUGAAGAAGCAGAUCCUGCUG"
-    # NEUTRAL_TOKEN_ID = 4  # for mask token
+    NEUTRAL_TOKEN_ID = 4  # for mask token
     # NEUTRAL_TOKEN_ID = 0  # for pad token
-    NEUTRAL_TOKEN_ID = 10   # for N token
-    seq = sys.argv[1]
+    # NEUTRAL_TOKEN_ID = 10   # for N token
+    # seq = sys.argv[1]
     dim_reduction = 'sum'
-    # lig_result = run_lig_mask(
-    #     seq, model, tokenizer, NEUTRAL_TOKEN_ID,
-    #     n_steps=1000,
-    #     dim_reduction=dim_reduction
-    # )
-    
-    lig_result = run_lig_dinuc(
-        seq, model, tokenizer, 
-        n_shuffles=10,
-        n_steps=500, # 10,
-        dim_reduction='l2-norm'
-    )
-    
-    print(f"P(TIS) = {lig_result.pred_prob:.4f}  |  Δ_conv = {lig_result.convergence_delta:.5f}")
 
+    
     SAVE_DIR = "ig_data"
     import os; os.makedirs(SAVE_DIR, exist_ok=True)
+    
+    
+    df_test = pd.read_csv('df_test.csv')
+    df_test["seq"] = [
+        centralize_transcript(hp["left_window"], hp["right_window"], s, p)
+        for s, p in zip(df_test["seq"].values, df_test["position"].values)    
+    ]
+    c = 0
+    for s in df_test.seq:
+        c += 1
+        print(c, end=': ', flush=True)
+        # if c == 3:
+        #     break
+        # lig_result = run_lig_dinuc(
+        #     s, model, tokenizer, 
+        #     n_shuffles=10,
+        #     n_steps=500, # 10,
+        #     dim_reduction='l2-norm'
+        # )
+        lig_result = run_lig_mask(
+            s, model, tokenizer, NEUTRAL_TOKEN_ID,
+            n_steps=1024,
+            dim_reduction=dim_reduction
+        )
+        
+        # print(f"P(TIS) = {lig_result.pred_prob:.4f}  |  Δ_conv = {lig_result.convergence_delta:.5f}")
 
-    fig, axes = plt.subplots(
-        2, 1, figsize=(16, 4),
-        gridspec_kw={"height_ratios": [4, 1]},
-        facecolor="#0d1117",
-    )
-    plot_attribution(lig_result, ax_bar=axes[0], ax_seq=axes[1])
-    plt.tight_layout(h_pad=0)
-    plt.savefig(os.path.join(SAVE_DIR, "lig_result.png"), dpi=150, bbox_inches="tight", facecolor="#0d1117")
-    plt.show()
-    save_ig_result(lig_result, os.path.join(SAVE_DIR, "lig_result.json"))
-    print(f"saved → {save_path}")
+        save_ig_result(lig_result, os.path.join(SAVE_DIR, "df_test_lig_results.jsonl"))
+
+    # fig, axes = plt.subplots(
+    #     2, 1, figsize=(16, 4),
+    #     gridspec_kw={"height_ratios": [4, 1]},
+    #     facecolor="#0d1117",
+    # )
+    # plot_attribution(lig_result, ax_bar=axes[0], ax_seq=axes[1])
+    # plt.tight_layout(h_pad=0)
+    # plt.savefig(os.path.join(SAVE_DIR, "lig_result.png"), dpi=150, bbox_inches="tight", facecolor="#0d1117")
+    # plt.show()
+    # print(f"saved → {save_path}")
     print(f"ig run complete")
-
-    # print('------- debug -------')
-
-    # with torch.no_grad():
-    #     enc = tokenizer(seq, return_tensors="pt", padding=False, truncation=True)
-    #     input_ids      = enc["input_ids"].to(DEVICE)
-    #     attention_mask = enc["attention_mask"].to(DEVICE)
-        
-    #     baseline_ids = build_mask_baseline(input_ids, NEUTRAL_TOKEN_ID)
-        
-    #     forward_func = make_forward_func(model, attention_mask)
-        
-    #     f_input    = forward_func(input_ids).item()
-    #     f_baseline = forward_func(baseline_ids).item()
-
-    # print(f"f(input)    = {f_input:.4f}")
-    # print(f"f(baseline) = {f_baseline:.4f}")
-    # print(f"expected Δ  = {f_input - f_baseline:.4f}")
 
 
 if __name__ == '__main__':
