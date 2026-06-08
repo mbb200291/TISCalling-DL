@@ -8,4 +8,4 @@ source $HOME/miniconda3/etc/profile.d/conda.sh
 
 conda activate TIScalling
 
-python script_eval.py eval
+python script.py eval

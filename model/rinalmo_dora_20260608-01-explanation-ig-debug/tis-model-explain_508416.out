@@ -1,0 +1,114 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:1
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 34729.37it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260608-01-explanation-ig/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+embedding_layer: Embedding(26, 1280, padding_idx=0)
+[forward hook] embedding output: torch.Size([1, 1003, 1280])
+[backward hook] grad output norm: 0.019756626337766647
+forward called: True
+backward grad exists: True
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: -14.195963859558105
+relative_delta: 1.5614396333694458
+64 delta= -14.195963859558105 relative_delta= 1.5614396333694458 score_diff= 9.09158706665039
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: 3.3868675231933594
+relative_delta: 0.3725276589393616
+128 delta= 3.3868675231933594 relative_delta= 0.3725276589393616 score_diff= 9.09158706665039
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: -1.049025535583496
+relative_delta: 0.11538420617580414
+256 delta= -1.049025535583496 relative_delta= 0.11538420617580414 score_diff= 9.09158706665039
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: 0.5066308975219727
+relative_delta: 0.05572524294257164
+512 delta= 0.5066308975219727 relative_delta= 0.05572524294257164 score_diff= 9.09158706665039
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: -0.8124370574951172
+relative_delta: 0.08936141431331635
+1024 delta= -0.8124370574951172 relative_delta= 0.08936141431331635 score_diff= 9.09158706665039
+logit: 7.2366814613342285
+baseline_logit: -1.8549060821533203
+score_diff: 9.09158706665039
+delta: 0.03703784942626953
+relative_delta: 0.00407385965809226
+2048 delta= 0.03703784942626953 relative_delta= 0.00407385965809226 score_diff= 9.09158706665039
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: 2.128428
+delta_abs_mean: 10.288521
+delta_abs_min: 0.931627
+delta_abs_max: 26.663914
+relative_delta_mean: 0.536952
+relative_delta_min: 0.049314
+relative_delta_max: 1.362225
+64 delta= 2.1284281730651857 relative_delta= 0.5369524445384741 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -5.144882
+delta_abs_mean: 15.732379
+delta_abs_min: 3.094645
+delta_abs_max: 31.355236
+relative_delta_mean: 0.822359
+relative_delta_min: 0.158101
+relative_delta_max: 1.650903
+128 delta= -5.144881534576416 relative_delta= 0.8223587274551392 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -7.701504
+delta_abs_mean: 11.023507
+delta_abs_min: 3.760983
+delta_abs_max: 22.427626
+relative_delta_mean: 0.578985
+relative_delta_min: 0.195697
+relative_delta_max: 1.132911
+256 delta= -7.701504135131836 relative_delta= 0.5789847657084465 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -0.123548
+delta_abs_mean: 6.433035
+delta_abs_min: 0.986364
+delta_abs_max: 14.989677
+relative_delta_mean: 0.337792
+relative_delta_min: 0.051934
+relative_delta_max: 0.796654
+512 delta= -0.12354803085327148 relative_delta= 0.337792032212019 score_diff= 19.086351203918458
+slurmstepd: error: *** JOB 508416 ON haydn CANCELLED AT 2026-06-08T14:33:01 ***

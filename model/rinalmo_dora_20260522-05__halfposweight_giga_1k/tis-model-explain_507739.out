@@ -1,0 +1,3815 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:0
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 33687.02it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.bias                        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-05__halfposweight_giga_1k/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+1: logit: 9.173386573791504
+baseline_logit: -0.404838502407074
+score_diff: 9.578225135803223
+delta: 1.4934816360473633
+relative_delta: 0.15592467784881592
+saved → ig_data/df_test_lig_results.jsonl
+2: logit: 8.410919189453125
+baseline_logit: -1.4026975631713867
+score_diff: 9.813616752624512
+delta: -0.38147640228271484
+relative_delta: 0.03887215256690979
+saved → ig_data/df_test_lig_results.jsonl
+3: logit: 2.958390235900879
+baseline_logit: -1.4124150276184082
+score_diff: 4.370805263519287
+delta: 2.0862393379211426
+relative_delta: 0.4773123562335968
+saved → ig_data/df_test_lig_results.jsonl
+4: logit: 8.57666015625
+baseline_logit: -1.3529598712921143
+score_diff: 9.929619789123535
+delta: 1.9838190078735352
+relative_delta: 0.19978801906108856
+saved → ig_data/df_test_lig_results.jsonl
+5: logit: 8.264694213867188
+baseline_logit: -1.354638695716858
+score_diff: 9.619333267211914
+delta: 0.3197212219238281
+relative_delta: 0.033237356692552567
+saved → ig_data/df_test_lig_results.jsonl
+6: logit: 8.5424222946167
+baseline_logit: -1.3529598712921143
+score_diff: 9.895381927490234
+delta: 1.1320199966430664
+relative_delta: 0.11439881473779678
+saved → ig_data/df_test_lig_results.jsonl
+7: logit: 7.759109973907471
+baseline_logit: -0.9106877446174622
+score_diff: 8.669797897338867
+delta: 3.0223159790039062
+relative_delta: 0.348602831363678
+saved → ig_data/df_test_lig_results.jsonl
+8: logit: 8.388286590576172
+baseline_logit: -0.8690297603607178
+score_diff: 9.257316589355469
+delta: 0.9034996032714844
+relative_delta: 0.09759843349456787
+saved → ig_data/df_test_lig_results.jsonl
+9: logit: 0.31220322847366333
+baseline_logit: -1.4283682107925415
+score_diff: 1.7405714988708496
+delta: 0.8588075637817383
+relative_delta: 0.4934055209159851
+saved → ig_data/df_test_lig_results.jsonl
+10: logit: 7.977187156677246
+baseline_logit: -1.2893911600112915
+score_diff: 9.266578674316406
+delta: 0.5230951309204102
+relative_delta: 0.05644965171813965
+saved → ig_data/df_test_lig_results.jsonl
+11: logit: 9.281820297241211
+baseline_logit: -1.406569004058838
+score_diff: 10.68838882446289
+delta: 1.022653579711914
+relative_delta: 0.09567892551422119
+saved → ig_data/df_test_lig_results.jsonl
+12: logit: 5.718752384185791
+baseline_logit: -1.344576358795166
+score_diff: 7.063328742980957
+delta: -0.10809040069580078
+relative_delta: 0.01530303992331028
+saved → ig_data/df_test_lig_results.jsonl
+13: logit: 8.470467567443848
+baseline_logit: -1.4208775758743286
+score_diff: 9.891345024108887
+delta: 2.997307777404785
+relative_delta: 0.3030232787132263
+saved → ig_data/df_test_lig_results.jsonl
+14: logit: 7.5362420082092285
+baseline_logit: -1.342897653579712
+score_diff: 8.87913990020752
+delta: 3.6457462310791016
+relative_delta: 0.4105967879295349
+saved → ig_data/df_test_lig_results.jsonl
+15: logit: 8.747957229614258
+baseline_logit: -1.4273154735565186
+score_diff: 10.175272941589355
+delta: 1.49676513671875
+relative_delta: 0.14709827303886414
+saved → ig_data/df_test_lig_results.jsonl
+16: logit: 8.190217018127441
+baseline_logit: -1.3750494718551636
+score_diff: 9.565266609191895
+delta: -0.2625102996826172
+relative_delta: 0.02744411677122116
+saved → ig_data/df_test_lig_results.jsonl
+17: logit: 8.952742576599121
+baseline_logit: -1.3931858539581299
+score_diff: 10.345928192138672
+delta: 1.3161401748657227
+relative_delta: 0.12721334397792816
+saved → ig_data/df_test_lig_results.jsonl
+18: logit: 7.340074062347412
+baseline_logit: -1.336484670639038
+score_diff: 8.676558494567871
+delta: 0.45106029510498047
+relative_delta: 0.05198608338832855
+saved → ig_data/df_test_lig_results.jsonl
+19: logit: 4.028805732727051
+baseline_logit: -1.4262014627456665
+score_diff: 5.455007076263428
+delta: 1.3934307098388672
+relative_delta: 0.25544068217277527
+saved → ig_data/df_test_lig_results.jsonl
+20: logit: 9.577201843261719
+baseline_logit: -0.8404825329780579
+score_diff: 10.417684555053711
+delta: 1.1818103790283203
+relative_delta: 0.11344271153211594
+saved → ig_data/df_test_lig_results.jsonl
+21: logit: 8.972091674804688
+baseline_logit: -0.9443219304084778
+score_diff: 9.916413307189941
+delta: 1.4873981475830078
+relative_delta: 0.14999356865882874
+saved → ig_data/df_test_lig_results.jsonl
+22: logit: 6.671284198760986
+baseline_logit: -0.895194947719574
+score_diff: 7.566479206085205
+delta: 6.885478496551514
+relative_delta: 0.9099977016448975
+saved → ig_data/df_test_lig_results.jsonl
+23: logit: 9.018594741821289
+baseline_logit: -1.4129819869995117
+score_diff: 10.4315767288208
+delta: 0.7278785705566406
+relative_delta: 0.06977646797895432
+saved → ig_data/df_test_lig_results.jsonl
+24: logit: 9.622776985168457
+baseline_logit: -1.4219974279403687
+score_diff: 11.044774055480957
+delta: 2.2731943130493164
+relative_delta: 0.20581628382205963
+saved → ig_data/df_test_lig_results.jsonl
+25: logit: 8.693164825439453
+baseline_logit: -1.3159316778182983
+score_diff: 10.009096145629883
+delta: 1.0440864562988281
+relative_delta: 0.10431376099586487
+saved → ig_data/df_test_lig_results.jsonl
+26: logit: 4.79904317855835
+baseline_logit: -1.4201890230178833
+score_diff: 6.219232082366943
+delta: 0.9525313377380371
+relative_delta: 0.1531589925289154
+saved → ig_data/df_test_lig_results.jsonl
+27: logit: 8.340531349182129
+baseline_logit: -0.8804832100868225
+score_diff: 9.221014976501465
+delta: 1.4769859313964844
+relative_delta: 0.16017606854438782
+saved → ig_data/df_test_lig_results.jsonl
+28: logit: 0.3381960391998291
+baseline_logit: -0.895194947719574
+score_diff: 1.2333910465240479
+delta: 1.1644737720489502
+relative_delta: 0.9441237449645996
+saved → ig_data/df_test_lig_results.jsonl
+29: logit: 6.119384288787842
+baseline_logit: -1.4178178310394287
+score_diff: 7.537201881408691
+delta: 0.7385034561157227
+relative_delta: 0.09798111766576767
+saved → ig_data/df_test_lig_results.jsonl
+30: logit: 1.0168378353118896
+baseline_logit: -1.8549060821533203
+score_diff: 2.87174391746521
+delta: 0.9703786373138428
+relative_delta: 0.3379057049751282
+saved → ig_data/df_test_lig_results.jsonl
+31: logit: 8.54166030883789
+baseline_logit: -0.9727814793586731
+score_diff: 9.51444149017334
+delta: 0.8170757293701172
+relative_delta: 0.085877425968647
+saved → ig_data/df_test_lig_results.jsonl
+32: logit: 6.743691444396973
+baseline_logit: -0.9727814793586731
+score_diff: 7.71647310256958
+delta: 1.188316822052002
+relative_delta: 0.15399740636348724
+saved → ig_data/df_test_lig_results.jsonl
+33: logit: 8.814441680908203
+baseline_logit: -0.9727814793586731
+score_diff: 9.787222862243652
+delta: 2.443309783935547
+relative_delta: 0.24964280426502228
+saved → ig_data/df_test_lig_results.jsonl
+34: logit: 9.130221366882324
+baseline_logit: -0.9777877926826477
+score_diff: 10.108009338378906
+delta: -0.052193641662597656
+relative_delta: 0.005163592752069235
+saved → ig_data/df_test_lig_results.jsonl
+35: logit: 8.160603523254395
+baseline_logit: -1.3002362251281738
+score_diff: 9.460840225219727
+delta: 0.7314882278442383
+relative_delta: 0.07731746882200241
+saved → ig_data/df_test_lig_results.jsonl
+36: logit: 8.339768409729004
+baseline_logit: -1.2804591655731201
+score_diff: 9.620227813720703
+delta: 0.8995990753173828
+relative_delta: 0.093511201441288
+saved → ig_data/df_test_lig_results.jsonl
+37: logit: 7.736903190612793
+baseline_logit: -1.0545886754989624
+score_diff: 8.791491508483887
+delta: 1.0830001831054688
+relative_delta: 0.12318731099367142
+saved → ig_data/df_test_lig_results.jsonl
+38: logit: 8.78062629699707
+baseline_logit: -1.406569004058838
+score_diff: 10.18719482421875
+delta: 0.8344135284423828
+relative_delta: 0.08190807700157166
+saved → ig_data/df_test_lig_results.jsonl
+39: logit: 8.009967803955078
+baseline_logit: -1.3529598712921143
+score_diff: 9.362927436828613
+delta: 1.5023927688598633
+relative_delta: 0.16046185791492462
+saved → ig_data/df_test_lig_results.jsonl
+40: logit: 4.052172660827637
+baseline_logit: -1.4174647331237793
+score_diff: 5.469637393951416
+delta: 0.6355643272399902
+relative_delta: 0.11619862169027328
+saved → ig_data/df_test_lig_results.jsonl
+41: logit: 6.609847545623779
+baseline_logit: -1.332649827003479
+score_diff: 7.942497253417969
+delta: 0.6269330978393555
+relative_delta: 0.07893399894237518
+saved → ig_data/df_test_lig_results.jsonl
+42: logit: 8.568893432617188
+baseline_logit: -1.3587849140167236
+score_diff: 9.927678108215332
+delta: 1.743199348449707
+relative_delta: 0.17558982968330383
+saved → ig_data/df_test_lig_results.jsonl
+43: logit: 7.587774753570557
+baseline_logit: -1.1296645402908325
+score_diff: 8.717439651489258
+delta: 0.6743288040161133
+relative_delta: 0.07735399901866913
+saved → ig_data/df_test_lig_results.jsonl
+44: logit: 5.830435752868652
+baseline_logit: -1.4202213287353516
+score_diff: 7.250657081604004
+delta: 0.12531614303588867
+relative_delta: 0.017283419147133827
+saved → ig_data/df_test_lig_results.jsonl
+45: logit: 9.461920738220215
+baseline_logit: -1.0874156951904297
+score_diff: 10.549336433410645
+delta: -0.22618961334228516
+relative_delta: 0.021441122516989708
+saved → ig_data/df_test_lig_results.jsonl
+46: logit: 8.087422370910645
+baseline_logit: -0.9727814793586731
+score_diff: 9.060203552246094
+delta: 2.041842460632324
+relative_delta: 0.2253638654947281
+saved → ig_data/df_test_lig_results.jsonl
+47: logit: 8.24949836730957
+baseline_logit: -0.886218786239624
+score_diff: 9.135717391967773
+delta: 1.2321395874023438
+relative_delta: 0.13487058877944946
+saved → ig_data/df_test_lig_results.jsonl
+48: logit: 6.4145917892456055
+baseline_logit: -1.8549060821533203
+score_diff: 8.269497871398926
+delta: -0.37741947174072266
+relative_delta: 0.04563995078206062
+saved → ig_data/df_test_lig_results.jsonl
+49: logit: 8.603204727172852
+baseline_logit: -1.0519145727157593
+score_diff: 9.655118942260742
+delta: 1.188638687133789
+relative_delta: 0.12310969084501266
+saved → ig_data/df_test_lig_results.jsonl
+50: logit: 9.49437427520752
+baseline_logit: -1.4219974279403687
+score_diff: 10.91637134552002
+delta: 1.094883918762207
+relative_delta: 0.10029742121696472
+saved → ig_data/df_test_lig_results.jsonl
+51: logit: 8.218607902526855
+baseline_logit: -1.1443195343017578
+score_diff: 9.362927436828613
+delta: 0.27521228790283203
+relative_delta: 0.02939382940530777
+saved → ig_data/df_test_lig_results.jsonl
+52: logit: 9.232047080993652
+baseline_logit: -1.2014946937561035
+score_diff: 10.433542251586914
+delta: 1.5148820877075195
+relative_delta: 0.1451934576034546
+saved → ig_data/df_test_lig_results.jsonl
+53: logit: 5.776801109313965
+baseline_logit: -1.4159131050109863
+score_diff: 7.192714214324951
+delta: -2.080397129058838
+relative_delta: 0.28923672437667847
+saved → ig_data/df_test_lig_results.jsonl
+54: logit: 8.511635780334473
+baseline_logit: -1.2592602968215942
+score_diff: 9.770895957946777
+delta: 1.1219749450683594
+relative_delta: 0.11482825875282288
+saved → ig_data/df_test_lig_results.jsonl
+55: logit: 0.1756497323513031
+baseline_logit: -1.4262014627456665
+score_diff: 1.601851224899292
+delta: -3.024380683898926
+relative_delta: 1.8880534172058105
+saved → ig_data/df_test_lig_results.jsonl
+56: logit: 9.06879997253418
+baseline_logit: -1.080862283706665
+score_diff: 10.149662017822266
+delta: 0.947169303894043
+relative_delta: 0.09332028031349182
+saved → ig_data/df_test_lig_results.jsonl
+57: logit: 7.268791198730469
+baseline_logit: -1.8549060821533203
+score_diff: 9.123697280883789
+delta: 0.6678543090820312
+relative_delta: 0.07319996505975723
+saved → ig_data/df_test_lig_results.jsonl
+58: logit: 7.681064128875732
+baseline_logit: -1.2214186191558838
+score_diff: 8.902482986450195
+delta: -0.02948474884033203
+relative_delta: 0.003311969107016921
+saved → ig_data/df_test_lig_results.jsonl
+59: logit: 3.217702627182007
+baseline_logit: -1.2738587856292725
+score_diff: 4.491561412811279
+delta: -0.8790087699890137
+relative_delta: 0.19570226967334747
+saved → ig_data/df_test_lig_results.jsonl
+60: logit: 8.117171287536621
+baseline_logit: -1.3957698345184326
+score_diff: 9.512941360473633
+delta: 2.40793514251709
+relative_delta: 0.2531220316886902
+saved → ig_data/df_test_lig_results.jsonl
+61: logit: 7.568249225616455
+baseline_logit: -1.0527901649475098
+score_diff: 8.621039390563965
+delta: 0.534968376159668
+relative_delta: 0.06205381453037262
+saved → ig_data/df_test_lig_results.jsonl
+62: logit: 4.898488521575928
+baseline_logit: -0.8757082223892212
+score_diff: 5.774196624755859
+delta: 1.087496280670166
+relative_delta: 0.18833725154399872
+saved → ig_data/df_test_lig_results.jsonl
+63: logit: 8.040492057800293
+baseline_logit: -0.9527005553245544
+score_diff: 8.993192672729492
+delta: 1.9683189392089844
+relative_delta: 0.21886764466762543
+saved → ig_data/df_test_lig_results.jsonl
+64: logit: 7.427058219909668
+baseline_logit: -1.8549060821533203
+score_diff: 9.281964302062988
+delta: -0.6435117721557617
+relative_delta: 0.06932926923036575
+saved → ig_data/df_test_lig_results.jsonl
+65: logit: 7.389262676239014
+baseline_logit: -1.8549060821533203
+score_diff: 9.244169235229492
+delta: 0.8859891891479492
+relative_delta: 0.09584303200244904
+saved → ig_data/df_test_lig_results.jsonl
+66: logit: 6.577665328979492
+baseline_logit: -0.8381209969520569
+score_diff: 7.415786266326904
+delta: 1.798351764678955
+relative_delta: 0.24250318109989166
+saved → ig_data/df_test_lig_results.jsonl
+67: logit: 8.423826217651367
+baseline_logit: -1.3630242347717285
+score_diff: 9.786849975585938
+delta: -0.18251419067382812
+relative_delta: 0.018648920580744743
+saved → ig_data/df_test_lig_results.jsonl
+68: logit: 7.7371697425842285
+baseline_logit: -1.370923638343811
+score_diff: 9.10809326171875
+delta: 0.3715543746948242
+relative_delta: 0.04079386964440346
+saved → ig_data/df_test_lig_results.jsonl
+69: logit: 8.890328407287598
+baseline_logit: -0.9727814793586731
+score_diff: 9.863109588623047
+delta: 1.24041748046875
+relative_delta: 0.12576332688331604
+saved → ig_data/df_test_lig_results.jsonl
+70: logit: 9.318913459777832
+baseline_logit: -0.9727814793586731
+score_diff: 10.291694641113281
+delta: 0.5579404830932617
+relative_delta: 0.05421269312500954
+saved → ig_data/df_test_lig_results.jsonl
+71: logit: 8.71939468383789
+baseline_logit: -0.9564781785011292
+score_diff: 9.675872802734375
+delta: 0.7628107070922852
+relative_delta: 0.07883637398481369
+saved → ig_data/df_test_lig_results.jsonl
+72: logit: 9.252273559570312
+baseline_logit: -0.8390715718269348
+score_diff: 10.091344833374023
+delta: 3.1943140029907227
+relative_delta: 0.3165399730205536
+saved → ig_data/df_test_lig_results.jsonl
+73: logit: 7.831673622131348
+baseline_logit: -1.4246658086776733
+score_diff: 9.256339073181152
+delta: 1.272512435913086
+relative_delta: 0.13747470080852509
+saved → ig_data/df_test_lig_results.jsonl
+74: logit: 4.878781318664551
+baseline_logit: -1.4280309677124023
+score_diff: 6.306812286376953
+delta: 0.9104337692260742
+relative_delta: 0.14435720443725586
+saved → ig_data/df_test_lig_results.jsonl
+75: logit: 7.190762042999268
+baseline_logit: -0.7946630120277405
+score_diff: 7.985424995422363
+delta: 1.6534347534179688
+relative_delta: 0.20705658197402954
+saved → ig_data/df_test_lig_results.jsonl
+76: logit: 7.209580898284912
+baseline_logit: -0.9245601296424866
+score_diff: 8.134140968322754
+delta: 1.8087444305419922
+relative_delta: 0.22236452996730804
+saved → ig_data/df_test_lig_results.jsonl
+77: logit: 6.60431432723999
+baseline_logit: -1.417317509651184
+score_diff: 8.021632194519043
+delta: 0.14778709411621094
+relative_delta: 0.018423568457365036
+saved → ig_data/df_test_lig_results.jsonl
+78: logit: 9.19944953918457
+baseline_logit: -0.9159066677093506
+score_diff: 10.1153564453125
+delta: 1.2061882019042969
+relative_delta: 0.11924327164888382
+saved → ig_data/df_test_lig_results.jsonl
+79: logit: 6.961693286895752
+baseline_logit: -1.362060546875
+score_diff: 8.323753356933594
+delta: 0.35999298095703125
+relative_delta: 0.04324887692928314
+saved → ig_data/df_test_lig_results.jsonl
+80: logit: 7.728611469268799
+baseline_logit: -1.104130744934082
+score_diff: 8.832742691040039
+delta: 0.4819803237915039
+relative_delta: 0.05456745997071266
+saved → ig_data/df_test_lig_results.jsonl
+81: logit: 8.295955657958984
+baseline_logit: -1.4254980087280273
+score_diff: 9.721453666687012
+delta: 0.8618803024291992
+relative_delta: 0.08865755051374435
+saved → ig_data/df_test_lig_results.jsonl
+82: logit: 7.602370738983154
+baseline_logit: -1.091300129890442
+score_diff: 8.693671226501465
+delta: 1.460770606994629
+relative_delta: 0.1680268943309784
+saved → ig_data/df_test_lig_results.jsonl
+83: logit: 9.635422706604004
+baseline_logit: -1.2951271533966064
+score_diff: 10.930549621582031
+delta: 0.33501338958740234
+relative_delta: 0.030649272724986076
+saved → ig_data/df_test_lig_results.jsonl
+84: logit: 7.204833030700684
+baseline_logit: -1.4129819869995117
+score_diff: 8.617815017700195
+delta: 1.0166816711425781
+relative_delta: 0.1179744154214859
+saved → ig_data/df_test_lig_results.jsonl
+85: logit: 9.75549602508545
+baseline_logit: -1.4201890230178833
+score_diff: 11.175684928894043
+delta: 0.7887086868286133
+relative_delta: 0.07057363539934158
+saved → ig_data/df_test_lig_results.jsonl
+86: logit: 8.723715782165527
+baseline_logit: -1.3096330165863037
+score_diff: 10.03334903717041
+delta: 0.6234626770019531
+relative_delta: 0.06213904172182083
+saved → ig_data/df_test_lig_results.jsonl
+87: logit: 9.3438138961792
+baseline_logit: -1.4543981552124023
+score_diff: 10.798212051391602
+delta: 1.1045112609863281
+relative_delta: 0.10228649526834488
+saved → ig_data/df_test_lig_results.jsonl
+88: logit: 6.413068771362305
+baseline_logit: -1.1038453578948975
+score_diff: 7.516914367675781
+delta: 1.196671485900879
+relative_delta: 0.15919716656208038
+saved → ig_data/df_test_lig_results.jsonl
+89: logit: 6.350976467132568
+baseline_logit: -1.8549060821533203
+score_diff: 8.205883026123047
+delta: 0.15207767486572266
+relative_delta: 0.018532762303948402
+saved → ig_data/df_test_lig_results.jsonl
+90: logit: 5.184544563293457
+baseline_logit: -1.332649827003479
+score_diff: 6.5171942710876465
+delta: 0.7628579139709473
+relative_delta: 0.11705312132835388
+saved → ig_data/df_test_lig_results.jsonl
+91: logit: 7.414247989654541
+baseline_logit: -1.3828537464141846
+score_diff: 8.797101974487305
+delta: 1.3853416442871094
+relative_delta: 0.15747705101966858
+saved → ig_data/df_test_lig_results.jsonl
+92: logit: 5.1203389167785645
+baseline_logit: -1.2951271533966064
+score_diff: 6.41546630859375
+delta: 1.3593626022338867
+relative_delta: 0.2118883579969406
+saved → ig_data/df_test_lig_results.jsonl
+93: logit: 8.479263305664062
+baseline_logit: -1.3096330165863037
+score_diff: 9.788896560668945
+delta: -0.0948629379272461
+relative_delta: 0.009690871462225914
+saved → ig_data/df_test_lig_results.jsonl
+94: logit: 8.550228118896484
+baseline_logit: -0.9727814793586731
+score_diff: 9.523009300231934
+delta: 0.21493244171142578
+relative_delta: 0.022569803521037102
+saved → ig_data/df_test_lig_results.jsonl
+95: logit: 8.955108642578125
+baseline_logit: -0.4678060710430145
+score_diff: 9.422914505004883
+delta: 2.437498092651367
+relative_delta: 0.25867772102355957
+saved → ig_data/df_test_lig_results.jsonl
+96: logit: 7.84368371963501
+baseline_logit: -1.3905645608901978
+score_diff: 9.234248161315918
+delta: 5.850982666015625
+relative_delta: 0.633617639541626
+saved → ig_data/df_test_lig_results.jsonl
+97: logit: 8.642732620239258
+baseline_logit: -1.3002362251281738
+score_diff: 9.942968368530273
+delta: -0.5870342254638672
+relative_delta: 0.0590401366353035
+saved → ig_data/df_test_lig_results.jsonl
+98: logit: 8.720876693725586
+baseline_logit: -0.9727814793586731
+score_diff: 9.693657875061035
+delta: 1.611750602722168
+relative_delta: 0.16626857221126556
+saved → ig_data/df_test_lig_results.jsonl
+99: logit: 9.363204956054688
+baseline_logit: -0.9727814793586731
+score_diff: 10.335986137390137
+delta: 2.319133758544922
+relative_delta: 0.2243746966123581
+saved → ig_data/df_test_lig_results.jsonl
+100: logit: 9.175212860107422
+baseline_logit: -0.8253499865531921
+score_diff: 10.00056266784668
+delta: 0.4820518493652344
+relative_delta: 0.04820247367024422
+saved → ig_data/df_test_lig_results.jsonl
+101: logit: 7.405096054077148
+baseline_logit: -1.0045522451400757
+score_diff: 8.409647941589355
+delta: 1.115891456604004
+relative_delta: 0.13269181549549103
+saved → ig_data/df_test_lig_results.jsonl
+102: logit: -5.2497358322143555
+baseline_logit: -0.9564781785011292
+score_diff: -4.293257713317871
+delta: 1.9786126613616943
+relative_delta: 0.4608651101589203
+saved → ig_data/df_test_lig_results.jsonl
+103: logit: 8.058589935302734
+baseline_logit: -0.9727814793586731
+score_diff: 9.031371116638184
+delta: 0.9664793014526367
+relative_delta: 0.10701357573270798
+saved → ig_data/df_test_lig_results.jsonl
+104: logit: 7.742438793182373
+baseline_logit: -1.370923638343811
+score_diff: 9.113362312316895
+delta: 1.0433053970336914
+relative_delta: 0.11448084563016891
+saved → ig_data/df_test_lig_results.jsonl
+105: logit: 7.803000450134277
+baseline_logit: -1.8549060821533203
+score_diff: 9.657906532287598
+delta: -0.34555530548095703
+relative_delta: 0.035779524594545364
+saved → ig_data/df_test_lig_results.jsonl
+106: logit: 9.059162139892578
+baseline_logit: -0.9727814793586731
+score_diff: 10.031943321228027
+delta: 0.9617376327514648
+relative_delta: 0.09586752951145172
+saved → ig_data/df_test_lig_results.jsonl
+107: logit: 6.868904113769531
+baseline_logit: -0.9827275276184082
+score_diff: 7.8516316413879395
+delta: 2.379978656768799
+relative_delta: 0.3031190037727356
+saved → ig_data/df_test_lig_results.jsonl
+108: logit: 6.630891799926758
+baseline_logit: -0.9226053953170776
+score_diff: 7.553497314453125
+delta: 2.5120086669921875
+relative_delta: 0.33256232738494873
+saved → ig_data/df_test_lig_results.jsonl
+109: logit: 7.916079044342041
+baseline_logit: -1.104130744934082
+score_diff: 9.020210266113281
+delta: 1.081913948059082
+relative_delta: 0.11994332075119019
+saved → ig_data/df_test_lig_results.jsonl
+110: logit: 7.632368087768555
+baseline_logit: -1.3652141094207764
+score_diff: 8.99758243560791
+delta: 1.0857887268066406
+relative_delta: 0.12067560851573944
+saved → ig_data/df_test_lig_results.jsonl
+111: logit: 6.033886432647705
+baseline_logit: -1.3059446811676025
+score_diff: 7.339831352233887
+delta: 1.9161386489868164
+relative_delta: 0.26106029748916626
+saved → ig_data/df_test_lig_results.jsonl
+112: logit: 8.088455200195312
+baseline_logit: -1.020946741104126
+score_diff: 9.10940170288086
+delta: 0.3809957504272461
+relative_delta: 0.041824452579021454
+saved → ig_data/df_test_lig_results.jsonl
+113: logit: 2.174431562423706
+baseline_logit: -1.0989645719528198
+score_diff: 3.2733960151672363
+delta: 1.4750175476074219
+relative_delta: 0.4506077170372009
+saved → ig_data/df_test_lig_results.jsonl
+114: logit: 9.170145988464355
+baseline_logit: -1.4129819869995117
+score_diff: 10.583127975463867
+delta: 3.2550344467163086
+relative_delta: 0.3075682818889618
+saved → ig_data/df_test_lig_results.jsonl
+115: logit: 8.431265830993652
+baseline_logit: -1.4280309677124023
+score_diff: 9.859296798706055
+delta: 0.8787574768066406
+relative_delta: 0.08912983536720276
+saved → ig_data/df_test_lig_results.jsonl
+116: logit: 8.517034530639648
+baseline_logit: -1.3905645608901978
+score_diff: 9.907599449157715
+delta: 0.20301151275634766
+relative_delta: 0.020490484312176704
+saved → ig_data/df_test_lig_results.jsonl
+117: logit: 8.914691925048828
+baseline_logit: -1.332649827003479
+score_diff: 10.247342109680176
+delta: 1.0811042785644531
+relative_delta: 0.10550094395875931
+saved → ig_data/df_test_lig_results.jsonl
+118: logit: 8.053709983825684
+baseline_logit: -1.3180012702941895
+score_diff: 9.371711730957031
+delta: 0.5875673294067383
+relative_delta: 0.06269583851099014
+saved → ig_data/df_test_lig_results.jsonl
+119: logit: 8.978035926818848
+baseline_logit: -1.4201890230178833
+score_diff: 10.398224830627441
+delta: 0.7858428955078125
+relative_delta: 0.07557471841573715
+saved → ig_data/df_test_lig_results.jsonl
+120: logit: 6.5664591789245605
+baseline_logit: -1.8549060821533203
+score_diff: 8.421365737915039
+delta: 0.18554019927978516
+relative_delta: 0.022032080218195915
+saved → ig_data/df_test_lig_results.jsonl
+121: logit: 8.506149291992188
+baseline_logit: -1.1795662641525269
+score_diff: 9.685715675354004
+delta: 1.7153759002685547
+relative_delta: 0.1771036833524704
+saved → ig_data/df_test_lig_results.jsonl
+122: logit: 8.009818077087402
+baseline_logit: -1.2738587856292725
+score_diff: 9.283677101135254
+delta: 0.8601522445678711
+relative_delta: 0.0926521047949791
+saved → ig_data/df_test_lig_results.jsonl
+123: logit: 7.114444732666016
+baseline_logit: -1.4218740463256836
+score_diff: 8.5363187789917
+delta: 0.569117546081543
+relative_delta: 0.06667013466358185
+saved → ig_data/df_test_lig_results.jsonl
+124: logit: -3.4714531898498535
+baseline_logit: -1.184483528137207
+score_diff: -2.2869696617126465
+delta: -0.851834774017334
+relative_delta: 0.3724731504917145
+saved → ig_data/df_test_lig_results.jsonl
+125: logit: 4.779730319976807
+baseline_logit: -1.4280309677124023
+score_diff: 6.207761287689209
+delta: 0.917567253112793
+relative_delta: 0.1478096842765808
+saved → ig_data/df_test_lig_results.jsonl
+126: logit: 6.690459728240967
+baseline_logit: -1.4102355241775513
+score_diff: 8.100695610046387
+delta: -0.6568260192871094
+relative_delta: 0.08108267188072205
+saved → ig_data/df_test_lig_results.jsonl
+127: logit: 7.978464126586914
+baseline_logit: -1.3577699661254883
+score_diff: 9.336234092712402
+delta: 0.9012651443481445
+relative_delta: 0.0965341180562973
+saved → ig_data/df_test_lig_results.jsonl
+128: logit: 9.51120376586914
+baseline_logit: -0.9727814793586731
+score_diff: 10.48398494720459
+delta: 0.18406200408935547
+relative_delta: 0.01755649223923683
+saved → ig_data/df_test_lig_results.jsonl
+129: logit: 8.116759300231934
+baseline_logit: -1.0648672580718994
+score_diff: 9.181626319885254
+delta: 1.5659418106079102
+relative_delta: 0.17055168747901917
+saved → ig_data/df_test_lig_results.jsonl
+130: logit: 9.128170013427734
+baseline_logit: -1.417317509651184
+score_diff: 10.545487403869629
+delta: 1.1415395736694336
+relative_delta: 0.10824910551309586
+saved → ig_data/df_test_lig_results.jsonl
+131: logit: -4.022151470184326
+baseline_logit: -1.4281620979309082
+score_diff: -2.593989372253418
+delta: -0.5992696285247803
+relative_delta: 0.23102238774299622
+saved → ig_data/df_test_lig_results.jsonl
+132: logit: 8.16469669342041
+baseline_logit: -1.3255791664123535
+score_diff: 9.490276336669922
+delta: 0.7765617370605469
+relative_delta: 0.08182709664106369
+saved → ig_data/df_test_lig_results.jsonl
+133: logit: 5.423604965209961
+baseline_logit: -1.410334587097168
+score_diff: 6.833939552307129
+delta: 0.8702178001403809
+relative_delta: 0.12733764946460724
+saved → ig_data/df_test_lig_results.jsonl
+134: logit: 8.235981941223145
+baseline_logit: -0.8952890038490295
+score_diff: 9.131271362304688
+delta: 1.4007434844970703
+relative_delta: 0.1534007042646408
+saved → ig_data/df_test_lig_results.jsonl
+135: logit: 8.645009994506836
+baseline_logit: -0.8716472387313843
+score_diff: 9.516656875610352
+delta: 1.4885387420654297
+relative_delta: 0.15641403198242188
+saved → ig_data/df_test_lig_results.jsonl
+136: logit: 2.3516952991485596
+baseline_logit: -1.1708924770355225
+score_diff: 3.522587776184082
+delta: 1.225550651550293
+relative_delta: 0.3479120135307312
+saved → ig_data/df_test_lig_results.jsonl
+137: logit: 7.417917251586914
+baseline_logit: -1.4174647331237793
+score_diff: 8.835382461547852
+delta: 0.5986404418945312
+relative_delta: 0.06775490194559097
+saved → ig_data/df_test_lig_results.jsonl
+138: logit: 6.318648815155029
+baseline_logit: -0.895194947719574
+score_diff: 7.213843822479248
+delta: 1.914548397064209
+relative_delta: 0.26539918780326843
+saved → ig_data/df_test_lig_results.jsonl
+139: logit: 9.197103500366211
+baseline_logit: -1.3587849140167236
+score_diff: 10.555888175964355
+delta: -0.23032855987548828
+relative_delta: 0.021819913759827614
+saved → ig_data/df_test_lig_results.jsonl
+140: logit: -9.639906883239746
+baseline_logit: -1.124267578125
+score_diff: -8.515639305114746
+delta: 0.5315418243408203
+relative_delta: 0.06241948530077934
+saved → ig_data/df_test_lig_results.jsonl
+141: logit: 6.353444576263428
+baseline_logit: -1.4218840599060059
+score_diff: 7.775328636169434
+delta: -0.24115324020385742
+relative_delta: 0.03101518377661705
+saved → ig_data/df_test_lig_results.jsonl
+142: logit: 4.286675930023193
+baseline_logit: -1.0665242671966553
+score_diff: 5.3531999588012695
+delta: 2.761387825012207
+relative_delta: 0.5158387422561646
+saved → ig_data/df_test_lig_results.jsonl
+143: logit: 0.08459640294313431
+baseline_logit: -1.4207011461257935
+score_diff: 1.5052975416183472
+delta: 0.32646286487579346
+relative_delta: 0.21687597036361694
+saved → ig_data/df_test_lig_results.jsonl
+144: logit: 8.1434965133667
+baseline_logit: -0.9727814793586731
+score_diff: 9.116277694702148
+delta: 1.328826904296875
+relative_delta: 0.14576420187950134
+saved → ig_data/df_test_lig_results.jsonl
+145: logit: 7.726111888885498
+baseline_logit: -0.9727814793586731
+score_diff: 8.698893547058105
+delta: 1.447770118713379
+relative_delta: 0.16643153131008148
+saved → ig_data/df_test_lig_results.jsonl
+146: logit: 9.515625
+baseline_logit: -1.4221489429473877
+score_diff: 10.937773704528809
+delta: -0.6263341903686523
+relative_delta: 0.05726340785622597
+saved → ig_data/df_test_lig_results.jsonl
+147: logit: 8.498332977294922
+baseline_logit: -0.9727814793586731
+score_diff: 9.471114158630371
+delta: 1.5926637649536133
+relative_delta: 0.16816012561321259
+saved → ig_data/df_test_lig_results.jsonl
+148: logit: 9.235427856445312
+baseline_logit: -0.9727814793586731
+score_diff: 10.208209037780762
+delta: 0.4312124252319336
+relative_delta: 0.04224172979593277
+saved → ig_data/df_test_lig_results.jsonl
+149: logit: 8.109729766845703
+baseline_logit: -1.3828537464141846
+score_diff: 9.492583274841309
+delta: 1.1447572708129883
+relative_delta: 0.12059491127729416
+saved → ig_data/df_test_lig_results.jsonl
+150: logit: 8.08411979675293
+baseline_logit: -0.8697822690010071
+score_diff: 8.953902244567871
+delta: 1.1600522994995117
+relative_delta: 0.12955829501152039
+saved → ig_data/df_test_lig_results.jsonl
+151: logit: 8.063801765441895
+baseline_logit: -0.89118492603302
+score_diff: 8.954986572265625
+delta: 1.5897293090820312
+relative_delta: 0.17752447724342346
+saved → ig_data/df_test_lig_results.jsonl
+152: logit: 5.7359137535095215
+baseline_logit: -1.0861600637435913
+score_diff: 6.822073936462402
+delta: -1.5969924926757812
+relative_delta: 0.23409193754196167
+saved → ig_data/df_test_lig_results.jsonl
+153: logit: 6.686813831329346
+baseline_logit: -0.9727814793586731
+score_diff: 7.659595489501953
+delta: 1.2627143859863281
+relative_delta: 0.16485393047332764
+saved → ig_data/df_test_lig_results.jsonl
+154: logit: 7.8224711418151855
+baseline_logit: -1.3828537464141846
+score_diff: 9.20532512664795
+delta: -1.6606035232543945
+relative_delta: 0.1803959608078003
+saved → ig_data/df_test_lig_results.jsonl
+155: logit: 4.732362270355225
+baseline_logit: -1.2858643531799316
+score_diff: 6.018226623535156
+delta: 0.31774139404296875
+relative_delta: 0.05279651656746864
+saved → ig_data/df_test_lig_results.jsonl
+156: logit: 9.27144718170166
+baseline_logit: -0.9727814793586731
+score_diff: 10.24422836303711
+delta: 1.3557090759277344
+relative_delta: 0.13233882188796997
+saved → ig_data/df_test_lig_results.jsonl
+157: logit: 8.898459434509277
+baseline_logit: -0.9160287976264954
+score_diff: 9.814488410949707
+delta: 0.7268791198730469
+relative_delta: 0.07406184822320938
+saved → ig_data/df_test_lig_results.jsonl
+158: logit: 7.932603359222412
+baseline_logit: -0.8832090497016907
+score_diff: 8.815812110900879
+delta: 1.5315628051757812
+relative_delta: 0.1737290620803833
+saved → ig_data/df_test_lig_results.jsonl
+159: logit: 8.930093765258789
+baseline_logit: -1.0575815439224243
+score_diff: 9.987675666809082
+delta: 1.2659320831298828
+relative_delta: 0.1267494112253189
+saved → ig_data/df_test_lig_results.jsonl
+160: logit: 9.042641639709473
+baseline_logit: -1.0609990358352661
+score_diff: 10.10364055633545
+delta: 0.7169656753540039
+relative_delta: 0.0709611251950264
+saved → ig_data/df_test_lig_results.jsonl
+161: logit: 6.781754970550537
+baseline_logit: -1.8549060821533203
+score_diff: 8.636661529541016
+delta: 0.3675270080566406
+relative_delta: 0.04255429282784462
+saved → ig_data/df_test_lig_results.jsonl
+162: logit: -2.549278497695923
+baseline_logit: -1.8549060821533203
+score_diff: -0.6943724155426025
+delta: -0.7825634479522705
+relative_delta: 1.127008318901062
+saved → ig_data/df_test_lig_results.jsonl
+163: logit: 7.838470935821533
+baseline_logit: -1.2370660305023193
+score_diff: 9.075536727905273
+delta: 1.3592205047607422
+relative_delta: 0.14976750314235687
+saved → ig_data/df_test_lig_results.jsonl
+164: logit: 7.9040961265563965
+baseline_logit: -1.0628209114074707
+score_diff: 8.966917037963867
+delta: 2.0802812576293945
+relative_delta: 0.23199515044689178
+saved → ig_data/df_test_lig_results.jsonl
+165: logit: 9.074228286743164
+baseline_logit: -1.3159316778182983
+score_diff: 10.390159606933594
+delta: 1.2263126373291016
+relative_delta: 0.11802635341882706
+saved → ig_data/df_test_lig_results.jsonl
+166: logit: 8.4437255859375
+baseline_logit: -1.3255791664123535
+score_diff: 9.769304275512695
+delta: 0.28656673431396484
+relative_delta: 0.029333382844924927
+saved → ig_data/df_test_lig_results.jsonl
+167: logit: 8.278443336486816
+baseline_logit: -1.3985100984573364
+score_diff: 9.676953315734863
+delta: 0.6706705093383789
+relative_delta: 0.06930595636367798
+saved → ig_data/df_test_lig_results.jsonl
+168: logit: 7.957055568695068
+baseline_logit: -1.4102355241775513
+score_diff: 9.367291450500488
+delta: 0.5072612762451172
+relative_delta: 0.05415239557623863
+saved → ig_data/df_test_lig_results.jsonl
+169: logit: 6.969043731689453
+baseline_logit: -1.4281620979309082
+score_diff: 8.397205352783203
+delta: 0.5373916625976562
+relative_delta: 0.06399648636579514
+saved → ig_data/df_test_lig_results.jsonl
+170: logit: 8.513452529907227
+baseline_logit: -1.2430627346038818
+score_diff: 9.756515502929688
+delta: 0.7335824966430664
+relative_delta: 0.07518898695707321
+saved → ig_data/df_test_lig_results.jsonl
+171: logit: 8.806793212890625
+baseline_logit: -0.9033827185630798
+score_diff: 9.710175514221191
+delta: 0.7527494430541992
+relative_delta: 0.07752171158790588
+saved → ig_data/df_test_lig_results.jsonl
+172: logit: 5.625161647796631
+baseline_logit: -1.1073638200759888
+score_diff: 6.73252534866333
+delta: 0.40836668014526367
+relative_delta: 0.06065579503774643
+saved → ig_data/df_test_lig_results.jsonl
+173: logit: 6.947778224945068
+baseline_logit: -1.1379590034484863
+score_diff: 8.085737228393555
+delta: -0.07175827026367188
+relative_delta: 0.008874672465026379
+saved → ig_data/df_test_lig_results.jsonl
+174: logit: 7.835106372833252
+baseline_logit: -1.3985100984573364
+score_diff: 9.233616828918457
+delta: 0.4781923294067383
+relative_delta: 0.05178819224238396
+saved → ig_data/df_test_lig_results.jsonl
+175: logit: 9.196280479431152
+baseline_logit: -1.294667363166809
+score_diff: 10.490947723388672
+delta: 2.1656694412231445
+relative_delta: 0.20643220841884613
+saved → ig_data/df_test_lig_results.jsonl
+176: logit: 8.701967239379883
+baseline_logit: -0.9727814793586731
+score_diff: 9.674748420715332
+delta: 1.582406997680664
+relative_delta: 0.16356052458286285
+saved → ig_data/df_test_lig_results.jsonl
+177: logit: 9.320412635803223
+baseline_logit: -1.0836316347122192
+score_diff: 10.404044151306152
+delta: 0.4230012893676758
+relative_delta: 0.04065738990902901
+saved → ig_data/df_test_lig_results.jsonl
+178: logit: 9.301926612854004
+baseline_logit: -1.4197660684585571
+score_diff: 10.72169303894043
+delta: 0.8420925140380859
+relative_delta: 0.07854100316762924
+saved → ig_data/df_test_lig_results.jsonl
+179: logit: 8.300824165344238
+baseline_logit: -1.8549060821533203
+score_diff: 10.155730247497559
+delta: -0.26943492889404297
+relative_delta: 0.02653033472597599
+saved → ig_data/df_test_lig_results.jsonl
+180: logit: 4.699880123138428
+baseline_logit: -1.3609689474105835
+score_diff: 6.060849189758301
+delta: 1.9616022109985352
+relative_delta: 0.32365137338638306
+saved → ig_data/df_test_lig_results.jsonl
+181: logit: 8.277202606201172
+baseline_logit: -1.3750494718551636
+score_diff: 9.652252197265625
+delta: 1.039947509765625
+relative_delta: 0.10774143785238266
+saved → ig_data/df_test_lig_results.jsonl
+182: logit: 8.778879165649414
+baseline_logit: -0.9644569754600525
+score_diff: 9.743335723876953
+delta: 0.8406057357788086
+relative_delta: 0.08627494424581528
+saved → ig_data/df_test_lig_results.jsonl
+183: logit: 6.582403659820557
+baseline_logit: -1.4279614686965942
+score_diff: 8.01036548614502
+delta: 0.8364324569702148
+relative_delta: 0.10441876202821732
+saved → ig_data/df_test_lig_results.jsonl
+184: logit: 9.220638275146484
+baseline_logit: -1.406401515007019
+score_diff: 10.627039909362793
+delta: 0.41229724884033203
+relative_delta: 0.03879699856042862
+saved → ig_data/df_test_lig_results.jsonl
+185: logit: 9.445938110351562
+baseline_logit: -1.250537395477295
+score_diff: 10.696475982666016
+delta: 0.25922203063964844
+relative_delta: 0.024234339594841003
+saved → ig_data/df_test_lig_results.jsonl
+186: logit: 9.740598678588867
+baseline_logit: -1.4280542135238647
+score_diff: 11.168652534484863
+delta: 0.8963613510131836
+relative_delta: 0.08025689423084259
+saved → ig_data/df_test_lig_results.jsonl
+187: logit: 9.58468246459961
+baseline_logit: -1.0527901649475098
+score_diff: 10.637472152709961
+delta: -0.3109703063964844
+relative_delta: 0.029233478009700775
+saved → ig_data/df_test_lig_results.jsonl
+188: logit: 6.193190097808838
+baseline_logit: -1.4243557453155518
+score_diff: 7.617546081542969
+delta: 0.391357421875
+relative_delta: 0.05137578770518303
+saved → ig_data/df_test_lig_results.jsonl
+189: logit: -4.745100498199463
+baseline_logit: -0.9382947087287903
+score_diff: -3.8068058490753174
+delta: 0.787691593170166
+relative_delta: 0.2069166749715805
+saved → ig_data/df_test_lig_results.jsonl
+190: logit: 6.196176052093506
+baseline_logit: -0.907662034034729
+score_diff: 7.103837966918945
+delta: 1.2536849975585938
+relative_delta: 0.17647995054721832
+saved → ig_data/df_test_lig_results.jsonl
+191: logit: 6.877828121185303
+baseline_logit: -1.3096330165863037
+score_diff: 8.187460899353027
+delta: 1.9998464584350586
+relative_delta: 0.24425722658634186
+saved → ig_data/df_test_lig_results.jsonl
+192: logit: 6.957605838775635
+baseline_logit: -0.5363932847976685
+score_diff: 7.493999004364014
+delta: 0.5817465782165527
+relative_delta: 0.07762832194566727
+saved → ig_data/df_test_lig_results.jsonl
+193: logit: 8.159953117370605
+baseline_logit: -0.9727814793586731
+score_diff: 9.132734298706055
+delta: 1.878744125366211
+relative_delta: 0.20571540296077728
+saved → ig_data/df_test_lig_results.jsonl
+194: logit: 7.085104942321777
+baseline_logit: -0.886218786239624
+score_diff: 7.9713239669799805
+delta: 0.9916305541992188
+relative_delta: 0.12439972907304764
+saved → ig_data/df_test_lig_results.jsonl
+195: logit: -4.277079105377197
+baseline_logit: -1.0484178066253662
+score_diff: -3.228661298751831
+delta: 0.31244897842407227
+relative_delta: 0.09677353501319885
+saved → ig_data/df_test_lig_results.jsonl
+196: logit: 9.50250244140625
+baseline_logit: -0.9126622676849365
+score_diff: 10.415164947509766
+delta: 1.7319984436035156
+relative_delta: 0.1662958264350891
+saved → ig_data/df_test_lig_results.jsonl
+197: logit: 9.330143928527832
+baseline_logit: -1.0734155178070068
+score_diff: 10.403559684753418
+delta: 1.3017663955688477
+relative_delta: 0.12512701749801636
+saved → ig_data/df_test_lig_results.jsonl
+198: logit: 6.602715015411377
+baseline_logit: -1.0836316347122192
+score_diff: 7.686346530914307
+delta: 1.5102944374084473
+relative_delta: 0.19649054110050201
+saved → ig_data/df_test_lig_results.jsonl
+199: logit: 8.639897346496582
+baseline_logit: -0.9727814793586731
+score_diff: 9.612678527832031
+delta: 2.11199951171875
+relative_delta: 0.21970978379249573
+saved → ig_data/df_test_lig_results.jsonl
+200: logit: 9.12331771850586
+baseline_logit: -1.342897653579712
+score_diff: 10.466215133666992
+delta: 1.2069473266601562
+relative_delta: 0.1153184100985527
+saved → ig_data/df_test_lig_results.jsonl
+201: logit: 5.647416114807129
+baseline_logit: -1.124267578125
+score_diff: 6.771683692932129
+delta: 1.6632795333862305
+relative_delta: 0.24562273919582367
+saved → ig_data/df_test_lig_results.jsonl
+202: logit: 3.5524566173553467
+baseline_logit: -1.4129819869995117
+score_diff: 4.9654388427734375
+delta: -0.18529605865478516
+relative_delta: 0.03731715679168701
+saved → ig_data/df_test_lig_results.jsonl
+203: logit: 6.831719398498535
+baseline_logit: -1.8549060821533203
+score_diff: 8.686625480651855
+delta: -0.16894054412841797
+relative_delta: 0.019448351114988327
+saved → ig_data/df_test_lig_results.jsonl
+204: logit: 2.478424549102783
+baseline_logit: -1.8549060821533203
+score_diff: 4.3333306312561035
+delta: 0.6869893074035645
+relative_delta: 0.15853609144687653
+saved → ig_data/df_test_lig_results.jsonl
+205: logit: 6.85323429107666
+baseline_logit: -1.8549060821533203
+score_diff: 8.70814037322998
+delta: 1.0234041213989258
+relative_delta: 0.117522694170475
+saved → ig_data/df_test_lig_results.jsonl
+206: logit: 8.2442626953125
+baseline_logit: -0.8363613486289978
+score_diff: 9.080623626708984
+delta: 1.2558555603027344
+relative_delta: 0.1383005827665329
+saved → ig_data/df_test_lig_results.jsonl
+207: logit: 8.493298530578613
+baseline_logit: -1.2804591655731201
+score_diff: 9.773757934570312
+delta: 0.6551856994628906
+relative_delta: 0.06703519076108932
+saved → ig_data/df_test_lig_results.jsonl
+208: logit: 8.593568801879883
+baseline_logit: -0.9480113387107849
+score_diff: 9.541580200195312
+delta: 2.117258071899414
+relative_delta: 0.22189804911613464
+saved → ig_data/df_test_lig_results.jsonl
+209: logit: 9.267801284790039
+baseline_logit: -1.3255791664123535
+score_diff: 10.593379974365234
+delta: 0.9075946807861328
+relative_delta: 0.08567564934492111
+saved → ig_data/df_test_lig_results.jsonl
+210: logit: 5.908844947814941
+baseline_logit: -1.0638139247894287
+score_diff: 6.972659111022949
+delta: 0.5292229652404785
+relative_delta: 0.07589973509311676
+saved → ig_data/df_test_lig_results.jsonl
+211: logit: 5.820648670196533
+baseline_logit: -0.8408582806587219
+score_diff: 6.6615071296691895
+delta: 2.6408114433288574
+relative_delta: 0.39642852544784546
+saved → ig_data/df_test_lig_results.jsonl
+212: logit: 9.033215522766113
+baseline_logit: -1.0553699731826782
+score_diff: 10.08858585357666
+delta: 1.0908937454223633
+relative_delta: 0.10813148319721222
+saved → ig_data/df_test_lig_results.jsonl
+213: logit: 9.002510070800781
+baseline_logit: -0.8741685152053833
+score_diff: 9.876678466796875
+delta: 1.1568870544433594
+relative_delta: 0.11713320761919022
+saved → ig_data/df_test_lig_results.jsonl
+214: logit: 6.994750499725342
+baseline_logit: -1.6408296823501587
+score_diff: 8.635580062866211
+delta: 0.24807167053222656
+relative_delta: 0.028726695105433464
+saved → ig_data/df_test_lig_results.jsonl
+215: logit: 8.177440643310547
+baseline_logit: -0.9777877926826477
+score_diff: 9.155228614807129
+delta: 1.5640697479248047
+relative_delta: 0.17083896696567535
+saved → ig_data/df_test_lig_results.jsonl
+216: logit: 3.3851540088653564
+baseline_logit: -1.4243557453155518
+score_diff: 4.809509754180908
+delta: 1.2503294944763184
+relative_delta: 0.2599702477455139
+saved → ig_data/df_test_lig_results.jsonl
+217: logit: 2.7400808334350586
+baseline_logit: -0.9497489333152771
+score_diff: 3.6898298263549805
+delta: 0.8089389801025391
+relative_delta: 0.21923476457595825
+saved → ig_data/df_test_lig_results.jsonl
+218: logit: -9.157026290893555
+baseline_logit: -1.1424254179000854
+score_diff: -8.01460075378418
+delta: 2.049880027770996
+relative_delta: 0.25576820969581604
+saved → ig_data/df_test_lig_results.jsonl
+219: logit: 7.953545093536377
+baseline_logit: -0.9126622676849365
+score_diff: 8.866207122802734
+delta: 0.4230079650878906
+relative_delta: 0.04771013930439949
+saved → ig_data/df_test_lig_results.jsonl
+220: logit: 8.804388046264648
+baseline_logit: -0.8029457926750183
+score_diff: 9.60733413696289
+delta: 1.5120601654052734
+relative_delta: 0.15738603472709656
+saved → ig_data/df_test_lig_results.jsonl
+221: logit: 8.62456226348877
+baseline_logit: -1.3981812000274658
+score_diff: 10.022743225097656
+delta: 1.4457721710205078
+relative_delta: 0.14424914121627808
+saved → ig_data/df_test_lig_results.jsonl
+222: logit: 7.022246837615967
+baseline_logit: -1.0942898988723755
+score_diff: 8.116537094116211
+delta: 0.6392889022827148
+relative_delta: 0.07876375317573547
+saved → ig_data/df_test_lig_results.jsonl
+223: logit: 6.099151134490967
+baseline_logit: -1.8549060821533203
+score_diff: 7.954057216644287
+delta: -0.24573278427124023
+relative_delta: 0.030894016847014427
+saved → ig_data/df_test_lig_results.jsonl
+224: logit: 9.353601455688477
+baseline_logit: -1.425527811050415
+score_diff: 10.779129028320312
+delta: 2.209634780883789
+relative_delta: 0.20499196648597717
+saved → ig_data/df_test_lig_results.jsonl
+225: logit: -8.871429443359375
+baseline_logit: -1.8549060821533203
+score_diff: -7.016523361206055
+delta: -0.21366548538208008
+relative_delta: 0.030451759696006775
+saved → ig_data/df_test_lig_results.jsonl
+226: logit: 9.099054336547852
+baseline_logit: -1.2138570547103882
+score_diff: 10.312911033630371
+delta: 2.7633047103881836
+relative_delta: 0.26794615387916565
+saved → ig_data/df_test_lig_results.jsonl
+227: logit: 5.878403186798096
+baseline_logit: -1.1036787033081055
+score_diff: 6.982081890106201
+delta: 2.3937458992004395
+relative_delta: 0.3428412675857544
+saved → ig_data/df_test_lig_results.jsonl
+228: logit: 9.19044017791748
+baseline_logit: -1.1038453578948975
+score_diff: 10.294285774230957
+delta: 1.5128889083862305
+relative_delta: 0.1469639539718628
+saved → ig_data/df_test_lig_results.jsonl
+229: logit: 8.436116218566895
+baseline_logit: -0.8363613486289978
+score_diff: 9.272477149963379
+delta: 1.5050973892211914
+relative_delta: 0.16231879591941833
+saved → ig_data/df_test_lig_results.jsonl
+230: logit: 7.196712970733643
+baseline_logit: -1.8549060821533203
+score_diff: 9.051618576049805
+delta: 0.3294658660888672
+relative_delta: 0.03639855980873108
+saved → ig_data/df_test_lig_results.jsonl
+231: logit: 8.401122093200684
+baseline_logit: -0.8253499865531921
+score_diff: 9.226471900939941
+delta: 1.8884820938110352
+relative_delta: 0.20468084514141083
+saved → ig_data/df_test_lig_results.jsonl
+232: logit: 9.720024108886719
+baseline_logit: -0.9727814793586731
+score_diff: 10.692805290222168
+delta: 1.4897089004516602
+relative_delta: 0.1393188089132309
+saved → ig_data/df_test_lig_results.jsonl
+233: logit: 6.551002025604248
+baseline_logit: -1.0652647018432617
+score_diff: 7.61626672744751
+delta: 0.5971875190734863
+relative_delta: 0.07840947806835175
+saved → ig_data/df_test_lig_results.jsonl
+234: logit: 2.346489906311035
+baseline_logit: -1.3905645608901978
+score_diff: 3.7370543479919434
+delta: 0.4431571960449219
+relative_delta: 0.11858462542295456
+saved → ig_data/df_test_lig_results.jsonl
+235: logit: 9.281167030334473
+baseline_logit: -1.1769137382507324
+score_diff: 10.458080291748047
+delta: 1.40081787109375
+relative_delta: 0.1339459866285324
+saved → ig_data/df_test_lig_results.jsonl
+236: logit: 8.927868843078613
+baseline_logit: -0.9124841094017029
+score_diff: 9.840353012084961
+delta: 1.6435127258300781
+relative_delta: 0.16701765358448029
+saved → ig_data/df_test_lig_results.jsonl
+237: logit: 5.589061260223389
+baseline_logit: -1.36604642868042
+score_diff: 6.955107688903809
+delta: -0.3782773017883301
+relative_delta: 0.054388418793678284
+saved → ig_data/df_test_lig_results.jsonl
+238: logit: 9.070229530334473
+baseline_logit: -1.4283682107925415
+score_diff: 10.498598098754883
+delta: 0.41129493713378906
+relative_delta: 0.039176177233457565
+saved → ig_data/df_test_lig_results.jsonl
+239: logit: -9.200057983398438
+baseline_logit: -0.8892106413841248
+score_diff: -8.310847282409668
+delta: 1.5051054954528809
+relative_delta: 0.18110133707523346
+saved → ig_data/df_test_lig_results.jsonl
+240: logit: 9.124208450317383
+baseline_logit: -0.8729864358901978
+score_diff: 9.99719524383545
+delta: 3.3072004318237305
+relative_delta: 0.33081284165382385
+saved → ig_data/df_test_lig_results.jsonl
+241: logit: 7.479423999786377
+baseline_logit: -0.8748704195022583
+score_diff: 8.354294776916504
+delta: 0.6574125289916992
+relative_delta: 0.07869156450033188
+saved → ig_data/df_test_lig_results.jsonl
+242: logit: 9.091796875
+baseline_logit: -1.1051486730575562
+score_diff: 10.196945190429688
+delta: 0.6059074401855469
+relative_delta: 0.05942048504948616
+saved → ig_data/df_test_lig_results.jsonl
+243: logit: 7.226515293121338
+baseline_logit: -0.8366561532020569
+score_diff: 8.06317138671875
+delta: 1.8718976974487305
+relative_delta: 0.2321540266275406
+saved → ig_data/df_test_lig_results.jsonl
+244: logit: -2.102104663848877
+baseline_logit: -0.946060299873352
+score_diff: -1.156044363975525
+delta: 0.9775258302688599
+relative_delta: 0.845578134059906
+saved → ig_data/df_test_lig_results.jsonl
+245: logit: 2.838810682296753
+baseline_logit: -1.8549060821533203
+score_diff: 4.693717002868652
+delta: 0.07355976104736328
+relative_delta: 0.01567196287214756
+saved → ig_data/df_test_lig_results.jsonl
+246: logit: 8.045116424560547
+baseline_logit: -1.2144525051116943
+score_diff: 9.25956916809082
+delta: 1.8574552536010742
+relative_delta: 0.20059844851493835
+saved → ig_data/df_test_lig_results.jsonl
+247: logit: 8.157051086425781
+baseline_logit: -0.3677302896976471
+score_diff: 8.524781227111816
+delta: 1.666712760925293
+relative_delta: 0.19551384449005127
+saved → ig_data/df_test_lig_results.jsonl
+248: logit: 9.143790245056152
+baseline_logit: -0.9104518294334412
+score_diff: 10.054242134094238
+delta: 1.0977020263671875
+relative_delta: 0.10917799919843674
+saved → ig_data/df_test_lig_results.jsonl
+249: logit: 8.312530517578125
+baseline_logit: -1.8549060821533203
+score_diff: 10.167436599731445
+delta: -1.1060476303100586
+relative_delta: 0.10878333449363708
+saved → ig_data/df_test_lig_results.jsonl
+250: logit: 9.312225341796875
+baseline_logit: -0.36946335434913635
+score_diff: 9.68168830871582
+delta: 2.0080223083496094
+relative_delta: 0.20740415155887604
+saved → ig_data/df_test_lig_results.jsonl
+251: logit: 8.303035736083984
+baseline_logit: -1.2881765365600586
+score_diff: 9.591212272644043
+delta: 0.771693229675293
+relative_delta: 0.08045836538076401
+saved → ig_data/df_test_lig_results.jsonl
+252: logit: 8.865732192993164
+baseline_logit: -1.0701403617858887
+score_diff: 9.935873031616211
+delta: 0.2869071960449219
+relative_delta: 0.028875891119241714
+saved → ig_data/df_test_lig_results.jsonl
+253: logit: 8.714269638061523
+baseline_logit: -1.3905645608901978
+score_diff: 10.10483455657959
+delta: 0.019278526306152344
+relative_delta: 0.001907851779833436
+saved → ig_data/df_test_lig_results.jsonl
+254: logit: 8.810563087463379
+baseline_logit: -1.091300129890442
+score_diff: 9.901863098144531
+delta: 1.3891916275024414
+relative_delta: 0.14029598236083984
+saved → ig_data/df_test_lig_results.jsonl
+255: logit: 6.654457092285156
+baseline_logit: -1.1453449726104736
+score_diff: 7.799801826477051
+delta: 0.6162538528442383
+relative_delta: 0.07900891453027725
+saved → ig_data/df_test_lig_results.jsonl
+256: logit: 8.22128677368164
+baseline_logit: -1.4411585330963135
+score_diff: 9.662445068359375
+delta: 0.8405475616455078
+relative_delta: 0.08699118345975876
+saved → ig_data/df_test_lig_results.jsonl
+257: logit: 3.540280818939209
+baseline_logit: -1.8549060821533203
+score_diff: 5.395186901092529
+delta: -0.026703834533691406
+relative_delta: 0.004949565976858139
+saved → ig_data/df_test_lig_results.jsonl
+258: logit: 8.123489379882812
+baseline_logit: -1.2594166994094849
+score_diff: 9.382905960083008
+delta: 0.7977790832519531
+relative_delta: 0.08502473682165146
+saved → ig_data/df_test_lig_results.jsonl
+259: logit: 8.763154983520508
+baseline_logit: -1.4250320196151733
+score_diff: 10.188186645507812
+delta: 0.7884368896484375
+relative_delta: 0.07738736271858215
+saved → ig_data/df_test_lig_results.jsonl
+260: logit: 8.220481872558594
+baseline_logit: -0.9727814793586731
+score_diff: 9.193263053894043
+delta: 1.207808494567871
+relative_delta: 0.13137973845005035
+saved → ig_data/df_test_lig_results.jsonl
+261: logit: 1.6633079051971436
+baseline_logit: -0.8748704195022583
+score_diff: 2.5381784439086914
+delta: 0.49059391021728516
+relative_delta: 0.19328582286834717
+saved → ig_data/df_test_lig_results.jsonl
+262: logit: 8.661497116088867
+baseline_logit: -1.1443195343017578
+score_diff: 9.805816650390625
+delta: 0.96722412109375
+relative_delta: 0.09863779693841934
+saved → ig_data/df_test_lig_results.jsonl
+263: logit: 8.497613906860352
+baseline_logit: -1.4129819869995117
+score_diff: 9.910595893859863
+delta: 0.5504179000854492
+relative_delta: 0.055538326501846313
+saved → ig_data/df_test_lig_results.jsonl
+264: logit: 8.284615516662598
+baseline_logit: -1.3577699661254883
+score_diff: 9.642385482788086
+delta: 0.8608989715576172
+relative_delta: 0.08928278088569641
+saved → ig_data/df_test_lig_results.jsonl
+265: logit: 4.993002414703369
+baseline_logit: -1.404375672340393
+score_diff: 6.397377967834473
+delta: 1.3234586715698242
+relative_delta: 0.20687517523765564
+saved → ig_data/df_test_lig_results.jsonl
+266: logit: 8.633819580078125
+baseline_logit: -1.3796443939208984
+score_diff: 10.013463973999023
+delta: 1.0386333465576172
+relative_delta: 0.1037236824631691
+saved → ig_data/df_test_lig_results.jsonl
+267: logit: 9.671443939208984
+baseline_logit: -1.4218840599060059
+score_diff: 11.093328475952148
+delta: 1.4766950607299805
+relative_delta: 0.13311560451984406
+saved → ig_data/df_test_lig_results.jsonl
+268: logit: 6.774616718292236
+baseline_logit: -1.4268953800201416
+score_diff: 8.201512336730957
+delta: 1.1130237579345703
+relative_delta: 0.13570956885814667
+saved → ig_data/df_test_lig_results.jsonl
+269: logit: 5.58132791519165
+baseline_logit: -0.936371386051178
+score_diff: 6.517699241638184
+delta: 0.6202144622802734
+relative_delta: 0.09515849500894547
+saved → ig_data/df_test_lig_results.jsonl
+270: logit: 3.89685320854187
+baseline_logit: -1.8549060821533203
+score_diff: 5.7517595291137695
+delta: -0.16965627670288086
+relative_delta: 0.029496412724256516
+saved → ig_data/df_test_lig_results.jsonl
+271: logit: 5.511775493621826
+baseline_logit: -1.4219974279403687
+score_diff: 6.933773040771484
+delta: 2.795684814453125
+relative_delta: 0.4031982123851776
+saved → ig_data/df_test_lig_results.jsonl
+272: logit: 8.960609436035156
+baseline_logit: -1.1650426387786865
+score_diff: 10.125652313232422
+delta: 1.1178293228149414
+relative_delta: 0.11039578169584274
+saved → ig_data/df_test_lig_results.jsonl
+273: logit: 8.349309921264648
+baseline_logit: -0.9727814793586731
+score_diff: 9.322091102600098
+delta: 1.7835149765014648
+relative_delta: 0.19132134318351746
+saved → ig_data/df_test_lig_results.jsonl
+274: logit: 8.776191711425781
+baseline_logit: -0.8838711977005005
+score_diff: 9.660062789916992
+delta: 2.4873390197753906
+relative_delta: 0.25748685002326965
+saved → ig_data/df_test_lig_results.jsonl
+275: logit: 8.343530654907227
+baseline_logit: -1.4202213287353516
+score_diff: 9.763751983642578
+delta: 0.5109081268310547
+relative_delta: 0.052327029407024384
+saved → ig_data/df_test_lig_results.jsonl
+276: logit: 8.7066650390625
+baseline_logit: -1.4219974279403687
+score_diff: 10.128662109375
+delta: 0.30191802978515625
+relative_delta: 0.02980828285217285
+saved → ig_data/df_test_lig_results.jsonl
+277: logit: 9.722766876220703
+baseline_logit: -1.4286556243896484
+score_diff: 11.151422500610352
+delta: 0.7840995788574219
+relative_delta: 0.07031386345624924
+saved → ig_data/df_test_lig_results.jsonl
+278: logit: 9.139102935791016
+baseline_logit: -1.3750494718551636
+score_diff: 10.514152526855469
+delta: 1.2604732513427734
+relative_delta: 0.11988348513841629
+saved → ig_data/df_test_lig_results.jsonl
+279: logit: 4.668247699737549
+baseline_logit: -1.1311200857162476
+score_diff: 5.799367904663086
+delta: 1.2041187286376953
+relative_delta: 0.20762930810451508
+saved → ig_data/df_test_lig_results.jsonl
+280: logit: 8.883016586303711
+baseline_logit: -1.0615746974945068
+score_diff: 9.944591522216797
+delta: 5.5970354080200195
+relative_delta: 0.5628220438957214
+saved → ig_data/df_test_lig_results.jsonl
+281: logit: 7.466246128082275
+baseline_logit: -1.0605356693267822
+score_diff: 8.526782035827637
+delta: 0.8017511367797852
+relative_delta: 0.09402740001678467
+saved → ig_data/df_test_lig_results.jsonl
+282: logit: 1.4250746965408325
+baseline_logit: -1.1456608772277832
+score_diff: 2.570735454559326
+delta: 1.4064178466796875
+relative_delta: 0.5470877289772034
+saved → ig_data/df_test_lig_results.jsonl
+283: logit: 8.468408584594727
+baseline_logit: -1.4159131050109863
+score_diff: 9.884321212768555
+delta: 1.7930803298950195
+relative_delta: 0.18140652775764465
+saved → ig_data/df_test_lig_results.jsonl
+284: logit: 9.176053047180176
+baseline_logit: -0.9727814793586731
+score_diff: 10.148834228515625
+delta: 1.579756736755371
+relative_delta: 0.15565893054008484
+saved → ig_data/df_test_lig_results.jsonl
+285: logit: 9.53676986694336
+baseline_logit: -1.2592602968215942
+score_diff: 10.796030044555664
+delta: 1.713083267211914
+relative_delta: 0.1586771458387375
+saved → ig_data/df_test_lig_results.jsonl
+286: logit: 0.3216765522956848
+baseline_logit: -0.8843156695365906
+score_diff: 1.2059922218322754
+delta: 3.7265424728393555
+relative_delta: 3.090022087097168
+saved → ig_data/df_test_lig_results.jsonl
+287: logit: 8.331872940063477
+baseline_logit: -0.8759950399398804
+score_diff: 9.207867622375488
+delta: 0.8846378326416016
+relative_delta: 0.09607412666082382
+saved → ig_data/df_test_lig_results.jsonl
+288: logit: 7.721025466918945
+baseline_logit: -0.38093024492263794
+score_diff: 8.10195541381836
+delta: 2.1989212036132812
+relative_delta: 0.27140623331069946
+saved → ig_data/df_test_lig_results.jsonl
+289: logit: 4.759400844573975
+baseline_logit: -1.370923638343811
+score_diff: 6.130324363708496
+delta: -1.561258316040039
+relative_delta: 0.2546779215335846
+saved → ig_data/df_test_lig_results.jsonl
+290: logit: 8.19615650177002
+baseline_logit: -1.351410984992981
+score_diff: 9.547567367553711
+delta: 0.5458621978759766
+relative_delta: 0.05717290937900543
+saved → ig_data/df_test_lig_results.jsonl
+291: logit: 9.369388580322266
+baseline_logit: -1.4208775758743286
+score_diff: 10.790266036987305
+delta: 1.6607179641723633
+relative_delta: 0.1539088934659958
+saved → ig_data/df_test_lig_results.jsonl
+292: logit: -1.8939247131347656
+baseline_logit: -1.0945420265197754
+score_diff: -0.7993826866149902
+delta: 1.7060294151306152
+relative_delta: 2.134183645248413
+saved → ig_data/df_test_lig_results.jsonl
+293: logit: 8.021893501281738
+baseline_logit: -1.0861600637435913
+score_diff: 9.108053207397461
+delta: -0.05453681945800781
+relative_delta: 0.005987758282572031
+saved → ig_data/df_test_lig_results.jsonl
+294: logit: 4.317872524261475
+baseline_logit: -1.044823408126831
+score_diff: 5.362695693969727
+delta: 0.6088056564331055
+relative_delta: 0.11352604627609253
+saved → ig_data/df_test_lig_results.jsonl
+295: logit: -5.277732849121094
+baseline_logit: -1.2812271118164062
+score_diff: -3.9965057373046875
+delta: 0.17966747283935547
+relative_delta: 0.04495614022016525
+saved → ig_data/df_test_lig_results.jsonl
+296: logit: 6.422093868255615
+baseline_logit: -1.121543049812317
+score_diff: 7.543636798858643
+delta: 2.057384967803955
+relative_delta: 0.2727311849594116
+saved → ig_data/df_test_lig_results.jsonl
+297: logit: 8.08180046081543
+baseline_logit: -1.2096160650253296
+score_diff: 9.29141616821289
+delta: 1.5644826889038086
+relative_delta: 0.16837935149669647
+saved → ig_data/df_test_lig_results.jsonl
+298: logit: 9.211825370788574
+baseline_logit: -0.9727814793586731
+score_diff: 10.184606552124023
+delta: 0.3680381774902344
+relative_delta: 0.03613670915365219
+saved → ig_data/df_test_lig_results.jsonl
+299: logit: -5.708253860473633
+baseline_logit: -1.8549060821533203
+score_diff: -3.8533477783203125
+delta: 1.0044422149658203
+relative_delta: 0.2606674134731293
+saved → ig_data/df_test_lig_results.jsonl
+300: logit: 7.075692653656006
+baseline_logit: -1.8549060821533203
+score_diff: 8.930599212646484
+delta: -0.021764755249023438
+relative_delta: 0.002437099115923047
+saved → ig_data/df_test_lig_results.jsonl
+301: logit: 6.204716682434082
+baseline_logit: -1.8549060821533203
+score_diff: 8.059622764587402
+delta: 0.2104053497314453
+relative_delta: 0.026106104254722595
+saved → ig_data/df_test_lig_results.jsonl
+302: logit: -0.26480382680892944
+baseline_logit: -1.8549060821533203
+score_diff: 1.590102195739746
+delta: 1.074875831604004
+relative_delta: 0.6759790778160095
+saved → ig_data/df_test_lig_results.jsonl
+303: logit: 6.828243255615234
+baseline_logit: -0.9727814793586731
+score_diff: 7.801024913787842
+delta: 1.00150728225708
+relative_delta: 0.12838150560855865
+saved → ig_data/df_test_lig_results.jsonl
+304: logit: 8.436111450195312
+baseline_logit: -1.089258074760437
+score_diff: 9.525369644165039
+delta: 0.9810380935668945
+relative_delta: 0.10299212485551834
+saved → ig_data/df_test_lig_results.jsonl
+305: logit: 7.560625076293945
+baseline_logit: -0.9104518294334412
+score_diff: 8.471076965332031
+delta: 2.218921661376953
+relative_delta: 0.26194092631340027
+saved → ig_data/df_test_lig_results.jsonl
+306: logit: 5.038349628448486
+baseline_logit: -0.931219220161438
+score_diff: 5.969568729400635
+delta: 0.11517000198364258
+relative_delta: 0.01929285190999508
+saved → ig_data/df_test_lig_results.jsonl
+307: logit: 7.847642421722412
+baseline_logit: -0.87851482629776
+score_diff: 8.726157188415527
+delta: 1.419062614440918
+relative_delta: 0.16262170672416687
+saved → ig_data/df_test_lig_results.jsonl
+308: logit: 7.84537935256958
+baseline_logit: -1.336491584777832
+score_diff: 9.18187141418457
+delta: 0.8695068359375
+relative_delta: 0.0946982130408287
+saved → ig_data/df_test_lig_results.jsonl
+309: logit: 7.495045185089111
+baseline_logit: -1.1038453578948975
+score_diff: 8.59889030456543
+delta: 1.0606889724731445
+relative_delta: 0.12335184216499329
+saved → ig_data/df_test_lig_results.jsonl
+310: logit: 3.80591082572937
+baseline_logit: -1.336491584777832
+score_diff: 5.142402648925781
+delta: 0.44302845001220703
+relative_delta: 0.08615203201770782
+saved → ig_data/df_test_lig_results.jsonl
+311: logit: 8.007681846618652
+baseline_logit: -0.9221941828727722
+score_diff: 8.929876327514648
+delta: 0.8684310913085938
+relative_delta: 0.0972500666975975
+saved → ig_data/df_test_lig_results.jsonl
+312: logit: 8.780744552612305
+baseline_logit: -0.9996398091316223
+score_diff: 9.780384063720703
+delta: 1.1743745803833008
+relative_delta: 0.12007448822259903
+saved → ig_data/df_test_lig_results.jsonl
+313: logit: 8.903738021850586
+baseline_logit: -1.4279614686965942
+score_diff: 10.33169937133789
+delta: 2.1426258087158203
+relative_delta: 0.2073836773633957
+saved → ig_data/df_test_lig_results.jsonl
+314: logit: 8.366376876831055
+baseline_logit: -1.3681719303131104
+score_diff: 9.734548568725586
+delta: 0.7966175079345703
+relative_delta: 0.08183404803276062
+saved → ig_data/df_test_lig_results.jsonl
+315: logit: 9.10578727722168
+baseline_logit: -1.1708924770355225
+score_diff: 10.276679992675781
+delta: 1.2139129638671875
+relative_delta: 0.11812306940555573
+saved → ig_data/df_test_lig_results.jsonl
+316: logit: -3.4790873527526855
+baseline_logit: -1.2594166994094849
+score_diff: -2.2196707725524902
+delta: 0.10843753814697266
+relative_delta: 0.048852983862161636
+saved → ig_data/df_test_lig_results.jsonl
+317: logit: 8.087892532348633
+baseline_logit: -1.4281620979309082
+score_diff: 9.516054153442383
+delta: -0.10671329498291016
+relative_delta: 0.011214028112590313
+saved → ig_data/df_test_lig_results.jsonl
+318: logit: 9.300931930541992
+baseline_logit: -1.3587849140167236
+score_diff: 10.659716606140137
+delta: 2.8206968307495117
+relative_delta: 0.26461273431777954
+saved → ig_data/df_test_lig_results.jsonl
+319: logit: 9.362752914428711
+baseline_logit: -1.4246658086776733
+score_diff: 10.787418365478516
+delta: 0.9428596496582031
+relative_delta: 0.08740364015102386
+saved → ig_data/df_test_lig_results.jsonl
+320: logit: 8.090765953063965
+baseline_logit: -0.906693160533905
+score_diff: 8.997459411621094
+delta: 0.4846839904785156
+relative_delta: 0.05386898294091225
+saved → ig_data/df_test_lig_results.jsonl
+321: logit: 6.396397113800049
+baseline_logit: -1.0628209114074707
+score_diff: 7.4592180252075195
+delta: 1.438206672668457
+relative_delta: 0.1928093135356903
+saved → ig_data/df_test_lig_results.jsonl
+322: logit: 6.239576816558838
+baseline_logit: -1.0374795198440552
+score_diff: 7.2770562171936035
+delta: 1.075437068939209
+relative_delta: 0.14778463542461395
+saved → ig_data/df_test_lig_results.jsonl
+323: logit: 5.340616703033447
+baseline_logit: -1.0450754165649414
+score_diff: 6.385692119598389
+delta: 2.500723361968994
+relative_delta: 0.39161351323127747
+saved → ig_data/df_test_lig_results.jsonl
+324: logit: 8.218231201171875
+baseline_logit: -1.4268953800201416
+score_diff: 9.645126342773438
+delta: 1.0424385070800781
+relative_delta: 0.10807929933071136
+saved → ig_data/df_test_lig_results.jsonl
+325: logit: 9.763899803161621
+baseline_logit: -1.3159316778182983
+score_diff: 11.07983112335205
+delta: -0.12701129913330078
+relative_delta: 0.011463288217782974
+saved → ig_data/df_test_lig_results.jsonl
+326: logit: 6.686080455780029
+baseline_logit: -1.420052409172058
+score_diff: 8.106132507324219
+delta: 0.8454256057739258
+relative_delta: 0.10429456830024719
+saved → ig_data/df_test_lig_results.jsonl
+327: logit: 8.660612106323242
+baseline_logit: -0.5049900412559509
+score_diff: 9.16560173034668
+delta: -0.08199405670166016
+relative_delta: 0.008945845067501068
+saved → ig_data/df_test_lig_results.jsonl
+328: logit: 8.538544654846191
+baseline_logit: -1.336484670639038
+score_diff: 9.875029563903809
+delta: 0.3205089569091797
+relative_delta: 0.03245650604367256
+saved → ig_data/df_test_lig_results.jsonl
+329: logit: -1.1369543075561523
+baseline_logit: -0.9453700184822083
+score_diff: -0.1915842890739441
+delta: -0.23927384614944458
+relative_delta: 1.2489221096038818
+saved → ig_data/df_test_lig_results.jsonl
+330: logit: 2.025965452194214
+baseline_logit: -0.8078983426094055
+score_diff: 2.8338637351989746
+delta: 1.978090763092041
+relative_delta: 0.6980190277099609
+saved → ig_data/df_test_lig_results.jsonl
+331: logit: 4.930113792419434
+baseline_logit: -1.8549060821533203
+score_diff: 6.785019874572754
+delta: -0.11271095275878906
+relative_delta: 0.01661173440515995
+saved → ig_data/df_test_lig_results.jsonl
+332: logit: 8.658979415893555
+baseline_logit: -1.8549060821533203
+score_diff: 10.513885498046875
+delta: -0.41532325744628906
+relative_delta: 0.039502356201410294
+saved → ig_data/df_test_lig_results.jsonl
+333: logit: 5.100030422210693
+baseline_logit: -1.0545886754989624
+score_diff: 6.154619216918945
+delta: 2.029062271118164
+relative_delta: 0.3296812176704407
+saved → ig_data/df_test_lig_results.jsonl
+334: logit: 8.844619750976562
+baseline_logit: -1.3796443939208984
+score_diff: 10.224264144897461
+delta: -0.05044746398925781
+relative_delta: 0.00493409251794219
+saved → ig_data/df_test_lig_results.jsonl
+335: logit: 6.535571098327637
+baseline_logit: -1.8549060821533203
+score_diff: 8.390477180480957
+delta: 0.7696332931518555
+relative_delta: 0.09172699600458145
+saved → ig_data/df_test_lig_results.jsonl
+336: logit: 8.93553638458252
+baseline_logit: -1.0638139247894287
+score_diff: 9.999350547790527
+delta: 1.734602928161621
+relative_delta: 0.17347155511379242
+saved → ig_data/df_test_lig_results.jsonl
+337: logit: -10.436118125915527
+baseline_logit: -1.8549060821533203
+score_diff: -8.581212043762207
+delta: -0.2695798873901367
+relative_delta: 0.03141513094305992
+saved → ig_data/df_test_lig_results.jsonl
+338: logit: -0.12733428180217743
+baseline_logit: -1.059138536453247
+score_diff: 0.9318042397499084
+delta: -0.8103142380714417
+relative_delta: 0.8696185350418091
+saved → ig_data/df_test_lig_results.jsonl
+339: logit: 8.35342025756836
+baseline_logit: -1.3652141094207764
+score_diff: 9.718634605407715
+delta: 0.7154254913330078
+relative_delta: 0.07361378520727158
+saved → ig_data/df_test_lig_results.jsonl
+340: logit: -3.0411062240600586
+baseline_logit: -1.8549060821533203
+score_diff: -1.1862001419067383
+delta: -0.456728458404541
+relative_delta: 0.3850349187850952
+saved → ig_data/df_test_lig_results.jsonl
+341: logit: 1.8035767078399658
+baseline_logit: -1.8549060821533203
+score_diff: 3.658482789993286
+delta: -0.034471750259399414
+relative_delta: 0.009422416798770428
+saved → ig_data/df_test_lig_results.jsonl
+342: logit: 9.244893074035645
+baseline_logit: -0.9727814793586731
+score_diff: 10.217674255371094
+delta: 1.3780384063720703
+relative_delta: 0.13486811518669128
+saved → ig_data/df_test_lig_results.jsonl
+343: logit: 1.6316033601760864
+baseline_logit: -1.3405075073242188
+score_diff: 2.9721107482910156
+delta: 2.3452272415161133
+relative_delta: 0.7890779972076416
+saved → ig_data/df_test_lig_results.jsonl
+344: logit: 8.33819580078125
+baseline_logit: -0.413554847240448
+score_diff: 8.751750946044922
+delta: 1.787858009338379
+relative_delta: 0.20428575575351715
+saved → ig_data/df_test_lig_results.jsonl
+345: logit: 8.819613456726074
+baseline_logit: -0.8918962478637695
+score_diff: 9.711509704589844
+delta: 2.519865036010742
+relative_delta: 0.2594720125198364
+saved → ig_data/df_test_lig_results.jsonl
+346: logit: 8.603571891784668
+baseline_logit: -1.425764799118042
+score_diff: 10.029336929321289
+delta: 0.44729042053222656
+relative_delta: 0.04459820315241814
+saved → ig_data/df_test_lig_results.jsonl
+347: logit: 7.5165534019470215
+baseline_logit: -0.9727814793586731
+score_diff: 8.489335060119629
+delta: 0.3298530578613281
+relative_delta: 0.038854993879795074
+saved → ig_data/df_test_lig_results.jsonl
+348: logit: 9.488700866699219
+baseline_logit: -0.3669563829898834
+score_diff: 9.855657577514648
+delta: 1.3789043426513672
+relative_delta: 0.13990992307662964
+saved → ig_data/df_test_lig_results.jsonl
+349: logit: 6.407262325286865
+baseline_logit: -1.4256539344787598
+score_diff: 7.832916259765625
+delta: 0.9436521530151367
+relative_delta: 0.12047264724969864
+saved → ig_data/df_test_lig_results.jsonl
+350: logit: 4.877394199371338
+baseline_logit: -0.36838576197624207
+score_diff: 5.245779991149902
+delta: 0.3411722183227539
+relative_delta: 0.06503745913505554
+saved → ig_data/df_test_lig_results.jsonl
+351: logit: 2.631910562515259
+baseline_logit: -1.4280542135238647
+score_diff: 4.059964656829834
+delta: 0.8276705741882324
+relative_delta: 0.2038615196943283
+saved → ig_data/df_test_lig_results.jsonl
+352: logit: 8.902915954589844
+baseline_logit: -0.9160287976264954
+score_diff: 9.818944931030273
+delta: 0.7546110153198242
+relative_delta: 0.07685255259275436
+saved → ig_data/df_test_lig_results.jsonl
+353: logit: 8.486616134643555
+baseline_logit: -1.4273154735565186
+score_diff: 9.913931846618652
+delta: 1.703568458557129
+relative_delta: 0.17183580994606018
+saved → ig_data/df_test_lig_results.jsonl
+354: logit: 8.646401405334473
+baseline_logit: -0.8975396156311035
+score_diff: 9.543941497802734
+delta: 0.8424530029296875
+relative_delta: 0.08827096968889236
+saved → ig_data/df_test_lig_results.jsonl
+355: logit: 6.615829944610596
+baseline_logit: -0.8804832100868225
+score_diff: 7.496313095092773
+delta: 0.38283824920654297
+relative_delta: 0.0510702058672905
+saved → ig_data/df_test_lig_results.jsonl
+356: logit: 8.068961143493652
+baseline_logit: -0.9497489333152771
+score_diff: 9.018710136413574
+delta: 1.5228204727172852
+relative_delta: 0.16885125637054443
+saved → ig_data/df_test_lig_results.jsonl
+357: logit: 9.497518539428711
+baseline_logit: -1.342897653579712
+score_diff: 10.840415954589844
+delta: 0.5223903656005859
+relative_delta: 0.04818914458155632
+saved → ig_data/df_test_lig_results.jsonl
+358: logit: 2.1403610706329346
+baseline_logit: -1.410334587097168
+score_diff: 3.5506956577301025
+delta: 2.209676504135132
+relative_delta: 0.622322142124176
+saved → ig_data/df_test_lig_results.jsonl
+359: logit: 8.643569946289062
+baseline_logit: -1.404375672340393
+score_diff: 10.047945976257324
+delta: 0.8728427886962891
+relative_delta: 0.08686777949333191
+saved → ig_data/df_test_lig_results.jsonl
+360: logit: 9.394009590148926
+baseline_logit: -0.9727814793586731
+score_diff: 10.366790771484375
+delta: 1.1960868835449219
+relative_delta: 0.115376777946949
+saved → ig_data/df_test_lig_results.jsonl
+361: logit: 7.641928195953369
+baseline_logit: -1.3622797727584839
+score_diff: 9.004207611083984
+delta: 2.0373172760009766
+relative_delta: 0.22626280784606934
+saved → ig_data/df_test_lig_results.jsonl
+362: logit: 1.9387266635894775
+baseline_logit: -1.167219877243042
+score_diff: 3.1059465408325195
+delta: 0.9943571090698242
+relative_delta: 0.32014623284339905
+saved → ig_data/df_test_lig_results.jsonl
+363: logit: 6.408398151397705
+baseline_logit: -1.4221489429473877
+score_diff: 7.830547332763672
+delta: 0.8794097900390625
+relative_delta: 0.11230502277612686
+saved → ig_data/df_test_lig_results.jsonl
+364: logit: 9.338774681091309
+baseline_logit: -1.4276124238967896
+score_diff: 10.766386985778809
+delta: 1.292862892150879
+relative_delta: 0.1200832650065422
+saved → ig_data/df_test_lig_results.jsonl
+365: logit: -5.576141357421875
+baseline_logit: -1.2430627346038818
+score_diff: -4.333078384399414
+delta: 0.9512217044830322
+relative_delta: 0.21952562034130096
+saved → ig_data/df_test_lig_results.jsonl
+366: logit: 4.392577648162842
+baseline_logit: -0.9727814793586731
+score_diff: 5.365359306335449
+delta: 1.2216768264770508
+relative_delta: 0.22769711911678314
+saved → ig_data/df_test_lig_results.jsonl
+367: logit: 9.558890342712402
+baseline_logit: -0.9727814793586731
+score_diff: 10.531671524047852
+delta: 1.7378253936767578
+relative_delta: 0.16500945389270782
+saved → ig_data/df_test_lig_results.jsonl
+368: logit: 6.824102401733398
+baseline_logit: -1.8549060821533203
+score_diff: 8.679008483886719
+delta: 0.12475395202636719
+relative_delta: 0.01437421701848507
+saved → ig_data/df_test_lig_results.jsonl
+369: logit: 9.607316970825195
+baseline_logit: -0.5707008838653564
+score_diff: 10.178017616271973
+delta: 2.462954521179199
+relative_delta: 0.24198764562606812
+saved → ig_data/df_test_lig_results.jsonl
+370: logit: 8.89844799041748
+baseline_logit: -1.424391746520996
+score_diff: 10.322839736938477
+delta: -0.2697334289550781
+relative_delta: 0.026129769161343575
+saved → ig_data/df_test_lig_results.jsonl
+371: logit: 6.040339469909668
+baseline_logit: -1.0527901649475098
+score_diff: 7.093129634857178
+delta: 1.3861126899719238
+relative_delta: 0.19541624188423157
+saved → ig_data/df_test_lig_results.jsonl
+372: logit: 6.681107044219971
+baseline_logit: -0.8103248476982117
+score_diff: 7.491431713104248
+delta: 0.610527515411377
+relative_delta: 0.08149677515029907
+saved → ig_data/df_test_lig_results.jsonl
+373: logit: 9.397099494934082
+baseline_logit: -1.4271125793457031
+score_diff: 10.824212074279785
+delta: 0.656529426574707
+relative_delta: 0.06065378338098526
+saved → ig_data/df_test_lig_results.jsonl
+374: logit: 8.06540584564209
+baseline_logit: -1.4178178310394287
+score_diff: 9.483223915100098
+delta: 0.19090557098388672
+relative_delta: 0.02013087272644043
+saved → ig_data/df_test_lig_results.jsonl
+375: logit: 3.5454213619232178
+baseline_logit: -0.9407313466072083
+score_diff: 4.486152648925781
+delta: 2.174088954925537
+relative_delta: 0.48462215065956116
+saved → ig_data/df_test_lig_results.jsonl
+376: logit: 8.722663879394531
+baseline_logit: -1.332649827003479
+score_diff: 10.055314064025879
+delta: 0.4992704391479492
+relative_delta: 0.04965239763259888
+saved → ig_data/df_test_lig_results.jsonl
+377: logit: 8.396692276000977
+baseline_logit: -1.3255791664123535
+score_diff: 9.722270965576172
+delta: 0.027740478515625
+relative_delta: 0.002853292040526867
+saved → ig_data/df_test_lig_results.jsonl
+378: logit: 7.54127311706543
+baseline_logit: -1.1769137382507324
+score_diff: 8.71818733215332
+delta: 0.6087980270385742
+relative_delta: 0.06983080506324768
+saved → ig_data/df_test_lig_results.jsonl
+379: logit: 9.377481460571289
+baseline_logit: -1.1082978248596191
+score_diff: 10.48577880859375
+delta: 2.761241912841797
+relative_delta: 0.2633320689201355
+saved → ig_data/df_test_lig_results.jsonl
+380: logit: 8.837249755859375
+baseline_logit: -1.3307557106018066
+score_diff: 10.168004989624023
+delta: 1.6465072631835938
+relative_delta: 0.16193021833896637
+saved → ig_data/df_test_lig_results.jsonl
+381: logit: 3.7708919048309326
+baseline_logit: -1.0861600637435913
+score_diff: 4.857051849365234
+delta: 0.42621326446533203
+relative_delta: 0.08775143325328827
+saved → ig_data/df_test_lig_results.jsonl
+382: logit: 7.807924747467041
+baseline_logit: -1.1296645402908325
+score_diff: 8.937589645385742
+delta: 0.10040473937988281
+relative_delta: 0.011233984492719173
+saved → ig_data/df_test_lig_results.jsonl
+383: logit: 9.393444061279297
+baseline_logit: -1.3981812000274658
+score_diff: 10.791625022888184
+delta: 1.9286432266235352
+relative_delta: 0.17871665954589844
+saved → ig_data/df_test_lig_results.jsonl
+384: logit: 9.01136589050293
+baseline_logit: -1.2397798299789429
+score_diff: 10.251145362854004
+delta: 2.2597646713256836
+relative_delta: 0.22044020891189575
+saved → ig_data/df_test_lig_results.jsonl
+385: logit: 9.437811851501465
+baseline_logit: -1.4007630348205566
+score_diff: 10.83857536315918
+delta: 0.08174514770507812
+relative_delta: 0.007542056497186422
+saved → ig_data/df_test_lig_results.jsonl
+386: logit: 7.901089668273926
+baseline_logit: -1.3874499797821045
+score_diff: 9.28853988647461
+delta: 0.7777442932128906
+relative_delta: 0.08373159915208817
+saved → ig_data/df_test_lig_results.jsonl
+387: logit: 6.337220668792725
+baseline_logit: -1.4233741760253906
+score_diff: 7.760594844818115
+delta: 0.7428021430969238
+relative_delta: 0.09571459144353867
+saved → ig_data/df_test_lig_results.jsonl
+388: logit: 8.117283821105957
+baseline_logit: -1.4218840599060059
+score_diff: 9.539167404174805
+delta: 0.14225006103515625
+relative_delta: 0.01491220947355032
+saved → ig_data/df_test_lig_results.jsonl
+389: logit: 9.109456062316895
+baseline_logit: -1.3720890283584595
+score_diff: 10.481545448303223
+delta: 2.1470565795898438
+relative_delta: 0.20484159886837006
+saved → ig_data/df_test_lig_results.jsonl
+390: logit: 1.5942829847335815
+baseline_logit: -0.8152607679367065
+score_diff: 2.409543752670288
+delta: 1.5682499408721924
+relative_delta: 0.6508493423461914
+saved → ig_data/df_test_lig_results.jsonl
+391: logit: 4.473994255065918
+baseline_logit: -1.4145666360855103
+score_diff: 5.888560771942139
+delta: 1.4426755905151367
+relative_delta: 0.24499629437923431
+saved → ig_data/df_test_lig_results.jsonl
+392: logit: 6.47905969619751
+baseline_logit: -1.8549060821533203
+score_diff: 8.333965301513672
+delta: 1.497720718383789
+relative_delta: 0.17971286177635193
+saved → ig_data/df_test_lig_results.jsonl
+393: logit: 7.959160327911377
+baseline_logit: -0.9727814793586731
+score_diff: 8.931941986083984
+delta: 0.7466964721679688
+relative_delta: 0.08359844982624054
+saved → ig_data/df_test_lig_results.jsonl
+394: logit: 6.578945636749268
+baseline_logit: -1.8549060821533203
+score_diff: 8.43385124206543
+delta: 0.08395099639892578
+relative_delta: 0.009954052045941353
+saved → ig_data/df_test_lig_results.jsonl
+395: logit: 3.5428247451782227
+baseline_logit: -1.8549060821533203
+score_diff: 5.397730827331543
+delta: -0.6044301986694336
+relative_delta: 0.11197857558727264
+saved → ig_data/df_test_lig_results.jsonl
+396: logit: 9.193280220031738
+baseline_logit: -1.1708924770355225
+score_diff: 10.36417293548584
+delta: 0.6378097534179688
+relative_delta: 0.06153985857963562
+saved → ig_data/df_test_lig_results.jsonl
+397: logit: 8.193432807922363
+baseline_logit: -1.2074843645095825
+score_diff: 9.400917053222656
+delta: 1.5537071228027344
+relative_delta: 0.16527186334133148
+saved → ig_data/df_test_lig_results.jsonl
+398: logit: 7.0999345779418945
+baseline_logit: -0.9727814793586731
+score_diff: 8.072715759277344
+delta: 1.514017105102539
+relative_delta: 0.18754743039608002
+saved → ig_data/df_test_lig_results.jsonl
+399: logit: 5.478275299072266
+baseline_logit: -1.425764799118042
+score_diff: 6.904040336608887
+delta: 2.040079116821289
+relative_delta: 0.2954906225204468
+saved → ig_data/df_test_lig_results.jsonl
+400: logit: 7.890518665313721
+baseline_logit: -0.9727814793586731
+score_diff: 8.863300323486328
+delta: 1.040283203125
+relative_delta: 0.11736973375082016
+saved → ig_data/df_test_lig_results.jsonl
+401: logit: 5.495503902435303
+baseline_logit: -1.2893911600112915
+score_diff: 6.784894943237305
+delta: 1.4600543975830078
+relative_delta: 0.21519190073013306
+saved → ig_data/df_test_lig_results.jsonl
+402: logit: 9.167816162109375
+baseline_logit: -1.3891587257385254
+score_diff: 10.556974411010742
+delta: 0.7415218353271484
+relative_delta: 0.07023999840021133
+saved → ig_data/df_test_lig_results.jsonl
+403: logit: 2.66405987739563
+baseline_logit: -1.3405075073242188
+score_diff: 4.0045671463012695
+delta: 0.9572515487670898
+relative_delta: 0.23903995752334595
+saved → ig_data/df_test_lig_results.jsonl
+404: logit: 4.794031620025635
+baseline_logit: -1.1379590034484863
+score_diff: 5.931990623474121
+delta: -0.019570350646972656
+relative_delta: 0.0032991203479468822
+saved → ig_data/df_test_lig_results.jsonl
+405: logit: 8.779318809509277
+baseline_logit: -1.1608995199203491
+score_diff: 9.940217971801758
+delta: 1.2259197235107422
+relative_delta: 0.12332925945520401
+saved → ig_data/df_test_lig_results.jsonl
+406: logit: 8.689523696899414
+baseline_logit: -1.4174647331237793
+score_diff: 10.106988906860352
+delta: 3.9515562057495117
+relative_delta: 0.39097264409065247
+saved → ig_data/df_test_lig_results.jsonl
+407: logit: 7.618999481201172
+baseline_logit: -0.9727814793586731
+score_diff: 8.591780662536621
+delta: 2.0322694778442383
+relative_delta: 0.23653647303581238
+saved → ig_data/df_test_lig_results.jsonl
+408: logit: 8.684858322143555
+baseline_logit: -0.9727814793586731
+score_diff: 9.657639503479004
+delta: 1.42926025390625
+relative_delta: 0.14799271523952484
+saved → ig_data/df_test_lig_results.jsonl
+409: logit: 8.852489471435547
+baseline_logit: -1.1934959888458252
+score_diff: 10.045985221862793
+delta: 1.3611688613891602
+relative_delta: 0.13549381494522095
+saved → ig_data/df_test_lig_results.jsonl
+410: logit: 7.075534343719482
+baseline_logit: -0.9521196484565735
+score_diff: 8.027653694152832
+delta: 1.1617450714111328
+relative_delta: 0.14471788704395294
+saved → ig_data/df_test_lig_results.jsonl
+411: logit: 8.371928215026855
+baseline_logit: -1.250537395477295
+score_diff: 9.622465133666992
+delta: 1.6212615966796875
+relative_delta: 0.16848713159561157
+saved → ig_data/df_test_lig_results.jsonl
+412: logit: 8.733983039855957
+baseline_logit: -1.1036787033081055
+score_diff: 9.837661743164062
+delta: 1.7394657135009766
+relative_delta: 0.17681698501110077
+saved → ig_data/df_test_lig_results.jsonl
+413: logit: 8.807732582092285
+baseline_logit: -0.32916638255119324
+score_diff: 9.1368989944458
+delta: 1.7049503326416016
+relative_delta: 0.18660055100917816
+saved → ig_data/df_test_lig_results.jsonl
+414: logit: 9.179896354675293
+baseline_logit: -0.8950706124305725
+score_diff: 10.074967384338379
+delta: 2.5515708923339844
+relative_delta: 0.25325846672058105
+saved → ig_data/df_test_lig_results.jsonl
+415: logit: 8.366239547729492
+baseline_logit: -0.8394250273704529
+score_diff: 9.20566463470459
+delta: 3.3677825927734375
+relative_delta: 0.36583808064460754
+saved → ig_data/df_test_lig_results.jsonl
+416: logit: 8.329630851745605
+baseline_logit: -1.4267842769622803
+score_diff: 9.756415367126465
+delta: 0.6365785598754883
+relative_delta: 0.06524717807769775
+saved → ig_data/df_test_lig_results.jsonl
+417: logit: 7.2620530128479
+baseline_logit: -1.8549060821533203
+score_diff: 9.116958618164062
+delta: 1.1344175338745117
+relative_delta: 0.1244293823838234
+saved → ig_data/df_test_lig_results.jsonl
+418: logit: 8.282573699951172
+baseline_logit: -1.4026975631713867
+score_diff: 9.685271263122559
+delta: 1.0288667678833008
+relative_delta: 0.10623004287481308
+saved → ig_data/df_test_lig_results.jsonl
+419: logit: 8.228358268737793
+baseline_logit: -1.4201890230178833
+score_diff: 9.648547172546387
+delta: 0.7905683517456055
+relative_delta: 0.08193651586771011
+saved → ig_data/df_test_lig_results.jsonl
+420: logit: 8.983864784240723
+baseline_logit: -1.1650426387786865
+score_diff: 10.148907661437988
+delta: 0.8254461288452148
+relative_delta: 0.08133349567651749
+saved → ig_data/df_test_lig_results.jsonl
+421: logit: 7.149777889251709
+baseline_logit: -1.2881765365600586
+score_diff: 8.43795394897461
+delta: 1.4166603088378906
+relative_delta: 0.16789144277572632
+saved → ig_data/df_test_lig_results.jsonl
+422: logit: 9.693222999572754
+baseline_logit: -0.9727814793586731
+score_diff: 10.666004180908203
+delta: 1.540945053100586
+relative_delta: 0.14447256922721863
+saved → ig_data/df_test_lig_results.jsonl
+423: logit: 8.731840133666992
+baseline_logit: -0.9727814793586731
+score_diff: 9.704621315002441
+delta: 1.584345817565918
+relative_delta: 0.16325683891773224
+saved → ig_data/df_test_lig_results.jsonl
+424: logit: 8.553665161132812
+baseline_logit: -1.1381423473358154
+score_diff: 9.691807746887207
+delta: 0.4796028137207031
+relative_delta: 0.049485381692647934
+saved → ig_data/df_test_lig_results.jsonl
+425: logit: 0.35130035877227783
+baseline_logit: -1.8549060821533203
+score_diff: 2.2062063217163086
+delta: 0.5070147514343262
+relative_delta: 0.22981293499469757
+saved → ig_data/df_test_lig_results.jsonl
+426: logit: 3.2707293033599854
+baseline_logit: -1.8549060821533203
+score_diff: 5.125635147094727
+delta: -0.0768747329711914
+relative_delta: 0.014998089522123337
+saved → ig_data/df_test_lig_results.jsonl
+427: logit: 3.2379696369171143
+baseline_logit: -0.946316659450531
+score_diff: 4.184286117553711
+delta: 1.1327452659606934
+relative_delta: 0.2707141041755676
+saved → ig_data/df_test_lig_results.jsonl
+428: logit: 7.167459964752197
+baseline_logit: -0.9380980134010315
+score_diff: 8.105558395385742
+delta: 0.8134651184082031
+relative_delta: 0.10035892575979233
+saved → ig_data/df_test_lig_results.jsonl
+429: logit: 6.8940887451171875
+baseline_logit: -1.0753917694091797
+score_diff: 7.969480514526367
+delta: -0.22705507278442383
+relative_delta: 0.028490573167800903
+saved → ig_data/df_test_lig_results.jsonl
+430: logit: 6.520573616027832
+baseline_logit: -1.4218840599060059
+score_diff: 7.942457675933838
+delta: 1.4001860618591309
+relative_delta: 0.17629128694534302
+saved → ig_data/df_test_lig_results.jsonl
+431: logit: 5.275928497314453
+baseline_logit: -1.1136081218719482
+score_diff: 6.3895368576049805
+delta: 1.028843879699707
+relative_delta: 0.16102010011672974
+saved → ig_data/df_test_lig_results.jsonl
+432: logit: 7.947227478027344
+baseline_logit: -1.3796443939208984
+score_diff: 9.326871871948242
+delta: 1.790008544921875
+relative_delta: 0.1919194906949997
+saved → ig_data/df_test_lig_results.jsonl
+433: logit: -10.017380714416504
+baseline_logit: -0.9380980134010315
+score_diff: -9.079282760620117
+delta: 1.1647453308105469
+relative_delta: 0.12828604876995087
+saved → ig_data/df_test_lig_results.jsonl
+434: logit: 1.082349419593811
+baseline_logit: -1.8549060821533203
+score_diff: 2.937255382537842
+delta: -1.0366671085357666
+relative_delta: 0.35293734073638916
+saved → ig_data/df_test_lig_results.jsonl
+435: logit: -3.706271171569824
+baseline_logit: -0.8739243149757385
+score_diff: -2.8323469161987305
+delta: 2.2936062812805176
+relative_delta: 0.8097900152206421
+saved → ig_data/df_test_lig_results.jsonl
+436: logit: 8.954620361328125
+baseline_logit: -1.4280309677124023
+score_diff: 10.382651329040527
+delta: 0.4253091812133789
+relative_delta: 0.040963444858789444
+saved → ig_data/df_test_lig_results.jsonl
+437: logit: 7.5417351722717285
+baseline_logit: -1.332649827003479
+score_diff: 8.874384880065918
+delta: 1.858917236328125
+relative_delta: 0.2094699740409851
+saved → ig_data/df_test_lig_results.jsonl
+438: logit: 7.004140377044678
+baseline_logit: -1.420052409172058
+score_diff: 8.424192428588867
+delta: 1.7673931121826172
+relative_delta: 0.20979970693588257
+saved → ig_data/df_test_lig_results.jsonl
+439: logit: 9.75371265411377
+baseline_logit: -1.3609689474105835
+score_diff: 11.114681243896484
+delta: 1.153249740600586
+relative_delta: 0.10375913977622986
+saved → ig_data/df_test_lig_results.jsonl
+440: logit: 8.92625617980957
+baseline_logit: -1.104130744934082
+score_diff: 10.030386924743652
+delta: -0.42433834075927734
+relative_delta: 0.04230527952313423
+saved → ig_data/df_test_lig_results.jsonl
+441: logit: 7.028693675994873
+baseline_logit: -1.3630242347717285
+score_diff: 8.391717910766602
+delta: 1.1680278778076172
+relative_delta: 0.13918817043304443
+saved → ig_data/df_test_lig_results.jsonl
+442: logit: 7.657074928283691
+baseline_logit: -1.1013895273208618
+score_diff: 8.758464813232422
+delta: 0.7622842788696289
+relative_delta: 0.08703400939702988
+saved → ig_data/df_test_lig_results.jsonl
+443: logit: 8.66370677947998
+baseline_logit: -1.089258074760437
+score_diff: 9.752964973449707
+delta: 0.5683383941650391
+relative_delta: 0.058273397386074066
+saved → ig_data/df_test_lig_results.jsonl
+444: logit: 4.63806676864624
+baseline_logit: -1.2858643531799316
+score_diff: 5.923931121826172
+delta: -0.014498710632324219
+relative_delta: 0.0024474812671542168
+saved → ig_data/df_test_lig_results.jsonl
+445: logit: 8.215949058532715
+baseline_logit: -1.3652141094207764
+score_diff: 9.58116340637207
+delta: 0.7887382507324219
+relative_delta: 0.08232176303863525
+saved → ig_data/df_test_lig_results.jsonl
+446: logit: 9.115762710571289
+baseline_logit: -0.6590425372123718
+score_diff: 9.774805068969727
+delta: 2.2354164123535156
+relative_delta: 0.22869166731834412
+saved → ig_data/df_test_lig_results.jsonl
+447: logit: 9.377840042114258
+baseline_logit: -0.9727814793586731
+score_diff: 10.350621223449707
+delta: 2.0077924728393555
+relative_delta: 0.1939779669046402
+saved → ig_data/df_test_lig_results.jsonl
+448: logit: 9.191117286682129
+baseline_logit: -1.3518877029418945
+score_diff: 10.543004989624023
+delta: 0.8001947402954102
+relative_delta: 0.07589816302061081
+saved → ig_data/df_test_lig_results.jsonl
+449: logit: 6.852968692779541
+baseline_logit: -1.409171462059021
+score_diff: 8.262140274047852
+delta: 1.0972003936767578
+relative_delta: 0.13279856741428375
+saved → ig_data/df_test_lig_results.jsonl
+450: logit: 8.294880867004395
+baseline_logit: -0.9727814793586731
+score_diff: 9.267662048339844
+delta: 0.6772432327270508
+relative_delta: 0.07307595014572144
+saved → ig_data/df_test_lig_results.jsonl
+451: logit: 7.398530960083008
+baseline_logit: -1.2804591655731201
+score_diff: 8.678990364074707
+delta: 0.8647394180297852
+relative_delta: 0.09963594377040863
+saved → ig_data/df_test_lig_results.jsonl
+452: logit: 6.748182773590088
+baseline_logit: -0.9228103756904602
+score_diff: 7.670993328094482
+delta: 1.4827532768249512
+relative_delta: 0.1932935118675232
+saved → ig_data/df_test_lig_results.jsonl
+453: logit: 9.737345695495605
+baseline_logit: -1.3652141094207764
+score_diff: 11.102560043334961
+delta: -0.8486347198486328
+relative_delta: 0.07643594592809677
+saved → ig_data/df_test_lig_results.jsonl
+454: logit: 8.431517601013184
+baseline_logit: -0.9727814793586731
+score_diff: 9.404298782348633
+delta: 0.8647327423095703
+relative_delta: 0.09195079654455185
+saved → ig_data/df_test_lig_results.jsonl
+455: logit: 9.154031753540039
+baseline_logit: -1.3867326974868774
+score_diff: 10.540764808654785
+delta: 0.06710338592529297
+relative_delta: 0.006366083398461342
+saved → ig_data/df_test_lig_results.jsonl
+456: logit: 9.391756057739258
+baseline_logit: -1.420052409172058
+score_diff: 10.811808586120605
+delta: 1.158888816833496
+relative_delta: 0.10718732327222824
+saved → ig_data/df_test_lig_results.jsonl
+457: logit: 8.278061866760254
+baseline_logit: -0.3290230929851532
+score_diff: 8.607085227966309
+delta: 1.6759748458862305
+relative_delta: 0.19472037255764008
+saved → ig_data/df_test_lig_results.jsonl
+458: logit: 8.589333534240723
+baseline_logit: -1.4193971157073975
+score_diff: 10.0087308883667
+delta: 2.3564844131469727
+relative_delta: 0.2354428768157959
+saved → ig_data/df_test_lig_results.jsonl
+459: logit: 9.001975059509277
+baseline_logit: -1.2667295932769775
+score_diff: 10.268704414367676
+delta: -0.17237186431884766
+relative_delta: 0.016786135733127594
+saved → ig_data/df_test_lig_results.jsonl
+460: logit: 8.158172607421875
+baseline_logit: -0.9423087239265442
+score_diff: 9.100481033325195
+delta: 2.1627120971679688
+relative_delta: 0.2376481145620346
+saved → ig_data/df_test_lig_results.jsonl
+461: logit: -8.066448211669922
+baseline_logit: -1.8549060821533203
+score_diff: -6.211542129516602
+delta: -2.345315933227539
+relative_delta: 0.3775738477706909
+saved → ig_data/df_test_lig_results.jsonl
+462: logit: 9.645405769348145
+baseline_logit: -1.348249912261963
+score_diff: 10.993656158447266
+delta: 1.3482742309570312
+relative_delta: 0.12264111638069153
+saved → ig_data/df_test_lig_results.jsonl
+463: logit: 5.83951473236084
+baseline_logit: -1.420052409172058
+score_diff: 7.2595672607421875
+delta: 0.6571273803710938
+relative_delta: 0.09051880985498428
+saved → ig_data/df_test_lig_results.jsonl
+464: logit: -7.220437049865723
+baseline_logit: -1.8549060821533203
+score_diff: -5.365530967712402
+delta: 1.3504619598388672
+relative_delta: 0.25169214606285095
+saved → ig_data/df_test_lig_results.jsonl
+465: logit: 9.688201904296875
+baseline_logit: -1.428585171699524
+score_diff: 11.11678695678711
+delta: 1.0437688827514648
+relative_delta: 0.09389124065637589
+saved → ig_data/df_test_lig_results.jsonl
+466: logit: 9.572301864624023
+baseline_logit: -1.1650426387786865
+score_diff: 10.737344741821289
+delta: 1.0008821487426758
+relative_delta: 0.09321504831314087
+saved → ig_data/df_test_lig_results.jsonl
+467: logit: 8.69729232788086
+baseline_logit: -1.4268953800201416
+score_diff: 10.124187469482422
+delta: 2.8943328857421875
+relative_delta: 0.28588297963142395
+saved → ig_data/df_test_lig_results.jsonl
+468: logit: 4.8560285568237305
+baseline_logit: -1.4280309677124023
+score_diff: 6.284059524536133
+delta: 0.712132453918457
+relative_delta: 0.1133236363530159
+saved → ig_data/df_test_lig_results.jsonl
+469: logit: 7.832589626312256
+baseline_logit: -1.2667295932769775
+score_diff: 9.099319458007812
+delta: 0.6072654724121094
+relative_delta: 0.06673745810985565
+saved → ig_data/df_test_lig_results.jsonl
+470: logit: 7.975677013397217
+baseline_logit: -1.4280309677124023
+score_diff: 9.403707504272461
+delta: -0.5590190887451172
+relative_delta: 0.05944667011499405
+saved → ig_data/df_test_lig_results.jsonl
+471: logit: 8.758259773254395
+baseline_logit: -1.4250320196151733
+score_diff: 10.1832914352417
+delta: 0.5738382339477539
+relative_delta: 0.0563509576022625
+saved → ig_data/df_test_lig_results.jsonl
+472: logit: 8.757407188415527
+baseline_logit: -0.6700363159179688
+score_diff: 9.427443504333496
+delta: 2.1534032821655273
+relative_delta: 0.22841858863830566
+saved → ig_data/df_test_lig_results.jsonl
+473: logit: 8.732693672180176
+baseline_logit: -1.406401515007019
+score_diff: 10.139095306396484
+delta: 0.2713918685913086
+relative_delta: 0.02676687203347683
+saved → ig_data/df_test_lig_results.jsonl
+474: logit: 8.272012710571289
+baseline_logit: -1.4280542135238647
+score_diff: 9.700066566467285
+delta: 2.289250373840332
+relative_delta: 0.236003577709198
+saved → ig_data/df_test_lig_results.jsonl
+475: logit: 8.614487648010254
+baseline_logit: -1.2370660305023193
+score_diff: 9.851553916931152
+delta: 0.770294189453125
+relative_delta: 0.07819011807441711
+saved → ig_data/df_test_lig_results.jsonl
+476: logit: 9.313555717468262
+baseline_logit: -1.4129819869995117
+score_diff: 10.726537704467773
+delta: 0.6169157028198242
+relative_delta: 0.0575130321085453
+saved → ig_data/df_test_lig_results.jsonl
+477: logit: -3.773542881011963
+baseline_logit: -1.8549060821533203
+score_diff: -1.9186367988586426
+delta: 1.3486645221710205
+relative_delta: 0.7029285430908203
+saved → ig_data/df_test_lig_results.jsonl
+478: logit: 9.367875099182129
+baseline_logit: -1.3905645608901978
+score_diff: 10.758440017700195
+delta: 2.8913755416870117
+relative_delta: 0.26875415444374084
+saved → ig_data/df_test_lig_results.jsonl
+479: logit: 7.0400824546813965
+baseline_logit: -1.1073638200759888
+score_diff: 8.147446632385254
+delta: 0.3292045593261719
+relative_delta: 0.04040585830807686
+saved → ig_data/df_test_lig_results.jsonl
+480: logit: 6.7688469886779785
+baseline_logit: -1.294667363166809
+score_diff: 8.063514709472656
+delta: 2.9500303268432617
+relative_delta: 0.36584919691085815
+saved → ig_data/df_test_lig_results.jsonl
+481: logit: 8.227190971374512
+baseline_logit: -0.9291929602622986
+score_diff: 9.156383514404297
+delta: 1.6304340362548828
+relative_delta: 0.17806528508663177
+saved → ig_data/df_test_lig_results.jsonl
+482: logit: 9.308141708374023
+baseline_logit: -1.1701762676239014
+score_diff: 10.478318214416504
+delta: -0.7609786987304688
+relative_delta: 0.07262412458658218
+saved → ig_data/df_test_lig_results.jsonl
+483: logit: 9.203025817871094
+baseline_logit: -1.3577699661254883
+score_diff: 10.560795783996582
+delta: 1.4733991622924805
+relative_delta: 0.1395159214735031
+saved → ig_data/df_test_lig_results.jsonl
+484: logit: 8.80275821685791
+baseline_logit: -1.3518877029418945
+score_diff: 10.154645919799805
+delta: 0.7001361846923828
+relative_delta: 0.06894737482070923
+saved → ig_data/df_test_lig_results.jsonl
+485: logit: 8.705546379089355
+baseline_logit: -1.167219877243042
+score_diff: 9.872766494750977
+delta: 0.42119598388671875
+relative_delta: 0.04266240820288658
+saved → ig_data/df_test_lig_results.jsonl
+486: logit: 7.628726005554199
+baseline_logit: -1.167219877243042
+score_diff: 8.79594612121582
+delta: 5.144477844238281
+relative_delta: 0.5848692059516907
+saved → ig_data/df_test_lig_results.jsonl
+487: logit: 3.3386995792388916
+baseline_logit: -1.2951271533966064
+score_diff: 4.633826732635498
+delta: 0.36713361740112305
+relative_delta: 0.07922903448343277
+saved → ig_data/df_test_lig_results.jsonl
+488: logit: 9.953064918518066
+baseline_logit: -1.4184699058532715
+score_diff: 11.37153434753418
+delta: 2.0690650939941406
+relative_delta: 0.18195126950740814
+saved → ig_data/df_test_lig_results.jsonl
+489: logit: 8.533333778381348
+baseline_logit: -1.0609990358352661
+score_diff: 9.594332695007324
+delta: 3.168729782104492
+relative_delta: 0.33027100563049316
+saved → ig_data/df_test_lig_results.jsonl
+490: logit: 7.93063497543335
+baseline_logit: -0.8524938821792603
+score_diff: 8.78312873840332
+delta: 1.5434513092041016
+relative_delta: 0.17572909593582153
+saved → ig_data/df_test_lig_results.jsonl
+491: logit: 8.997701644897461
+baseline_logit: -1.0950212478637695
+score_diff: 10.09272289276123
+delta: 0.5330514907836914
+relative_delta: 0.052815429866313934
+saved → ig_data/df_test_lig_results.jsonl
+492: logit: 9.525219917297363
+baseline_logit: -1.348249912261963
+score_diff: 10.873470306396484
+delta: 0.6233682632446289
+relative_delta: 0.05732928216457367
+saved → ig_data/df_test_lig_results.jsonl
+493: logit: 9.36057186126709
+baseline_logit: -0.9727814793586731
+score_diff: 10.333353042602539
+delta: -0.4591541290283203
+relative_delta: 0.044434186071157455
+saved → ig_data/df_test_lig_results.jsonl
+494: logit: 8.327914237976074
+baseline_logit: -1.428585171699524
+score_diff: 9.756499290466309
+delta: 0.9153413772583008
+relative_delta: 0.09381862729787827
+saved → ig_data/df_test_lig_results.jsonl
+495: logit: 7.850650787353516
+baseline_logit: -1.3891587257385254
+score_diff: 9.239809036254883
+delta: 0.9307937622070312
+relative_delta: 0.10073734074831009
+saved → ig_data/df_test_lig_results.jsonl
+496: logit: 9.193988800048828
+baseline_logit: -1.1604244709014893
+score_diff: 10.354413032531738
+delta: 1.0131006240844727
+relative_delta: 0.09784240275621414
+saved → ig_data/df_test_lig_results.jsonl
+497: logit: 8.913029670715332
+baseline_logit: -0.9727814793586731
+score_diff: 9.885810852050781
+delta: 1.3400993347167969
+relative_delta: 0.1355578601360321
+saved → ig_data/df_test_lig_results.jsonl
+498: logit: 8.120462417602539
+baseline_logit: -1.0701403617858887
+score_diff: 9.190603256225586
+delta: 0.8976240158081055
+relative_delta: 0.09766758233308792
+saved → ig_data/df_test_lig_results.jsonl
+499: logit: 9.360078811645508
+baseline_logit: -1.2096160650253296
+score_diff: 10.569694519042969
+delta: 2.127915382385254
+relative_delta: 0.20132231712341309
+saved → ig_data/df_test_lig_results.jsonl
+500: logit: 9.142600059509277
+baseline_logit: -0.9727814793586731
+score_diff: 10.115381240844727
+delta: 2.5433921813964844
+relative_delta: 0.25143808126449585
+saved → ig_data/df_test_lig_results.jsonl
+501: logit: 7.270122528076172
+baseline_logit: -0.4359931945800781
+score_diff: 7.70611572265625
+delta: 1.5611934661865234
+relative_delta: 0.20259149372577667
+saved → ig_data/df_test_lig_results.jsonl
+502: logit: 6.428874492645264
+baseline_logit: -1.4267842769622803
+score_diff: 7.855658531188965
+delta: 0.4258546829223633
+relative_delta: 0.05420992895960808
+saved → ig_data/df_test_lig_results.jsonl
+503: logit: 8.505008697509766
+baseline_logit: -0.5811272263526917
+score_diff: 9.086135864257812
+delta: 1.8366107940673828
+relative_delta: 0.20213331282138824
+saved → ig_data/df_test_lig_results.jsonl
+504: logit: 8.011524200439453
+baseline_logit: -1.4283682107925415
+score_diff: 9.439892768859863
+delta: 0.3794822692871094
+relative_delta: 0.040199849754571915
+saved → ig_data/df_test_lig_results.jsonl
+505: logit: 8.068830490112305
+baseline_logit: -1.8549060821533203
+score_diff: 9.923736572265625
+delta: 0.39197540283203125
+relative_delta: 0.03949877247214317
+saved → ig_data/df_test_lig_results.jsonl
+506: logit: 9.041814804077148
+baseline_logit: -1.3828537464141846
+score_diff: 10.424668312072754
+delta: 1.5009880065917969
+relative_delta: 0.14398424327373505
+saved → ig_data/df_test_lig_results.jsonl
+507: logit: 0.5512012243270874
+baseline_logit: -1.8549060821533203
+score_diff: 2.4061074256896973
+delta: 0.7043671607971191
+relative_delta: 0.2927413582801819
+saved → ig_data/df_test_lig_results.jsonl
+508: logit: -0.6868687272071838
+baseline_logit: -1.8549060821533203
+score_diff: 1.1680374145507812
+delta: 0.7108488082885742
+relative_delta: 0.608583927154541
+saved → ig_data/df_test_lig_results.jsonl
+509: logit: 8.38629150390625
+baseline_logit: -1.424359917640686
+score_diff: 9.810651779174805
+delta: 1.0839738845825195
+relative_delta: 0.11048948764801025
+saved → ig_data/df_test_lig_results.jsonl
+510: logit: 5.07948637008667
+baseline_logit: -1.8549060821533203
+score_diff: 6.93439245223999
+delta: 0.34394407272338867
+relative_delta: 0.04959974065423012
+saved → ig_data/df_test_lig_results.jsonl
+511: logit: 8.748976707458496
+baseline_logit: -1.4283682107925415
+score_diff: 10.177345275878906
+delta: -3.104264259338379
+relative_delta: 0.3050170838832855
+saved → ig_data/df_test_lig_results.jsonl
+512: logit: 8.845544815063477
+baseline_logit: -1.3234093189239502
+score_diff: 10.168953895568848
+delta: 0.4783906936645508
+relative_delta: 0.047044239938259125
+saved → ig_data/df_test_lig_results.jsonl
+513: logit: 9.069519996643066
+baseline_logit: -1.3665465116500854
+score_diff: 10.436066627502441
+delta: 1.6945533752441406
+relative_delta: 0.16237471997737885
+saved → ig_data/df_test_lig_results.jsonl
+514: logit: 6.7989726066589355
+baseline_logit: -0.9727814793586731
+score_diff: 7.771754264831543
+delta: -1.5158886909484863
+relative_delta: 0.19505102932453156
+saved → ig_data/df_test_lig_results.jsonl
+515: logit: 8.89460563659668
+baseline_logit: -1.0374795198440552
+score_diff: 9.932085037231445
+delta: 0.7126255035400391
+relative_delta: 0.07174983620643616
+saved → ig_data/df_test_lig_results.jsonl
+516: logit: 8.149748802185059
+baseline_logit: -1.2804591655731201
+score_diff: 9.430208206176758
+delta: 1.548752784729004
+relative_delta: 0.16423314809799194
+saved → ig_data/df_test_lig_results.jsonl
+517: logit: 9.517127990722656
+baseline_logit: -1.380448579788208
+score_diff: 10.897576332092285
+delta: 1.355093002319336
+relative_delta: 0.12434811145067215
+saved → ig_data/df_test_lig_results.jsonl
+518: logit: 5.574733734130859
+baseline_logit: -1.0942898988723755
+score_diff: 6.669023513793945
+delta: 0.8140769004821777
+relative_delta: 0.1220683827996254
+saved → ig_data/df_test_lig_results.jsonl
+519: logit: 8.137689590454102
+baseline_logit: -1.1424254179000854
+score_diff: 9.280115127563477
+delta: 2.78851318359375
+relative_delta: 0.3004826009273529
+saved → ig_data/df_test_lig_results.jsonl
+520: logit: 5.73577356338501
+baseline_logit: -1.0734155178070068
+score_diff: 6.8091888427734375
+delta: 0.6026225090026855
+relative_delta: 0.08850136399269104
+saved → ig_data/df_test_lig_results.jsonl
+521: logit: 6.550596714019775
+baseline_logit: -0.9644569754600525
+score_diff: 7.515053749084473
+delta: 1.3950166702270508
+relative_delta: 0.18562963604927063
+saved → ig_data/df_test_lig_results.jsonl
+522: logit: 8.440266609191895
+baseline_logit: -0.9727814793586731
+score_diff: 9.413047790527344
+delta: 1.8693628311157227
+relative_delta: 0.19859272241592407
+saved → ig_data/df_test_lig_results.jsonl
+523: logit: 9.163777351379395
+baseline_logit: -0.9727814793586731
+score_diff: 10.136558532714844
+delta: 1.3811931610107422
+relative_delta: 0.1362585872411728
+saved → ig_data/df_test_lig_results.jsonl
+524: logit: 5.790913105010986
+baseline_logit: -1.3234093189239502
+score_diff: 7.114322662353516
+delta: 1.648488998413086
+relative_delta: 0.23171411454677582
+saved → ig_data/df_test_lig_results.jsonl
+525: logit: 9.869037628173828
+baseline_logit: -1.4283682107925415
+score_diff: 11.297406196594238
+delta: 1.1884565353393555
+relative_delta: 0.10519728809595108
+saved → ig_data/df_test_lig_results.jsonl
+526: logit: 8.798739433288574
+baseline_logit: -0.8766419887542725
+score_diff: 9.675381660461426
+delta: 1.5165605545043945
+relative_delta: 0.15674425661563873
+saved → ig_data/df_test_lig_results.jsonl
+527: logit: 5.205287456512451
+baseline_logit: -1.1769137382507324
+score_diff: 6.382201194763184
+delta: 0.2755012512207031
+relative_delta: 0.0431671217083931
+saved → ig_data/df_test_lig_results.jsonl
+528: logit: 8.351125717163086
+baseline_logit: -0.9727814793586731
+score_diff: 9.323906898498535
+delta: 1.5704984664916992
+relative_delta: 0.16843780875205994
+saved → ig_data/df_test_lig_results.jsonl
+529: logit: 8.450812339782715
+baseline_logit: -0.8761985898017883
+score_diff: 9.327011108398438
+delta: 2.8076915740966797
+relative_delta: 0.3010280132293701
+saved → ig_data/df_test_lig_results.jsonl
+530: logit: 8.783684730529785
+baseline_logit: -1.4246658086776733
+score_diff: 10.20835018157959
+delta: 1.0400991439819336
+relative_delta: 0.10188709199428558
+saved → ig_data/df_test_lig_results.jsonl
+531: logit: 8.432947158813477
+baseline_logit: -1.076174020767212
+score_diff: 9.50912094116211
+delta: 2.253387451171875
+relative_delta: 0.2369711697101593
+saved → ig_data/df_test_lig_results.jsonl
+532: logit: 7.506527900695801
+baseline_logit: -0.9727814793586731
+score_diff: 8.47930908203125
+delta: 0.8876619338989258
+relative_delta: 0.10468564182519913
+saved → ig_data/df_test_lig_results.jsonl
+533: logit: 6.3105597496032715
+baseline_logit: -1.0945420265197754
+score_diff: 7.405101776123047
+delta: 1.2137775421142578
+relative_delta: 0.16391098499298096
+saved → ig_data/df_test_lig_results.jsonl
+534: logit: 6.975121974945068
+baseline_logit: -1.098444938659668
+score_diff: 8.073566436767578
+delta: 1.1458549499511719
+relative_delta: 0.14192673563957214
+saved → ig_data/df_test_lig_results.jsonl
+535: logit: 5.415844440460205
+baseline_logit: -1.404375672340393
+score_diff: 6.820219993591309
+delta: 1.6305742263793945
+relative_delta: 0.23907941579818726
+saved → ig_data/df_test_lig_results.jsonl
+536: logit: 3.1140387058258057
+baseline_logit: -0.9439904093742371
+score_diff: 4.0580291748046875
+delta: 2.20982027053833
+relative_delta: 0.5445550680160522
+saved → ig_data/df_test_lig_results.jsonl
+537: logit: 2.427717447280884
+baseline_logit: -1.8549060821533203
+score_diff: 4.282623291015625
+delta: -0.5704212188720703
+relative_delta: 0.13319434225559235
+saved → ig_data/df_test_lig_results.jsonl
+538: logit: 8.244576454162598
+baseline_logit: -1.1708924770355225
+score_diff: 9.4154691696167
+delta: 1.2074785232543945
+relative_delta: 0.12824411690235138
+saved → ig_data/df_test_lig_results.jsonl
+539: logit: 7.071264743804932
+baseline_logit: -1.4178178310394287
+score_diff: 8.489082336425781
+delta: 0.4886131286621094
+relative_delta: 0.05755782499909401
+saved → ig_data/df_test_lig_results.jsonl
+540: logit: 4.208141803741455
+baseline_logit: -1.3957698345184326
+score_diff: 5.603911399841309
+delta: 1.4976530075073242
+relative_delta: 0.2672513723373413
+saved → ig_data/df_test_lig_results.jsonl
+541: logit: 6.019750118255615
+baseline_logit: -1.0878689289093018
+score_diff: 7.107619285583496
+delta: -0.6336655616760254
+relative_delta: 0.0891529992222786
+saved → ig_data/df_test_lig_results.jsonl
+542: logit: 6.011818885803223
+baseline_logit: -0.35472360253334045
+score_diff: 6.366542339324951
+delta: 1.570122241973877
+relative_delta: 0.24662087857723236
+saved → ig_data/df_test_lig_results.jsonl
+543: logit: 6.1738600730896
+baseline_logit: -1.4882233142852783
+score_diff: 7.662083625793457
+delta: 0.06528854370117188
+relative_delta: 0.00852099061012268
+saved → ig_data/df_test_lig_results.jsonl
+544: logit: 8.837197303771973
+baseline_logit: -1.454461932182312
+score_diff: 10.291659355163574
+delta: 1.490091323852539
+relative_delta: 0.1447862982749939
+saved → ig_data/df_test_lig_results.jsonl
+545: logit: 4.510311603546143
+baseline_logit: -1.3608131408691406
+score_diff: 5.871124744415283
+delta: 2.441662311553955
+relative_delta: 0.4158764183521271
+saved → ig_data/df_test_lig_results.jsonl
+546: logit: 9.077752113342285
+baseline_logit: -1.104130744934082
+score_diff: 10.181882858276367
+delta: 0.4304637908935547
+relative_delta: 0.04227742552757263
+saved → ig_data/df_test_lig_results.jsonl
+547: logit: 8.066067695617676
+baseline_logit: -1.4218840599060059
+score_diff: 9.487951278686523
+delta: 0.03532695770263672
+relative_delta: 0.0037233494222164154
+saved → ig_data/df_test_lig_results.jsonl
+548: logit: 7.610585689544678
+baseline_logit: -0.9727814793586731
+score_diff: 8.583367347717285
+delta: 2.5706796646118164
+relative_delta: 0.2994954586029053
+saved → ig_data/df_test_lig_results.jsonl
+549: logit: 7.555817127227783
+baseline_logit: -1.1051486730575562
+score_diff: 8.660965919494629
+delta: 1.3203907012939453
+relative_delta: 0.15245305001735687
+saved → ig_data/df_test_lig_results.jsonl
+550: logit: 8.83700180053711
+baseline_logit: -1.336484670639038
+score_diff: 10.173486709594727
+delta: 0.5987644195556641
+relative_delta: 0.05885538086295128
+saved → ig_data/df_test_lig_results.jsonl
+551: logit: 8.748845100402832
+baseline_logit: -1.4207011461257935
+score_diff: 10.169546127319336
+delta: 2.1672887802124023
+relative_delta: 0.21311558783054352
+saved → ig_data/df_test_lig_results.jsonl
+552: logit: 8.015435218811035
+baseline_logit: -1.0861600637435913
+score_diff: 9.101594924926758
+delta: 1.2288742065429688
+relative_delta: 0.13501745462417603
+saved → ig_data/df_test_lig_results.jsonl
+553: logit: 7.8677544593811035
+baseline_logit: -0.404838502407074
+score_diff: 8.272592544555664
+delta: 2.423707962036133
+relative_delta: 0.29298046231269836
+saved → ig_data/df_test_lig_results.jsonl
+554: logit: 9.143220901489258
+baseline_logit: -1.4251526594161987
+score_diff: 10.568373680114746
+delta: 0.6567144393920898
+relative_delta: 0.062139593064785004
+saved → ig_data/df_test_lig_results.jsonl
+555: logit: 7.8313493728637695
+baseline_logit: -1.250537395477295
+score_diff: 9.081886291503906
+delta: 0.8844318389892578
+relative_delta: 0.09738415479660034
+saved → ig_data/df_test_lig_results.jsonl
+556: logit: 1.3470770120620728
+baseline_logit: -1.370923638343811
+score_diff: 2.718000650405884
+delta: 0.555856466293335
+relative_delta: 0.20450931787490845
+saved → ig_data/df_test_lig_results.jsonl
+557: logit: 8.476508140563965
+baseline_logit: -1.273364543914795
+score_diff: 9.749872207641602
+delta: 1.122115135192871
+relative_delta: 0.11509024351835251
+saved → ig_data/df_test_lig_results.jsonl
+558: logit: 9.323101043701172
+baseline_logit: -1.4178178310394287
+score_diff: 10.74091911315918
+delta: 2.322002410888672
+relative_delta: 0.21618284285068512
+saved → ig_data/df_test_lig_results.jsonl
+559: logit: 8.707133293151855
+baseline_logit: -0.9394851326942444
+score_diff: 9.646618843078613
+delta: 1.4134550094604492
+relative_delta: 0.1465233564376831
+saved → ig_data/df_test_lig_results.jsonl
+560: logit: 7.61995267868042
+baseline_logit: -1.0950212478637695
+score_diff: 8.714973449707031
+delta: 2.7535219192504883
+relative_delta: 0.31595298647880554
+saved → ig_data/df_test_lig_results.jsonl
+561: logit: 8.626534461975098
+baseline_logit: -1.1116565465927124
+score_diff: 9.738190650939941
+delta: -0.8464202880859375
+relative_delta: 0.08691761642694473
+saved → ig_data/df_test_lig_results.jsonl
+562: logit: 8.223422050476074
+baseline_logit: -1.332649827003479
+score_diff: 9.556072235107422
+delta: -0.8614025115966797
+relative_delta: 0.0901418998837471
+saved → ig_data/df_test_lig_results.jsonl
+563: logit: 8.574796676635742
+baseline_logit: -0.9727814793586731
+score_diff: 9.547577857971191
+delta: 0.8317031860351562
+relative_delta: 0.08711143583059311
+saved → ig_data/df_test_lig_results.jsonl
+564: logit: 7.767618656158447
+baseline_logit: -1.4246658086776733
+score_diff: 9.19228458404541
+delta: 0.7798385620117188
+relative_delta: 0.0848362073302269
+saved → ig_data/df_test_lig_results.jsonl
+565: logit: 8.578197479248047
+baseline_logit: -1.4201890230178833
+score_diff: 9.99838638305664
+delta: 0.9683341979980469
+relative_delta: 0.09684904664754868
+saved → ig_data/df_test_lig_results.jsonl
+566: logit: -8.153188705444336
+baseline_logit: -0.910067081451416
+score_diff: -7.24312162399292
+delta: 1.5141596794128418
+relative_delta: 0.20904794335365295
+saved → ig_data/df_test_lig_results.jsonl
+567: logit: 8.057445526123047
+baseline_logit: -1.4221489429473877
+score_diff: 9.479594230651855
+delta: 0.6089143753051758
+relative_delta: 0.06423422694206238
+saved → ig_data/df_test_lig_results.jsonl
+568: logit: 8.446361541748047
+baseline_logit: -1.2858643531799316
+score_diff: 9.73222541809082
+delta: 0.638340950012207
+relative_delta: 0.06559044122695923
+saved → ig_data/df_test_lig_results.jsonl
+569: logit: 7.630305767059326
+baseline_logit: -0.9507831931114197
+score_diff: 8.58108901977539
+delta: 1.6182584762573242
+relative_delta: 0.18858428299427032
+saved → ig_data/df_test_lig_results.jsonl
+570: logit: 8.08116340637207
+baseline_logit: -1.4250320196151733
+score_diff: 9.506195068359375
+delta: 0.4963855743408203
+relative_delta: 0.052217062562704086
+saved → ig_data/df_test_lig_results.jsonl
+571: logit: 9.396811485290527
+baseline_logit: -1.336491584777832
+score_diff: 10.73330307006836
+delta: 1.6421699523925781
+relative_delta: 0.15299762785434723
+saved → ig_data/df_test_lig_results.jsonl
+572: logit: 8.652542114257812
+baseline_logit: -0.7946630120277405
+score_diff: 9.447205543518066
+delta: 0.8114347457885742
+relative_delta: 0.08589150756597519
+saved → ig_data/df_test_lig_results.jsonl
+573: logit: 9.248736381530762
+baseline_logit: -1.354638695716858
+score_diff: 10.603375434875488
+delta: 0.5901870727539062
+relative_delta: 0.05566029995679855
+saved → ig_data/df_test_lig_results.jsonl
+574: logit: 9.016435623168945
+baseline_logit: -1.3180012702941895
+score_diff: 10.334436416625977
+delta: 1.2032814025878906
+relative_delta: 0.11643415689468384
+saved → ig_data/df_test_lig_results.jsonl
+575: logit: 7.642967224121094
+baseline_logit: -1.3918205499649048
+score_diff: 9.034788131713867
+delta: 0.5581798553466797
+relative_delta: 0.061781179159879684
+saved → ig_data/df_test_lig_results.jsonl
+576: logit: 8.886332511901855
+baseline_logit: -0.9727814793586731
+score_diff: 9.859113693237305
+delta: 0.863835334777832
+relative_delta: 0.08761794865131378
+saved → ig_data/df_test_lig_results.jsonl
+577: logit: 8.77456283569336
+baseline_logit: -0.906693160533905
+score_diff: 9.681256294250488
+delta: 1.9391393661499023
+relative_delta: 0.20029832422733307
+saved → ig_data/df_test_lig_results.jsonl
+578: logit: 8.898333549499512
+baseline_logit: -1.410334587097168
+score_diff: 10.30866813659668
+delta: 0.47170257568359375
+relative_delta: 0.04575785994529724
+saved → ig_data/df_test_lig_results.jsonl
+579: logit: 9.329938888549805
+baseline_logit: -1.4218840599060059
+score_diff: 10.751823425292969
+delta: -0.07931137084960938
+relative_delta: 0.007376550696790218
+saved → ig_data/df_test_lig_results.jsonl
+580: logit: 7.028025150299072
+baseline_logit: -1.4276124238967896
+score_diff: 8.45563793182373
+delta: -1.1897602081298828
+relative_delta: 0.1407061368227005
+saved → ig_data/df_test_lig_results.jsonl
+581: logit: 9.030919075012207
+baseline_logit: -1.3891587257385254
+score_diff: 10.42007827758789
+delta: 1.2676010131835938
+relative_delta: 0.1216498538851738
+saved → ig_data/df_test_lig_results.jsonl
+582: logit: 9.163652420043945
+baseline_logit: -1.2370660305023193
+score_diff: 10.400718688964844
+delta: 0.34953880310058594
+relative_delta: 0.033607177436351776
+saved → ig_data/df_test_lig_results.jsonl
+583: logit: 7.341580867767334
+baseline_logit: -1.8549060821533203
+score_diff: 9.196487426757812
+delta: -0.5556888580322266
+relative_delta: 0.06042403355240822
+saved → ig_data/df_test_lig_results.jsonl
+584: logit: 4.250784397125244
+baseline_logit: -0.9735477566719055
+score_diff: 5.224332332611084
+delta: 0.7266721725463867
+relative_delta: 0.1390937864780426
+saved → ig_data/df_test_lig_results.jsonl
+585: logit: -6.860588550567627
+baseline_logit: -1.3234093189239502
+score_diff: -5.537178993225098
+delta: 0.8853192329406738
+relative_delta: 0.15988633036613464
+saved → ig_data/df_test_lig_results.jsonl
+586: logit: 8.18505573272705
+baseline_logit: -1.1064443588256836
+score_diff: 9.291500091552734
+delta: 1.605459213256836
+relative_delta: 0.17278794944286346
+saved → ig_data/df_test_lig_results.jsonl
+587: logit: 8.457058906555176
+baseline_logit: -1.4219974279403687
+score_diff: 9.879055976867676
+delta: -0.12971878051757812
+relative_delta: 0.01313068624585867
+saved → ig_data/df_test_lig_results.jsonl
+588: logit: 8.363646507263184
+baseline_logit: -1.4281620979309082
+score_diff: 9.79180908203125
+delta: 3.6872501373291016
+relative_delta: 0.37656474113464355
+saved → ig_data/df_test_lig_results.jsonl
+589: logit: 9.377143859863281
+baseline_logit: -1.061500072479248
+score_diff: 10.438644409179688
+delta: 0.8145580291748047
+relative_delta: 0.07803293317556381
+saved → ig_data/df_test_lig_results.jsonl
+590: logit: 8.322454452514648
+baseline_logit: -1.1536741256713867
+score_diff: 9.476128578186035
+delta: 1.579319953918457
+relative_delta: 0.16666299104690552
+saved → ig_data/df_test_lig_results.jsonl
+591: logit: 4.638113498687744
+baseline_logit: -1.8549060821533203
+score_diff: 6.4930195808410645
+delta: -0.09081506729125977
+relative_delta: 0.01398656889796257
+saved → ig_data/df_test_lig_results.jsonl
+592: logit: 0.10504881292581558
+baseline_logit: -1.8549060821533203
+score_diff: 1.959954857826233
+delta: 0.10488545894622803
+relative_delta: 0.05351422354578972
+saved → ig_data/df_test_lig_results.jsonl
+593: logit: 7.9265947341918945
+baseline_logit: -0.37650731205940247
+score_diff: 8.303102493286133
+delta: 2.677626609802246
+relative_delta: 0.3224850594997406
+saved → ig_data/df_test_lig_results.jsonl
+594: logit: 8.594727516174316
+baseline_logit: -0.40174320340156555
+score_diff: 8.99647045135498
+delta: 0.34461307525634766
+relative_delta: 0.038305364549160004
+saved → ig_data/df_test_lig_results.jsonl
+595: logit: 6.509406566619873
+baseline_logit: -1.4271125793457031
+score_diff: 7.936519145965576
+delta: -0.003277301788330078
+relative_delta: 0.00041293943650089204
+saved → ig_data/df_test_lig_results.jsonl
+596: logit: 8.597991943359375
+baseline_logit: -1.320410966873169
+score_diff: 9.918402671813965
+delta: 1.1807489395141602
+relative_delta: 0.11904627829790115
+saved → ig_data/df_test_lig_results.jsonl
+597: logit: 9.010860443115234
+baseline_logit: -0.9727814793586731
+score_diff: 9.983641624450684
+delta: 1.008925437927246
+relative_delta: 0.10105785727500916
+saved → ig_data/df_test_lig_results.jsonl
+598: logit: 6.4828572273254395
+baseline_logit: -1.3630242347717285
+score_diff: 7.845881462097168
+delta: 1.8567991256713867
+relative_delta: 0.23665907979011536
+saved → ig_data/df_test_lig_results.jsonl
+599: logit: 8.15401554107666
+baseline_logit: -0.8263564109802246
+score_diff: 8.980371475219727
+delta: 0.9608898162841797
+relative_delta: 0.10699889063835144
+saved → ig_data/df_test_lig_results.jsonl
+600: logit: 8.665973663330078
+baseline_logit: -1.4250320196151733
+score_diff: 10.091005325317383
+delta: 1.105301856994629
+relative_delta: 0.10953337699174881
+saved → ig_data/df_test_lig_results.jsonl
+601: logit: 9.076435089111328
+baseline_logit: -1.3234093189239502
+score_diff: 10.3998441696167
+delta: -0.7878656387329102
+relative_delta: 0.07575744390487671
+saved → ig_data/df_test_lig_results.jsonl
+602: logit: 9.951107025146484
+baseline_logit: -1.3891587257385254
+score_diff: 11.340265274047852
+delta: 0.6109685897827148
+relative_delta: 0.053876038640737534
+saved → ig_data/df_test_lig_results.jsonl
+603: logit: 7.853977680206299
+baseline_logit: -1.418535828590393
+score_diff: 9.272513389587402
+delta: 1.746957778930664
+relative_delta: 0.18840175867080688
+saved → ig_data/df_test_lig_results.jsonl
+604: logit: 9.114904403686523
+baseline_logit: -0.9727814793586731
+score_diff: 10.087685585021973
+delta: 1.0021581649780273
+relative_delta: 0.09934470802545547
+saved → ig_data/df_test_lig_results.jsonl
+605: logit: 8.113954544067383
+baseline_logit: -1.091300129890442
+score_diff: 9.205254554748535
+delta: 2.454507827758789
+relative_delta: 0.2666420340538025
+saved → ig_data/df_test_lig_results.jsonl
+606: logit: 8.3560209274292
+baseline_logit: -1.3255791664123535
+score_diff: 9.681600570678711
+delta: 1.1444263458251953
+relative_delta: 0.11820631474256516
+saved → ig_data/df_test_lig_results.jsonl
+607: logit: 6.317568302154541
+baseline_logit: -1.0652647018432617
+score_diff: 7.382833003997803
+delta: 0.8257403373718262
+relative_delta: 0.11184599995613098
+saved → ig_data/df_test_lig_results.jsonl
+608: logit: 0.6012941002845764
+baseline_logit: -1.8549060821533203
+score_diff: 2.456200122833252
+delta: -0.2133927345275879
+relative_delta: 0.08687921613454819
+saved → ig_data/df_test_lig_results.jsonl
+609: logit: 6.993954181671143
+baseline_logit: -1.8549060821533203
+score_diff: 8.848859786987305
+delta: 1.2966156005859375
+relative_delta: 0.14652912318706512
+saved → ig_data/df_test_lig_results.jsonl
+610: logit: 7.331340789794922
+baseline_logit: -1.8549060821533203
+score_diff: 9.186246871948242
+delta: 0.1029214859008789
+relative_delta: 0.011203866451978683
+saved → ig_data/df_test_lig_results.jsonl
+611: logit: 9.082429885864258
+baseline_logit: -1.1536741256713867
+score_diff: 10.236104011535645
+delta: 0.9773416519165039
+relative_delta: 0.09547984600067139
+saved → ig_data/df_test_lig_results.jsonl
+612: logit: 8.08328628540039
+baseline_logit: -1.336484670639038
+score_diff: 9.419771194458008
+delta: 2.969355583190918
+relative_delta: 0.31522586941719055
+saved → ig_data/df_test_lig_results.jsonl
+613: logit: 2.453662633895874
+baseline_logit: -0.9245601296424866
+score_diff: 3.378222703933716
+delta: 1.8830535411834717
+relative_delta: 0.5574095249176025
+saved → ig_data/df_test_lig_results.jsonl
+614: logit: 0.15463602542877197
+baseline_logit: -1.1013895273208618
+score_diff: 1.2560255527496338
+delta: 2.847450017929077
+relative_delta: 2.2670319080352783
+saved → ig_data/df_test_lig_results.jsonl
+615: logit: 8.475439071655273
+baseline_logit: -0.8832090497016907
+score_diff: 9.358648300170898
+delta: 1.1101932525634766
+relative_delta: 0.11862751841545105
+saved → ig_data/df_test_lig_results.jsonl
+616: logit: 6.630172252655029
+baseline_logit: -0.9104518294334412
+score_diff: 7.540624141693115
+delta: 2.0452799797058105
+relative_delta: 0.2712348401546478
+saved → ig_data/df_test_lig_results.jsonl
+617: logit: 7.639173984527588
+baseline_logit: -1.302233338356018
+score_diff: 8.941407203674316
+delta: 0.37647247314453125
+relative_delta: 0.042104385793209076
+saved → ig_data/df_test_lig_results.jsonl
+618: logit: -8.356088638305664
+baseline_logit: -1.2397798299789429
+score_diff: -7.116308689117432
+delta: 2.050579071044922
+relative_delta: 0.2881520688533783
+saved → ig_data/df_test_lig_results.jsonl
+619: logit: 7.840757846832275
+baseline_logit: -1.376997470855713
+score_diff: 9.217755317687988
+delta: 0.1450052261352539
+relative_delta: 0.015731077641248703
+saved → ig_data/df_test_lig_results.jsonl
+620: logit: 8.180355072021484
+baseline_logit: -1.4129819869995117
+score_diff: 9.593337059020996
+delta: -0.18768787384033203
+relative_delta: 0.019564399495720863
+saved → ig_data/df_test_lig_results.jsonl
+621: logit: 8.856178283691406
+baseline_logit: -0.910067081451416
+score_diff: 9.766244888305664
+delta: 1.0068435668945312
+relative_delta: 0.10309423506259918
+saved → ig_data/df_test_lig_results.jsonl
+622: logit: 8.391976356506348
+baseline_logit: -1.4102355241775513
+score_diff: 9.80221176147461
+delta: 0.9716272354125977
+relative_delta: 0.0991232618689537
+saved → ig_data/df_test_lig_results.jsonl
+623: logit: -3.7559540271759033
+baseline_logit: -0.8471276760101318
+score_diff: -2.9088263511657715
+delta: -1.0604100227355957
+relative_delta: 0.36454910039901733
+saved → ig_data/df_test_lig_results.jsonl
+624: logit: 8.927770614624023
+baseline_logit: -1.8549060821533203
+score_diff: 10.782676696777344
+delta: 0.6670999526977539
+relative_delta: 0.06186775118112564
+saved → ig_data/df_test_lig_results.jsonl
+625: logit: 8.941511154174805
+baseline_logit: -1.4174647331237793
+score_diff: 10.358976364135742
+delta: 0.10194015502929688
+relative_delta: 0.009840755723416805
+saved → ig_data/df_test_lig_results.jsonl
+626: logit: 7.341866970062256
+baseline_logit: -1.370923638343811
+score_diff: 8.712790489196777
+delta: 0.9066648483276367
+relative_delta: 0.10406136512756348
+saved → ig_data/df_test_lig_results.jsonl
+627: logit: 8.354670524597168
+baseline_logit: -1.3230069875717163
+score_diff: 9.677677154541016
+delta: 1.1358871459960938
+relative_delta: 0.11737187951803207
+saved → ig_data/df_test_lig_results.jsonl
+628: logit: 7.749083042144775
+baseline_logit: -1.4276124238967896
+score_diff: 9.176695823669434
+delta: 1.1850147247314453
+relative_delta: 0.12913304567337036
+saved → ig_data/df_test_lig_results.jsonl
+629: logit: 8.84017276763916
+baseline_logit: -1.425527811050415
+score_diff: 10.265700340270996
+delta: 2.9966163635253906
+relative_delta: 0.2919057011604309
+saved → ig_data/df_test_lig_results.jsonl
+630: logit: 8.95093822479248
+baseline_logit: -1.2144525051116943
+score_diff: 10.165390968322754
+delta: 1.1574726104736328
+relative_delta: 0.11386404931545258
+saved → ig_data/df_test_lig_results.jsonl
+631: logit: 8.88578987121582
+baseline_logit: -1.184483528137207
+score_diff: 10.070273399353027
+delta: 0.8553972244262695
+relative_delta: 0.08494280278682709
+saved → ig_data/df_test_lig_results.jsonl
+632: slurmstepd: error: *** JOB 507739 ON haydn CANCELLED AT 2026-06-08T15:48:53 ***

@@ -663,6 +663,11 @@ def load_model(path: str, hp: dict, device: torch.device = DEVICE) -> RiNALMoCla
 
     model.load_state_dict(sd)
     model.eval()
+    
+    try:
+        model.backbone.gradient_checkpointing_disable()
+    except AttributeError:
+        pass
     return model
 
 

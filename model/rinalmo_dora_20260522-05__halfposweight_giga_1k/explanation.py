@@ -72,6 +72,9 @@ class IGResult:
     convergence_delta: float
     baseline_type:     str
     dimension_reduction: str
+    baseline_logit : float
+    score_diff: float
+    relative_delta: float
 
 def run_lig_mask(
     sequence: str,
@@ -149,9 +152,9 @@ def run_lig_mask(
         convergence_delta=delta_value,
         baseline_type="[MASK]",
         dimension_reduction=dim_reduction,
-        # baseline_logit=baseline_logit_value,
-        # score_diff=score_diff_value,
-        # relative_delta=relative_delta_value,
+        baseline_logit=baseline_logit_value,
+        score_diff=score_diff_value,
+        relative_delta=relative_delta_value,
     )
 
 def dinucleotide_shuffle(
@@ -353,6 +356,9 @@ def save_ig_result(result: IGResult, path: str):
         "convergence_delta": result.convergence_delta if not np.isnan(result.convergence_delta) else None,
         "baseline_type":     result.baseline_type,
         "dim_reduction": result.dimension_reduction,
+        "baseline_logit": result.baseline_logit,
+        "score_diff": result.score_diff,
+        "relative_delta": result.relative_delta,
     }
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "a") as f:
@@ -378,13 +384,10 @@ def load_ig_result(path: str) -> IGResult:
 def main():
     import sys
     # ── example usage (requires real model) ──────────────────────────────────────
-    # seq = "GCCACCAUGGCCAAAGUGAAGAAGCAGAUCCUGCUG"
     NEUTRAL_TOKEN_ID = 4  # for mask token
     # NEUTRAL_TOKEN_ID = 0  # for pad token
     # NEUTRAL_TOKEN_ID = 10   # for N token
-    # seq = sys.argv[1]
     dim_reduction = 'sum'
-
     
     SAVE_DIR = "ig_data"
     import os; os.makedirs(SAVE_DIR, exist_ok=True)
@@ -398,7 +401,7 @@ def main():
     c = 0
     for s in df_test.seq:
         c += 1
-        print(c, end=': ', flush=True)
+        print(str(c) + ' -------------------------------', flush=True)
         # if c == 3:
         #     break
         # lig_result = run_lig_dinuc(

@@ -31,3 +31,17 @@ Total params: 659,633,888  |  Trainable: 8,755,157
 /nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260522-05__halfposweight_giga_1k/inference.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
   sd    = torch.load(path, map_location=device)
 [load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+========== test set: all sites ==========
+{'accuracy': 0.9892519970951343,
+ 'auc': np.float64(0.9969456027476505),
+ 'aupr': np.float64(0.9877132947136624),
+ 'f1': np.float64(0.9576174112256587),
+ 'fn': np.int64(43),
+ 'fp': np.int64(31),
+ 'mcc': np.float64(0.951492858917189),
+ 'precision': np.float64(0.9642445213379469),
+ 'recall': np.float64(0.9510807736063709),
+ 'specificity': np.float64(0.9948384948384948),
+ 'tn': np.int64(5975),
+ 'total': np.int64(6885),
+ 'tp': np.int64(836)}
