@@ -1,0 +1,178 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:1
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+  tokenizer vocab_size=28, len(tokenizer)=28
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 34812.14it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+  base_model vocab_size=28, emb.shape=torch.Size([28, 1280])
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+embedding_layer: Embedding(28, 1280, padding_idx=0)
+[forward hook] embedding output: torch.Size([1, 204, 1280])
+[backward hook] grad output norm: 0.1452316790819168
+forward called: True
+backward grad exists: True
+
+By Mask token================
+
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: 1.123311996459961
+relative_delta: 0.7711836695671082
+64 delta= 1.123311996459961 relative_delta= 0.7711836695671082 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: -7.727750778198242
+relative_delta: 5.305307388305664
+128 delta= -7.727750778198242 relative_delta= 5.305307388305664 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: 1.0204882621765137
+relative_delta: 0.7005924582481384
+256 delta= 1.0204882621765137 relative_delta= 0.7005924582481384 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: -7.420167922973633
+relative_delta: 5.094143390655518
+512 delta= -7.420167922973633 relative_delta= 5.094143390655518 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: 1.171839714050293
+relative_delta: 0.8044992685317993
+1024 delta= 1.171839714050293 relative_delta= 0.8044992685317993 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: -3.0213887691497803
+relative_delta: 2.0742640495300293
+2048 delta= -3.0213887691497803 relative_delta= 2.0742640495300293 score_diff= -1.4566075801849365
+logit: -4.917050361633301
+baseline_logit: -3.4604427814483643
+score_diff: -1.4566075801849365
+delta: 0.7856612205505371
+relative_delta: 0.5393773913383484
+4096 delta= 0.7856612205505371 relative_delta= 0.5393773913383484 score_diff= -1.4566075801849365
+
+By N token================
+
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: 3.3693737983703613
+relative_delta: 0.8045344352722168
+64 delta= 3.3693737983703613 relative_delta= 0.8045344352722168 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: 13.915863037109375
+relative_delta: 3.322810411453247
+128 delta= 13.915863037109375 relative_delta= 3.322810411453247 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: -2.5843920707702637
+relative_delta: 0.6170975565910339
+256 delta= -2.5843920707702637 relative_delta= 0.6170975565910339 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: 10.53744888305664
+relative_delta: 2.516117572784424
+512 delta= 10.53744888305664 relative_delta= 2.516117572784424 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: 4.815087795257568
+relative_delta: 1.1497399806976318
+1024 delta= 4.815087795257568 relative_delta= 1.1497399806976318 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: -2.0103750228881836
+relative_delta: 0.48003455996513367
+2048 delta= -2.0103750228881836 relative_delta= 0.48003455996513367 score_diff= -4.187979698181152
+logit: -4.917050361633301
+baseline_logit: -0.7290704250335693
+score_diff: -4.187979698181152
+delta: 0.6166439056396484
+relative_delta: 0.14724138379096985
+4096 delta= 0.6166439056396484 relative_delta= 0.14724138379096985 score_diff= -4.187979698181152
+logit: -4.917050
+baseline_logit_mean: -10.744945
+score_diff_mean: 5.827894
+delta_mean: -6.183659
+delta_abs_mean: 27.550748
+delta_abs_min: 1.617147
+delta_abs_max: 89.092094
+relative_delta_mean: 81.030416
+relative_delta_min: 0.247309
+relative_delta_max: 781.543335
+64 delta= -6.1836589813232425 relative_delta= 81.03041610866785 score_diff= 5.827894163131714
+logit: -4.917050
+baseline_logit_mean: -10.744945
+score_diff_mean: 5.827894
+delta_mean: -4.995829
+delta_abs_mean: 18.550464
+delta_abs_min: 0.893569
+delta_abs_max: 87.977707
+relative_delta_mean: 13.302049
+relative_delta_min: 0.131781
+relative_delta_max: 101.624146
+128 delta= -4.995829153060913 relative_delta= 13.302048605680465 score_diff= 5.827894163131714
+logit: -4.917050
+baseline_logit_mean: -10.744945
+score_diff_mean: 5.827894
+delta_mean: -1.815372
+delta_abs_mean: 15.701082
+delta_abs_min: 0.040164
+delta_abs_max: 36.787167
+relative_delta_mean: 34.216407
+relative_delta_min: 0.006583
+relative_delta_max: 322.708374
+256 delta= -1.8153723239898683 relative_delta= 34.21640655919909 score_diff= 5.827894163131714
+logit: -4.917050
+baseline_logit_mean: -10.744945
+score_diff_mean: 5.827894
+delta_mean: 25.150855
+delta_abs_mean: 34.215358
+delta_abs_min: 1.108262
+delta_abs_max: 105.236595
+relative_delta_mean: 89.515575
+relative_delta_min: 0.157578
+relative_delta_max: 858.324768
+512 delta= 25.150854969024657 relative_delta= 89.51557491868735 score_diff= 5.827894163131714
+logit: -4.917050
+baseline_logit_mean: -10.744945
+score_diff_mean: 5.827894
+delta_mean: 1.664942
+delta_abs_mean: 21.579485
+delta_abs_min: 2.980629
+delta_abs_max: 80.734169
+relative_delta_mean: 40.651065
+relative_delta_min: 0.455825
+relative_delta_max: 380.420380
+1024 delta= 1.6649420738220215 relative_delta= 40.65106461942196 score_diff= 5.827894163131714
+slurmstepd: error: *** JOB 523491 ON haydn CANCELLED AT 2026-06-09T14:09:43 ***

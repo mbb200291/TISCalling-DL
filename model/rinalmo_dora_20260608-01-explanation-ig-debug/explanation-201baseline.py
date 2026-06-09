@@ -52,14 +52,41 @@ def make_forward_func(model, attention_mask):
     return forward_func
 
 
-def build_baseline(input_ids: torch.Tensor, baseline_token_id: int) -> torch.Tensor:
+def build_baseline_keep_tis_window(
+    input_ids: torch.Tensor,
+    baseline_token_id: int,
+    keep_left_window: int,
+    keep_right_window: int,
+    tis_position: int,
+) -> torch.Tensor:
     """
-    Baseline A: replace all real tokens with [MASK].
-    CLS (pos 0) and EOS (pos -1) are kept as-is — changing them
-    can destabilise the model's positional encoding.
+    Build baseline by masking tokens outside a TIS-centered window.
+
+    Assumptions:
+      - input_ids shape: [1, L]
+      - tokenizer adds CLS at token index 0 and EOS at token index -1
+      - tis_position is the raw sequence index, not token index
+      - keep window includes the TIS position itself:
+            [tis_position - keep_left_window, tis_position + keep_right_window]
     """
     baseline = input_ids.clone()
+
+    seq_len = input_ids.size(1) - 2  # exclude CLS and EOS
+
+    # raw sequence coordinate
+    keep_start_nt = max(0, tis_position - keep_left_window)
+    keep_end_nt = min(seq_len, tis_position + keep_right_window + 1)  # exclusive
+
+    # convert raw sequence coordinate to token coordinate
+    keep_start_tok = keep_start_nt + 1
+    keep_end_tok = keep_end_nt + 1
+
+    # mask all real sequence tokens first; keep CLS and EOS unchanged
     baseline[:, 1:-1] = baseline_token_id
+
+    # restore the TIS-centered window
+    baseline[:, keep_start_tok:keep_end_tok] = input_ids[:, keep_start_tok:keep_end_tok]
+
     return baseline
 
 # ── IGResult ─────────────────────────────────────────────────────────────────────
@@ -136,7 +163,10 @@ def run_lig_mask(
     attention_mask = enc["attention_mask"].to(DEVICE)
     attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
 
-    baseline_ids = build_baseline(input_ids, baseline_token_id)
+    baseline_ids = build_baseline_keep_tis_window(
+        input_ids, baseline_token_id,
+        keep_left_window=99, keep_right_window=102,
+        tis_position=500,)
 
     forward_func = make_forward_func(model, attention_mask)
 
@@ -496,13 +526,14 @@ def load_ig_result(path: str) -> IGResult:
 
 
 def main():
-    import sys
+    # import sys
     # ── example usage (requires real model) ──────────────────────────────────────
     NEUTRAL_TOKEN_ID = tokenizer.mask_token_id
     # NEUTRAL_TOKEN_ID = 0  # for pad token
     # NEUTRAL_TOKEN_ID = 10   # for N token
     dim_reduction = 'sum'
-    seq = sys.argv[1]
+    # seq = sys.argv[1]
+    seq = 'TATGAGTATAGATGAAGTATAGTAATAGTACTTAATATGTCGGATCCGTGCTATAAGCAATTTGGATTGTATGAAAAAATCTCTTAAATTTGATTGAAATATTATTCGTCCAATAATTATCAACTCAATACTAAATCGACCTATATCTAATTAATAATTTAACAAATTAATATTTTAAAAAATTGAAATATCAATAAGTCGAATCATTAAGCATAATTATCGGCCTATAAAAAAGATTTAGTCGTATTATCTGGAAAAGATTAAATAAATCCGGCGCCATATTCATAGTGATTTATGGCTGAAGCCCACACGTTATAACAACAACTACTCCATCAATGGAAGCTTCCATTTCTTGAATTTCTCAAACTCTTACTAAATTCAACTCCGGCGGTGGAACCCTTGTAATCTTCAACATATTTCGTTAATTAATTCTTATATACATATATATAAAGAAATTTGTTTTCTACTGCCGAAAGTTTCTTCTTCTCATCGGAGTAGATATGCCGAGCTTAATTGTCAAAGTTTACAGCTTACTCTTCAAGTATAACCTTAATCGCCGATTGCAATCACTAATCCAATCCCCAATTTCATACCCTTTTAACGGTGTCGTCTCACGCGCCGATGAATCGATTATCACTTCTAACCCTAGTTTCTCTACCGACGGTGTTGCAACTAAGGACCTGCATATTGATTCTTTGACTTGTCTATCTCTCAGGATTTACCTCCCTCAATCTGCACTTATTTCGTTGAGAAATTTGGAATCTGGTGAAGGGGTTTATGGGGGTTATGTACCGGGAAAAAATGGGAAAAATTGTAAGAAATTGCCGGTGATTTTGCAGTTTCATGGTGGTGCTTGGGTGACTGGGGGTATTGATACGGTTTCCAATGATGTTTTTTGTAGGAAATTGGCGAAATCTTGTGATGCTATTGTGATTGCTGTTGGGTATAGATTGGCACCGGAGAGTAGGTTTCCGGCTGCGTTTGAAGATGGGGTTGCGGCG'
     
     SAVE_DIR = "ig_data"
     import os; os.makedirs(SAVE_DIR, exist_ok=True)
@@ -510,31 +541,13 @@ def main():
     # sanity check
     sanity_check(seq, model, tokenizer,)
     
-    # # test convergency by mask token as baseline when step increasing
-    # for n_steps in [64, 128, 256, 512, 1024, 2048]:
-    #     result = run_lig_mask(
-    #         seq, model, tokenizer,
-    #         n_steps=n_steps,
-    #         dim_reduction="sum",
-    #         baseline_token_id=NEUTRAL_TOKEN_ID,
-    #     )
-    #     print(
-    #         n_steps,
-    #         "delta=", result.convergence_delta,
-    #         "relative_delta=", result.relative_delta,
-    #         "score_diff=", result.score_diff,
-    #         flush=True,
-    #     )
-        
-    # test convergency by di-nt shuffle step increasing
-    print("\nBy Di-nt shuffle ================\n")
-    # for n_steps in [64, 128, 256, 512, 1024, 2048]:
-    for n_steps in [64, 128, 256, 512, 1024,]:
-        result = run_lig_dinuc(
+    # test convergency by mask token as baseline when step increasing
+    for n_steps in [64, 128, 256, 512, 1024, 2048]:
+        result = run_lig_mask(
             seq, model, tokenizer,
             n_steps=n_steps,
-            n_shuffles=10,
-            dim_reduction='sum',
+            dim_reduction="sum",
+            baseline_token_id=NEUTRAL_TOKEN_ID,
         )
         print(
             n_steps,
@@ -543,6 +556,22 @@ def main():
             "score_diff=", result.score_diff,
             flush=True,
         )
+        
+    # # test convergency by di-nt shuffle step increasing
+    # for n_steps in [64, 128, 256, 512, 1024, 2048]:
+    #     result = run_lig_dinuc(
+    #         seq, model, tokenizer,
+    #         n_steps=n_steps,
+    #         n_shuffles=10,
+    #         dim_reduction='l2-norm',
+    #     )
+    #     print(
+    #         n_steps,
+    #         "delta=", result.convergence_delta,
+    #         "relative_delta=", result.relative_delta,
+    #         "score_diff=", result.score_diff,
+    #         flush=True,
+    #     )
         
     
     

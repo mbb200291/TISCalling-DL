@@ -1,0 +1,70 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:1
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 31677.21it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260608-01-explanation-ig-debug/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+embedding_layer: Embedding(26, 1280, padding_idx=0)
+[forward hook] embedding output: torch.Size([1, 1003, 1280])
+[backward hook] grad output norm: 0.019756626337766647
+forward called: True
+backward grad exists: True
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: 18.3302001953125
+relative_delta: 2.003013849258423
+64 delta= 18.3302001953125 relative_delta= 2.003013849258423 score_diff= 9.151309967041016
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: -6.604997634887695
+relative_delta: 0.7217543125152588
+128 delta= -6.604997634887695 relative_delta= 0.7217543125152588 score_diff= 9.151309967041016
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: -3.176219940185547
+relative_delta: 0.3470781743526459
+256 delta= -3.176219940185547 relative_delta= 0.3470781743526459 score_diff= 9.151309967041016
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: -2.7398362159729004
+relative_delta: 0.29939278960227966
+512 delta= -2.7398362159729004 relative_delta= 0.29939278960227966 score_diff= 9.151309967041016
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: -1.316744327545166
+relative_delta: 0.14388588070869446
+1024 delta= -1.316744327545166 relative_delta= 0.14388588070869446 score_diff= 9.151309967041016
+logit: 7.2366814613342285
+baseline_logit: -1.9146288633346558
+score_diff: 9.151309967041016
+delta: -0.8000564575195312
+relative_delta: 0.0874253511428833
+2048 delta= -0.8000564575195312 relative_delta= 0.0874253511428833 score_diff= 9.151309967041016
+ig run complete

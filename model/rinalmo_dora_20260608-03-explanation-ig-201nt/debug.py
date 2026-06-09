@@ -8,8 +8,8 @@ from pathlib import Path
 import json
 from ushuffle import Shuffler, set_seed
 
-from main import *
-from main import _tokenizer, _PAD_ID
+from script import *
+from script import _tokenizer, _PAD_ID
 
 # # ── plug in your model ────────────────────────────────────────────────────────
 # DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -28,29 +28,63 @@ RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 tokenizer = _tokenizer
 
 # ── model ─────────────────────────────────────────────────────────────────────
-save_path = r'model.pt'
+save_path = r'model_201nt.pt'
 hp = hyperparameters_queryer()
 
 model = load_model(save_path, hp, DEVICE)
 model.to(DEVICE).eval()
 
-
-# ── forward function ──────────────────────────────────────────────────────────
-
 def make_forward_func(model, attention_mask):
     """
-    Returns a forward_func compatible with LayerIntegratedGradients.
+    Create a forward function compatible with Captum LayerIntegratedGradients.
 
-    LayerIntegratedGradients calls forward_func(input_ids) internally,
-    so attention_mask must be captured via closure.
+    Captum may internally expand the input batch during Integrated Gradients
+    computation, for example when internal_batch_size > 1. Since attention_mask
+    is captured from the outer scope, its original batch size may remain 1 while
+    input_ids is expanded to a larger batch size.
 
-    Returns raw logit (scalar) — LIG will backprop through this.
+    This function dynamically expands attention_mask to match the current
+    input_ids batch size and always returns a 1-D tensor with shape (batch,).
+    Captum requires the batch dimension to be preserved, even when batch size is 1.
     """
     def forward_func(input_ids):
-        output = model(input_ids, attention_mask=attention_mask)
-        return output.squeeze(-1).unsqueeze(0)    # plain tensor
-    return forward_func
+        current_attention_mask = attention_mask
 
+        # Captum may call this function with an expanded input batch.
+        # If the original attention_mask has batch size 1, expand it virtually
+        # across the current batch dimension.
+        if current_attention_mask.size(0) != input_ids.size(0):
+            if current_attention_mask.size(0) != 1:
+                raise ValueError(
+                    f"Cannot expand attention_mask from "
+                    f"{current_attention_mask.shape} to match input_ids "
+                    f"{input_ids.shape}"
+                )
+
+            current_attention_mask = current_attention_mask.expand(
+                input_ids.size(0),
+                -1,
+            )
+
+        output = model(input_ids, attention_mask=current_attention_mask)
+
+        # Normalize model output shape to (batch,).
+        #
+        # Possible model output shapes:
+        #   (batch,)       -> already valid
+        #   (batch, 1)     -> flatten to (batch,)
+        #   scalar tensor  -> invalid for Captum, but can happen if batch dim
+        #                     was accidentally squeezed elsewhere
+        #
+        # Using reshape(input_ids.size(0), -1) preserves the batch dimension
+        # even when batch size is 1.
+        output = output.reshape(input_ids.size(0), -1)
+
+        # For binary classification / regression with one logit per sample,
+        # take the first logit and return shape (batch,).
+        return output[:, 0]
+
+    return forward_func
 
 def build_baseline(input_ids: torch.Tensor, baseline_token_id: int) -> torch.Tensor:
     """
@@ -77,7 +111,7 @@ class IGResult:
     relative_delta: float
 
 def sanity_check(
-        sequence: str,
+    sequence: str,
     model,
     tokenizer,
 ):
@@ -151,9 +185,9 @@ def run_lig_mask(
         n_steps=n_steps,
         method="gausslegendre",
         # method="riemann_trapezoid",
-        internal_batch_size=1,
+        internal_batch_size=2,
         return_convergence_delta=True,
-    )  # attrs: (1, L, D)
+    )  # attrs: (B, L, D)
 
     # dim reduction over embedding dim → per-token scalar, strip CLS/EOS
     if dim_reduction == 'l2-norm':
@@ -496,27 +530,47 @@ def load_ig_result(path: str) -> IGResult:
 
 
 def main():
-    import sys
+    # import sys
     # ── example usage (requires real model) ──────────────────────────────────────
     NEUTRAL_TOKEN_ID = tokenizer.mask_token_id
     # NEUTRAL_TOKEN_ID = 0  # for pad token
     # NEUTRAL_TOKEN_ID = 10   # for N token
     dim_reduction = 'sum'
-    seq = sys.argv[1]
+    # seq = sys.argv[1]
+    seq = "GTTGTCGTCTGTCTTTCAATTTCAGAAATTTTATACAAAAATCAAACTCCCTTTTAGGTGTTTTGTTTTTGAAAGCCAGGTGATCCAGAACAGAGATCAACGTTCTCTTTTTATTTTTTAAATTGTTCAAACAACCACAAGGGTCTGTTTTTCGTATCCCTAAAGCAGCTATAGATGTATACAGCAGCAGCAGTAACTTGTC"
     
-    SAVE_DIR = "ig_data"
+    SAVE_DIR = "ig_data_debug"
     import os; os.makedirs(SAVE_DIR, exist_ok=True)
     
     # sanity check
     sanity_check(seq, model, tokenizer,)
     
-    # # test convergency by mask token as baseline when step increasing
-    # for n_steps in [64, 128, 256, 512, 1024, 2048]:
+    # test convergency by mask token as baseline when step increasing
+    # print("\nBy Mask token================\n")
+    # for n_steps in [64, 128, 256, 512, 1024, 2048, 4096]:
     #     result = run_lig_mask(
     #         seq, model, tokenizer,
     #         n_steps=n_steps,
     #         dim_reduction="sum",
-    #         baseline_token_id=NEUTRAL_TOKEN_ID,
+    #         baseline_token_id=tokenizer.mask_token_id,
+    #     )
+    #     print(
+    #         n_steps,
+    #         "delta=", result.convergence_delta,
+    #         "relative_delta=", result.relative_delta,
+    #         "score_diff=", result.score_diff,
+    #         flush=True,
+    #     )
+        
+    
+    # # test convergency by N token as baseline when step increasing
+    # print("\nBy N token================\n")
+    # for n_steps in [64, 128, 256, 512, 1024, 2048, 4096]:
+    #     result = run_lig_mask(
+    #         seq, model, tokenizer,
+    #         n_steps=n_steps,
+    #         dim_reduction="sum",
+    #         baseline_token_id=10,
     #     )
     #     print(
     #         n_steps,
@@ -527,9 +581,8 @@ def main():
     #     )
         
     # test convergency by di-nt shuffle step increasing
-    print("\nBy Di-nt shuffle ================\n")
-    # for n_steps in [64, 128, 256, 512, 1024, 2048]:
-    for n_steps in [64, 128, 256, 512, 1024,]:
+    print("\nBy Di-nt shuffle================\n")
+    for n_steps in [64, 128, 256, 512, 1024, ]:
         result = run_lig_dinuc(
             seq, model, tokenizer,
             n_steps=n_steps,
@@ -543,45 +596,7 @@ def main():
             "score_diff=", result.score_diff,
             flush=True,
         )
-        
-    
-    
-    # df_test = pd.read_csv('df_test.csv')
-    # df_test["seq"] = [
-    #     centralize_transcript(hp["left_window"], hp["right_window"], s, p)
-    #     for s, p in zip(df_test["seq"].values, df_test["position"].values)    
-    # ]
-    # c = 0
-    # for s in df_test.seq:
-    #     c += 1
-    #     print(f"{c} -------------------------------", flush=True)        # if c == 3:
-    #     #     break
-    #     # lig_result = run_lig_dinuc(
-    #     #     s, model, tokenizer, 
-    #     #     n_shuffles=10,
-    #     #     n_steps=500, # 10,
-    #     #     dim_reduction='l2-norm'
-    #     # )
-    #     lig_result = run_lig_mask(
-    #         s, model, tokenizer, NEUTRAL_TOKEN_ID,
-    #         n_steps=1024,
-    #         dim_reduction=dim_reduction
-    #     )
-        
-    #     # print(f"P(TIS) = {lig_result.pred_prob:.4f}  |  Δ_conv = {lig_result.convergence_delta:.5f}")
 
-    #     save_ig_result(lig_result, os.path.join(SAVE_DIR, "df_test_lig_results.jsonl"))
-
-    # # fig, axes = plt.subplots(
-    # #     2, 1, figsize=(16, 4),
-    # #     gridspec_kw={"height_ratios": [4, 1]},
-    # #     facecolor="#0d1117",
-    # # )
-    # # plot_attribution(lig_result, ax_bar=axes[0], ax_seq=axes[1])
-    # # plt.tight_layout(h_pad=0)
-    # # plt.savefig(os.path.join(SAVE_DIR, "lig_result.png"), dpi=150, bbox_inches="tight", facecolor="#0d1117")
-    # # plt.show()
-    # # print(f"saved → {save_path}")
     print(f"ig run complete")
 
 
