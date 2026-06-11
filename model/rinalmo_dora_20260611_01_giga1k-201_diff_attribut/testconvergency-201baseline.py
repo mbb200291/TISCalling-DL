@@ -9,7 +9,7 @@ import json
 from ushuffle import Shuffler, set_seed
 
 from main import *
-from main import _tokenizer, _PAD_ID
+from main import _tokenizer, _PAD_ID, centralize_transcript
 
 # # ── plug in your model ────────────────────────────────────────────────────────
 # DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -28,7 +28,7 @@ RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 tokenizer = _tokenizer
 
 # ── model ─────────────────────────────────────────────────────────────────────
-save_path = r'model.pt'
+save_path = r'model_1k.pt'
 hp = hyperparameters_queryer()
 
 model = load_model(save_path, hp, DEVICE)
@@ -163,6 +163,9 @@ def run_lig_mask(
     attention_mask = enc["attention_mask"].to(DEVICE)
     attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
 
+    print()
+    print('baseline token: ', baseline_token_id)
+    print()
     baseline_ids = build_baseline_keep_tis_window(
         input_ids, baseline_token_id,
         keep_left_window=99, keep_right_window=102,
@@ -433,132 +436,130 @@ def run_lig_dinuc(
         relative_delta=relative_delta_mean,
     )
 
-NT_COLOR = {"A": "#e74c3c", "U": "#3498db", "G": "#2ecc71", "C": "#f39c12", "N": "#95a5a6"}
-
-def plot_attribution(
-    result: IGResult,
-    window: Optional[tuple] = None,
-    figsize: tuple = (16, 4),
-    ax_bar=None,
-    ax_seq=None,
-):
-    seq   = result.sequence
-    attrs = result.attributions.copy()
-    if window is not None:
-        s, e  = window
-        seq   = seq[s:e]
-        attrs = attrs[s:e]
-    mx = np.abs(attrs).max()
-    if mx > 0:
-        attrs = attrs / mx
-    pos    = np.arange(len(seq))
-    colors = ["#e74c3c" if v > 0 else "#2563eb" for v in attrs]
-    standalone = ax_bar is None
-    if standalone:
-        fig, (ax_bar, ax_seq) = plt.subplots(
-            2, 1, figsize=figsize,
-            gridspec_kw={"height_ratios": [4, 1]},
-            facecolor="#0d1117",
-        )
-    for ax in (ax_bar, ax_seq):
-        ax.set_facecolor("#0d1117")
-    ax_bar.bar(pos, attrs, color=colors, width=0.85, linewidth=0)
-    ax_bar.axhline(0, color="#30363d", lw=0.8)
-    ax_bar.set_xlim(-0.5, len(seq) - 0.5)
-    ax_bar.set_ylim(-1.2, 1.2)
-    ax_bar.set_ylabel("Attribution (norm.)", color="#8b949e", fontsize=9)
-    ax_bar.tick_params(colors="#8b949e")
-    for sp in ax_bar.spines.values():
-        sp.set_color("#30363d"); sp.set_linewidth(0.5)
-    delta_str = f"Δ={result.convergence_delta:.4f}" if not np.isnan(result.convergence_delta) else "Δ=n/a"
-    ax_bar.set_title(
-        f"reduction_method: {result.dimension_reduction}  |  baseline: {result.baseline_type}  |  P(TIS)={result.pred_prob:.3f}  |  {delta_str}",
-        color="#8b949e", fontsize=9, loc="right", pad=5,
-    )
-    ax_seq.set_facecolor("#0d1117")
-    ax_seq.set_xlim(-0.5, len(seq) - 0.5)
-    ax_seq.set_ylim(0, 1)
-    ax_seq.axis("off")
-    fs = max(5, min(11, 200 // len(seq)))
-    for i, nt in enumerate(seq):
-        ax_seq.text(
-            i, 0.5, nt, ha="center", va="center",
-            fontsize=fs, fontfamily="monospace", fontweight="bold",
-            color=NT_COLOR.get(nt, "#95a5a6"),
-        )
-    if standalone:
-        plt.tight_layout(h_pad=0)
-        return fig
-
-
-def save_ig_result(result: IGResult, path: str):
-    """marshal as json"""
-    data = {
-        "sequence":          result.sequence,
-        "attributions":      result.attributions.tolist(),
-        "pred_prob":         result.pred_prob,
-        "convergence_delta": result.convergence_delta if not np.isnan(result.convergence_delta) else None,
-        "baseline_type":     result.baseline_type,
-        "dim_reduction": result.dimension_reduction,
-        "baseline_logit": result.baseline_logit,
-        "score_diff": result.score_diff,
-        "relative_delta": result.relative_delta,
-    }
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a") as f:
-        # json.dump(data, f, indent=2)
-        f.write(json.dumps(data, ensure_ascii=False) + "\n")
-    print(f"saved → {path}")
-
-
-def load_ig_result(path: str) -> IGResult:
-    """load IGResult。"""
-    with open(path) as f:
-        data = json.load(f)
-    return IGResult(
-        sequence=          data["sequence"],
-        attributions=      np.array(data["attributions"]),
-        pred_prob=         data["pred_prob"],
-        convergence_delta= data["convergence_delta"] if data["convergence_delta"] is not None else float("nan"),
-        baseline_type=     data["baseline_type"],
-        dim_reduction=data["dim_reduction"],
-    )
-
 
 def main():
     # import sys
+    import pandas as pd
     # ── example usage (requires real model) ──────────────────────────────────────
     NEUTRAL_TOKEN_ID = tokenizer.mask_token_id
     # NEUTRAL_TOKEN_ID = 0  # for pad token
     # NEUTRAL_TOKEN_ID = 10   # for N token
     dim_reduction = 'sum'
     # seq = sys.argv[1]
-    seq = 'TATGAGTATAGATGAAGTATAGTAATAGTACTTAATATGTCGGATCCGTGCTATAAGCAATTTGGATTGTATGAAAAAATCTCTTAAATTTGATTGAAATATTATTCGTCCAATAATTATCAACTCAATACTAAATCGACCTATATCTAATTAATAATTTAACAAATTAATATTTTAAAAAATTGAAATATCAATAAGTCGAATCATTAAGCATAATTATCGGCCTATAAAAAAGATTTAGTCGTATTATCTGGAAAAGATTAAATAAATCCGGCGCCATATTCATAGTGATTTATGGCTGAAGCCCACACGTTATAACAACAACTACTCCATCAATGGAAGCTTCCATTTCTTGAATTTCTCAAACTCTTACTAAATTCAACTCCGGCGGTGGAACCCTTGTAATCTTCAACATATTTCGTTAATTAATTCTTATATACATATATATAAAGAAATTTGTTTTCTACTGCCGAAAGTTTCTTCTTCTCATCGGAGTAGATATGCCGAGCTTAATTGTCAAAGTTTACAGCTTACTCTTCAAGTATAACCTTAATCGCCGATTGCAATCACTAATCCAATCCCCAATTTCATACCCTTTTAACGGTGTCGTCTCACGCGCCGATGAATCGATTATCACTTCTAACCCTAGTTTCTCTACCGACGGTGTTGCAACTAAGGACCTGCATATTGATTCTTTGACTTGTCTATCTCTCAGGATTTACCTCCCTCAATCTGCACTTATTTCGTTGAGAAATTTGGAATCTGGTGAAGGGGTTTATGGGGGTTATGTACCGGGAAAAAATGGGAAAAATTGTAAGAAATTGCCGGTGATTTTGCAGTTTCATGGTGGTGCTTGGGTGACTGGGGGTATTGATACGGTTTCCAATGATGTTTTTTGTAGGAAATTGGCGAAATCTTGTGATGCTATTGTGATTGCTGTTGGGTATAGATTGGCACCGGAGAGTAGGTTTCCGGCTGCGTTTGAAGATGGGGTTGCGGCG'
+    # seq = 'TATGAGTATAGATGAAGTATAGTAATAGTACTTAATATGTCGGATCCGTGCTATAAGCAATTTGGATTGTATGAAAAAATCTCTTAAATTTGATTGAAATATTATTCGTCCAATAATTATCAACTCAATACTAAATCGACCTATATCTAATTAATAATTTAACAAATTAATATTTTAAAAAATTGAAATATCAATAAGTCGAATCATTAAGCATAATTATCGGCCTATAAAAAAGATTTAGTCGTATTATCTGGAAAAGATTAAATAAATCCGGCGCCATATTCATAGTGATTTATGGCTGAAGCCCACACGTTATAACAACAACTACTCCATCAATGGAAGCTTCCATTTCTTGAATTTCTCAAACTCTTACTAAATTCAACTCCGGCGGTGGAACCCTTGTAATCTTCAACATATTTCGTTAATTAATTCTTATATACATATATATAAAGAAATTTGTTTTCTACTGCCGAAAGTTTCTTCTTCTCATCGGAGTAGATATGCCGAGCTTAATTGTCAAAGTTTACAGCTTACTCTTCAAGTATAACCTTAATCGCCGATTGCAATCACTAATCCAATCCCCAATTTCATACCCTTTTAACGGTGTCGTCTCACGCGCCGATGAATCGATTATCACTTCTAACCCTAGTTTCTCTACCGACGGTGTTGCAACTAAGGACCTGCATATTGATTCTTTGACTTGTCTATCTCTCAGGATTTACCTCCCTCAATCTGCACTTATTTCGTTGAGAAATTTGGAATCTGGTGAAGGGGTTTATGGGGGTTATGTACCGGGAAAAAATGGGAAAAATTGTAAGAAATTGCCGGTGATTTTGCAGTTTCATGGTGGTGCTTGGGTGACTGGGGGTATTGATACGGTTTCCAATGATGTTTTTTGTAGGAAATTGGCGAAATCTTGTGATGCTATTGTGATTGCTGTTGGGTATAGATTGGCACCGGAGAGTAGGTTTCCGGCTGCGTTTGAAGATGGGGTTGCGGCG'
+    df_test = pd.read_csv('df_test_giga_1k-diff-201truncated.csv')
+    df_test["seq"] = [
+        centralize_transcript(hp["left_window"], hp["right_window"], s, p)
+        for s, p in zip(df_test["seq"].values, df_test["position"].values)    
+    ]
     
-    SAVE_DIR = "ig_data"
-    import os; os.makedirs(SAVE_DIR, exist_ok=True)
-    
-    # sanity check
-    sanity_check(seq, model, tokenizer,)
-    
-    # test convergency by mask token as baseline when step increasing
-    for n_steps in [64, 128, 256, 512, 1024, 2048]:
-        result = run_lig_mask(
-            seq, model, tokenizer,
-            n_steps=n_steps,
-            dim_reduction="sum",
-            baseline_token_id=NEUTRAL_TOKEN_ID,
-        )
-        print(
-            n_steps,
-            "delta=", result.convergence_delta,
-            "relative_delta=", result.relative_delta,
-            "score_diff=", result.score_diff,
-            flush=True,
-        )
+    # SAVE_DIR = "ig_data"
+    # import os; os.makedirs(SAVE_DIR, exist_ok=True)
         
-    print(f"ig run complete")
 
+    N_SAMPLES = 5
+    STEP_LIST = [64, 128, 512]
 
+    rows = []
+
+    # 建議先轉成 list，避免 pandas Series 被 random.sample 時出現 index 行為混淆
+    sampled_seqs = random.sample(list(df_test.seq), k=min(N_SAMPLES, len(df_test)))
+
+    for sample_id, seq in enumerate(sampled_seqs):
+        print(f"\n=== sample_id={sample_id} | seq_len={len(seq)} ===", flush=True)
+
+        # test convergency by mask token as baseline when step increasing
+        for n_steps in STEP_LIST:
+            print(f"running n_steps={n_steps}", flush=True)
+
+            try:
+                result = run_lig_mask(
+                    seq,
+                    model,
+                    tokenizer,
+                    n_steps=n_steps,
+                    dim_reduction="sum",
+                    baseline_token_id=NEUTRAL_TOKEN_ID,
+                )
+
+                rows.append({
+                    "sample_id": sample_id,
+                    "seq_len": len(seq),
+                    "n_steps": n_steps,
+                    "delta": result.convergence_delta,
+                    "abs_delta": abs(result.convergence_delta),
+                    "relative_delta": result.relative_delta,
+                    "score_diff": result.score_diff,
+                    "baseline_logit": result.baseline_logit,
+                    "pred_prob": result.pred_prob,
+                    "status": "ok",
+                    "error": "",
+                })
+
+                print(
+                    "sample_id=", sample_id,
+                    "n_steps=", n_steps,
+                    "delta=", result.convergence_delta,
+                    "abs_delta=", abs(result.convergence_delta),
+                    "relative_delta=", result.relative_delta,
+                    "score_diff=", result.score_diff,
+                    flush=True,
+                )
+
+            except Exception as e:
+                rows.append({
+                    "sample_id": sample_id,
+                    "seq_len": len(seq),
+                    "n_steps": n_steps,
+                    "delta": np.nan,
+                    "abs_delta": np.nan,
+                    "relative_delta": np.nan,
+                    "score_diff": np.nan,
+                    "baseline_logit": np.nan,
+                    "pred_prob": np.nan,
+                    "status": "error",
+                    "error": repr(e),
+                })
+
+                print(
+                    f"[error] sample_id={sample_id}, n_steps={n_steps}: {repr(e)}",
+                    flush=True,
+                )
+    # 每一筆原始結果
+    delta_df = pd.DataFrame(rows)
+
+    print("\n=== raw delta results ===")
+    print(delta_df.to_string(index=False))
+
+    # 只統計成功的結果
+    ok_df = delta_df[delta_df["status"] == "ok"].copy()
+
+    summary_df = (
+        ok_df
+        .groupby("n_steps")
+        .agg(
+            n=("relative_delta", "count"),
+
+            delta_median=("delta", "median"),
+            delta_pr50=("delta", lambda x: np.percentile(x, 50)),
+            delta_pr90=("delta", lambda x: np.percentile(x, 90)),
+
+            abs_delta_median=("abs_delta", "median"),
+            abs_delta_pr50=("abs_delta", lambda x: np.percentile(x, 50)),
+            abs_delta_pr90=("abs_delta", lambda x: np.percentile(x, 90)),
+
+            relative_delta_median=("relative_delta", "median"),
+            relative_delta_pr50=("relative_delta", lambda x: np.percentile(x, 50)),
+            relative_delta_pr90=("relative_delta", lambda x: np.percentile(x, 90)),
+
+            score_diff_median=("score_diff", "median"),
+            score_diff_pr50=("score_diff", lambda x: np.percentile(x, 50)),
+            score_diff_pr90=("score_diff", lambda x: np.percentile(x, 90)),
+        )
+        .reset_index()
+    )
+
+    print("\n=== delta convergence summary ===")
+    print(summary_df.to_string(index=False))
 if __name__ == '__main__':
     main()

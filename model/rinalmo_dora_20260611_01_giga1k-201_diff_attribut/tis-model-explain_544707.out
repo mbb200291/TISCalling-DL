@@ -1,0 +1,143 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:0
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 33295.56it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+pooler.dense.bias                   | MISSING    | 
+pooler.dense.weight                 | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260611_01_giga1k-201_diff_attribut/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+
+=== sample_id=0 | seq_len=1253 ===
+running n_steps=64
+logit: 5.629465103149414
+baseline_logit: -2.6445364952087402
+score_diff: 8.274002075195312
+delta: -8.141924858093262
+relative_delta: 0.9840371012687683
+sample_id= 0 n_steps= 64 delta= -8.141924858093262 abs_delta= 8.141924858093262 relative_delta= 0.9840371012687683 score_diff= 8.274002075195312
+running n_steps=128
+logit: 5.629465103149414
+baseline_logit: -2.6445364952087402
+score_diff: 8.274002075195312
+delta: -8.447575569152832
+relative_delta: 1.0209782123565674
+sample_id= 0 n_steps= 128 delta= -8.447575569152832 abs_delta= 8.447575569152832 relative_delta= 1.0209782123565674 score_diff= 8.274002075195312
+running n_steps=512
+logit: 5.629465103149414
+baseline_logit: -2.6445364952087402
+score_diff: 8.274002075195312
+delta: -13.625356674194336
+relative_delta: 1.6467673778533936
+sample_id= 0 n_steps= 512 delta= -13.625356674194336 abs_delta= 13.625356674194336 relative_delta= 1.6467673778533936 score_diff= 8.274002075195312
+
+=== sample_id=1 | seq_len=2733 ===
+running n_steps=64
+logit: 7.8224711418151855
+baseline_logit: -2.2131083011627197
+score_diff: 10.035579681396484
+delta: -9.407021522521973
+relative_delta: 0.9373670220375061
+sample_id= 1 n_steps= 64 delta= -9.407021522521973 abs_delta= 9.407021522521973 relative_delta= 0.9373670220375061 score_diff= 10.035579681396484
+running n_steps=128
+logit: 7.8224711418151855
+baseline_logit: -2.2131083011627197
+score_diff: 10.035579681396484
+delta: 1.4766674041748047
+relative_delta: 0.14714321494102478
+sample_id= 1 n_steps= 128 delta= 1.4766674041748047 abs_delta= 1.4766674041748047 relative_delta= 0.14714321494102478 score_diff= 10.035579681396484
+running n_steps=512
+logit: 7.8224711418151855
+baseline_logit: -2.2131083011627197
+score_diff: 10.035579681396484
+delta: -37.08763122558594
+relative_delta: 3.6956143379211426
+sample_id= 1 n_steps= 512 delta= -37.08763122558594 abs_delta= 37.08763122558594 relative_delta= 3.6956143379211426 score_diff= 10.035579681396484
+
+=== sample_id=2 | seq_len=2909 ===
+running n_steps=64
+logit: 7.587774753570557
+baseline_logit: -1.721160650253296
+score_diff: 9.308935165405273
+delta: -9.138748168945312
+relative_delta: 0.9817178845405579
+sample_id= 2 n_steps= 64 delta= -9.138748168945312 abs_delta= 9.138748168945312 relative_delta= 0.9817178845405579 score_diff= 9.308935165405273
+running n_steps=128
+logit: 7.587774753570557
+baseline_logit: -1.721160650253296
+score_diff: 9.308935165405273
+delta: -14.38322639465332
+relative_delta: 1.5450990200042725
+sample_id= 2 n_steps= 128 delta= -14.38322639465332 abs_delta= 14.38322639465332 relative_delta= 1.5450990200042725 score_diff= 9.308935165405273
+running n_steps=512
+logit: 7.587774753570557
+baseline_logit: -1.721160650253296
+score_diff: 9.308935165405273
+delta: -7.488819122314453
+relative_delta: 0.8044764399528503
+sample_id= 2 n_steps= 512 delta= -7.488819122314453 abs_delta= 7.488819122314453 relative_delta= 0.8044764399528503 score_diff= 9.308935165405273
+
+=== sample_id=3 | seq_len=1001 ===
+running n_steps=64
+logit: -4.376880168914795
+baseline_logit: -2.3893914222717285
+score_diff: -1.9874887466430664
+delta: 3.516326427459717
+relative_delta: 1.769230842590332
+sample_id= 3 n_steps= 64 delta= 3.516326427459717 abs_delta= 3.516326427459717 relative_delta= 1.769230842590332 score_diff= -1.9874887466430664
+running n_steps=128
+logit: -4.376880168914795
+baseline_logit: -2.3893914222717285
+score_diff: -1.9874887466430664
+delta: 4.747885227203369
+relative_delta: 2.3888866901397705
+sample_id= 3 n_steps= 128 delta= 4.747885227203369 abs_delta= 4.747885227203369 relative_delta= 2.3888866901397705 score_diff= -1.9874887466430664
+running n_steps=512
+logit: -4.376880168914795
+baseline_logit: -2.3893914222717285
+score_diff: -1.9874887466430664
+delta: -52.33748245239258
+relative_delta: 26.333473205566406
+sample_id= 3 n_steps= 512 delta= -52.33748245239258 abs_delta= 52.33748245239258 relative_delta= 26.333473205566406 score_diff= -1.9874887466430664
+
+=== sample_id=4 | seq_len=2181 ===
+running n_steps=64
+logit: 5.100030422210693
+baseline_logit: -2.774963140487671
+score_diff: 7.874993324279785
+delta: -10.693495750427246
+relative_delta: 1.357905387878418
+sample_id= 4 n_steps= 64 delta= -10.693495750427246 abs_delta= 10.693495750427246 relative_delta= 1.357905387878418 score_diff= 7.874993324279785
+running n_steps=128
+logit: 5.100030422210693
+baseline_logit: -2.774963140487671
+score_diff: 7.874993324279785
+delta: -13.29453182220459
+relative_delta: 1.6881959438323975
+sample_id= 4 n_steps= 128 delta= -13.29453182220459 abs_delta= 13.29453182220459 relative_delta= 1.6881959438323975 score_diff= 7.874993324279785
+running n_steps=512
+logit: 5.100030422210693
+baseline_logit: -2.774963140487671
+score_diff: 7.874993324279785
+delta: -20.489887237548828
+relative_delta: 2.6018927097320557
+sample_id= 4 n_steps= 512 delta= -20.489887237548828 abs_delta= 20.489887237548828 relative_delta= 2.6018927097320557 score_diff= 7.874993324279785

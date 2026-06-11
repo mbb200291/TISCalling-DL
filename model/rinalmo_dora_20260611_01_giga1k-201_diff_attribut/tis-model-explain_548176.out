@@ -1,0 +1,212 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:0
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 33910.15it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260611_01_giga1k-201_diff_attribut/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+
+=== sample_id=0 | seq_len=1253 ===
+running n_steps=64
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: 3.072681427001953
+relative_delta: 0.37136581540107727
+sample_id= 0 n_steps= 64 delta= 3.072681427001953 abs_delta= 3.072681427001953 relative_delta= 0.37136581540107727 score_diff= 8.274002075195312
+running n_steps=128
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -7.095860481262207
+relative_delta: 0.857609212398529
+sample_id= 0 n_steps= 128 delta= -7.095860481262207 abs_delta= 7.095860481262207 relative_delta= 0.857609212398529 score_diff= 8.274002075195312
+running n_steps=512
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -6.559700012207031
+relative_delta: 0.7928085923194885
+sample_id= 0 n_steps= 512 delta= -6.559700012207031 abs_delta= 6.559700012207031 relative_delta= 0.7928085923194885 score_diff= 8.274002075195312
+
+=== sample_id=1 | seq_len=2733 ===
+running n_steps=64
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -17.75094223022461
+relative_delta: 2.1693387031555176
+sample_id= 1 n_steps= 64 delta= -17.75094223022461 abs_delta= 17.75094223022461 relative_delta= 2.1693387031555176 score_diff= 8.18265151977539
+running n_steps=128
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -41.1309700012207
+relative_delta: 5.026606559753418
+sample_id= 1 n_steps= 128 delta= -41.1309700012207 abs_delta= 41.1309700012207 relative_delta= 5.026606559753418 score_diff= 8.18265151977539
+running n_steps=512
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -14.369400024414062
+relative_delta: 1.7560811042785645
+sample_id= 1 n_steps= 512 delta= -14.369400024414062 abs_delta= 14.369400024414062 relative_delta= 1.7560811042785645 score_diff= 8.18265151977539
+
+=== sample_id=2 | seq_len=2909 ===
+running n_steps=64
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: 19.0443115234375
+relative_delta: 2.595564126968384
+sample_id= 2 n_steps= 64 delta= 19.0443115234375 abs_delta= 19.0443115234375 relative_delta= 2.595564126968384 score_diff= 7.337253570556641
+running n_steps=128
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -4.895877361297607
+relative_delta: 0.6672629117965698
+sample_id= 2 n_steps= 128 delta= -4.895877361297607 abs_delta= 4.895877361297607 relative_delta= 0.6672629117965698 score_diff= 7.337253570556641
+running n_steps=512
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -5.8228230476379395
+relative_delta: 0.7935971021652222
+sample_id= 2 n_steps= 512 delta= -5.8228230476379395 abs_delta= 5.8228230476379395 relative_delta= 0.7935971021652222 score_diff= 7.337253570556641
+
+=== sample_id=3 | seq_len=1001 ===
+running n_steps=64
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: -8.02035140991211
+relative_delta: 4.035419464111328
+sample_id= 3 n_steps= 64 delta= -8.02035140991211 abs_delta= 8.02035140991211 relative_delta= 4.035419464111328 score_diff= -1.9874889850616455
+running n_steps=128
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: 2.7544751167297363
+relative_delta: 1.3859070539474487
+sample_id= 3 n_steps= 128 delta= 2.7544751167297363 abs_delta= 2.7544751167297363 relative_delta= 1.3859070539474487 score_diff= -1.9874889850616455
+running n_steps=512
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: 1.3068087100982666
+relative_delta: 0.6575174331665039
+sample_id= 3 n_steps= 512 delta= 1.3068087100982666 abs_delta= 1.3068087100982666 relative_delta= 0.6575174331665039 score_diff= -1.9874889850616455
+
+=== sample_id=4 | seq_len=2181 ===
+running n_steps=64
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: 32.827877044677734
+relative_delta: 4.140623569488525
+sample_id= 4 n_steps= 64 delta= 32.827877044677734 abs_delta= 32.827877044677734 relative_delta= 4.140623569488525 score_diff= 7.928244590759277
+running n_steps=128
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -0.3045535087585449
+relative_delta: 0.03841373696923256
+sample_id= 4 n_steps= 128 delta= -0.3045535087585449 abs_delta= 0.3045535087585449 relative_delta= 0.03841373696923256 score_diff= 7.928244590759277
+running n_steps=512
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -4.617668151855469
+relative_delta: 0.5824326276779175
+sample_id= 4 n_steps= 512 delta= -4.617668151855469 abs_delta= 4.617668151855469 relative_delta= 0.5824326276779175 score_diff= 7.928244590759277
+
+=== raw delta results ===
+ sample_id  seq_len  n_steps      delta  abs_delta  relative_delta  score_diff  baseline_logit  pred_prob status error
+         0     1253       64   3.072681   3.072681        0.371366    8.274002       -2.644537   0.996422     ok      
+         0     1253      128  -7.095860   7.095860        0.857609    8.274002       -2.644537   0.996422     ok      
+         0     1253      512  -6.559700   6.559700        0.792809    8.274002       -2.644537   0.996422     ok      
+         1     2733       64 -17.750942  17.750942        2.169339    8.182652       -0.360180   0.999600     ok      
+         1     2733      128 -41.130970  41.130970        5.026607    8.182652       -0.360180   0.999600     ok      
+         1     2733      512 -14.369400  14.369400        1.756081    8.182652       -0.360180   0.999600     ok      
+         2     2909       64  19.044312  19.044312        2.595564    7.337254        0.250521   0.999494     ok      
+         2     2909      128  -4.895877   4.895877        0.667263    7.337254        0.250521   0.999494     ok      
+         2     2909      512  -5.822823   5.822823        0.793597    7.337254        0.250521   0.999494     ok      
+         3     1001       64  -8.020351   8.020351        4.035419   -1.987489       -2.389391   0.012409     ok      
+         3     1001      128   2.754475   2.754475        1.385907   -1.987489       -2.389391   0.012409     ok      
+         3     1001      512   1.306809   1.306809        0.657517   -1.987489       -2.389391   0.012409     ok      
+         4     2181       64  32.827877  32.827877        4.140624    7.928245       -2.828214   0.993940     ok      
+         4     2181      128  -0.304554   0.304554        0.038414    7.928245       -2.828214   0.993940     ok      
+         4     2181      512  -4.617668   4.617668        0.582433    7.928245       -2.828214   0.993940     ok      
+
+=== delta convergence summary ===
+ n_steps  n  delta_median  delta_pr50  delta_pr90  abs_delta_median  abs_delta_pr50  abs_delta_pr90  relative_delta_median  relative_delta_pr50  relative_delta_pr90  score_diff_median  score_diff_pr50  score_diff_pr90
+      64  5      3.072681    3.072681   27.314451         17.750942       17.750942       27.314451               2.595564             2.595564             4.098542           7.928245         7.928245         8.237462
+     128  5     -4.895877   -4.895877    1.530864          4.895877        4.895877       27.516926               0.857609             0.857609             3.570327           7.928245         7.928245         8.237462
+     512  5     -5.822823   -5.822823   -1.062982          5.822823        5.822823       11.245520               0.792809             0.792809             1.371088           7.928245         7.928245         8.237462

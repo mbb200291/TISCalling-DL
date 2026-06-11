@@ -31,3 +31,62 @@ embedding_layer: Embedding(26, 1280, padding_idx=0)
 [backward hook] grad output norm: 0.019756633788347244
 forward called: True
 backward grad exists: True
+
+By Di-nt shuffle ================
+
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: 2.128422
+delta_abs_mean: 10.288526
+delta_abs_min: 0.931637
+delta_abs_max: 26.663950
+relative_delta_mean: 0.536953
+relative_delta_min: 0.049314
+relative_delta_max: 1.362226
+64 delta= 2.1284223556518556 relative_delta= 0.536952729523182 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -5.144881
+delta_abs_mean: 15.732383
+delta_abs_min: 3.094654
+delta_abs_max: 31.355225
+relative_delta_mean: 0.822359
+relative_delta_min: 0.158102
+relative_delta_max: 1.650903
+128 delta= -5.144881343841552 relative_delta= 0.822358900308609 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -7.701507
+delta_abs_mean: 11.023507
+delta_abs_min: 3.760988
+delta_abs_max: 22.427635
+relative_delta_mean: 0.578985
+relative_delta_min: 0.195697
+relative_delta_max: 1.132911
+256 delta= -7.701506614685059 relative_delta= 0.5789848208427429 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: -0.123545
+delta_abs_mean: 6.433040
+delta_abs_min: 0.986362
+delta_abs_max: 14.989674
+relative_delta_mean: 0.337792
+relative_delta_min: 0.051934
+relative_delta_max: 0.796654
+512 delta= -0.12354450225830078 relative_delta= 0.3377922963351011 score_diff= 19.086351203918458
+logit: 7.236681
+baseline_logit_mean: -11.849670
+score_diff_mean: 19.086351
+delta_mean: 0.983905
+delta_abs_mean: 4.999814
+delta_abs_min: 0.278513
+delta_abs_max: 13.208435
+relative_delta_mean: 0.262103
+relative_delta_min: 0.014802
+relative_delta_max: 0.695445
+1024 delta= 0.9839045524597168 relative_delta= 0.26210279958322646 score_diff= 19.086351203918458
+ig run complete

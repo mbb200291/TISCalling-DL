@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+import sys
+import pandas as pd
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Optional
@@ -9,7 +9,7 @@ import json
 from ushuffle import Shuffler, set_seed
 
 from main import *
-from main import _tokenizer, _PAD_ID
+from main import _tokenizer, _PAD_ID, centralize_transcript, DEVICE, hyperparameters_queryer, load_model
 
 # # ── plug in your model ────────────────────────────────────────────────────────
 # DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -28,7 +28,9 @@ RINALMO_MODEL_ID = "multimolecule/rinalmo-giga"
 tokenizer = _tokenizer
 
 # ── model ─────────────────────────────────────────────────────────────────────
-save_path = r'model.pt'
+# save_path = r'model.pt'
+save_path = r'model_1k.pt'
+# save_path = sys.argv[1]
 hp = hyperparameters_queryer()
 
 model = load_model(save_path, hp, DEVICE)
@@ -89,6 +91,7 @@ def build_baseline_keep_tis_window(
 
     return baseline
 
+
 # ── IGResult ─────────────────────────────────────────────────────────────────────
 
 @dataclass
@@ -103,47 +106,6 @@ class IGResult:
     score_diff: float
     relative_delta: float
 
-def sanity_check(
-        sequence: str,
-    model,
-    tokenizer,
-):
-    enc = tokenizer(sequence, return_tensors="pt", padding=False, truncation=True)
-    input_ids      = enc["input_ids"].to(DEVICE)
-    attention_mask = enc["attention_mask"].to(DEVICE)
-    attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
-
-    # sanity check
-    embedding_layer = model.backbone.base_model.model.embeddings.word_embeddings
-
-    print("embedding_layer:", embedding_layer, flush=True)
-
-    called = {"fwd": False}
-    grads = {}
-
-    def fwd_hook(module, inputs, output):
-        called["fwd"] = True
-        print("[forward hook] embedding output:", output.shape)
-
-    def bwd_hook(module, grad_input, grad_output):
-        grads["bwd"] = grad_output[0]
-        print("[backward hook] grad output norm:", grad_output[0].norm().item())
-
-    h1 = embedding_layer.register_forward_hook(fwd_hook)
-    h2 = embedding_layer.register_full_backward_hook(bwd_hook)
-
-    model.zero_grad(set_to_none=True)
-
-    logit = model(input_ids, attention_mask=attention_mask).squeeze()
-    logit.backward()
-
-    h1.remove()
-    h2.remove()
-
-    print("forward called:", called["fwd"], flush=True)
-    print("backward grad exists:", "bwd" in grads, flush=True)
-
-    
 def run_lig_mask(
     sequence: str,
     model,
@@ -166,7 +128,8 @@ def run_lig_mask(
     baseline_ids = build_baseline_keep_tis_window(
         input_ids, baseline_token_id,
         keep_left_window=99, keep_right_window=102,
-        tis_position=500,)
+        tis_position=500,
+        )
 
     forward_func = make_forward_func(model, attention_mask)
 
@@ -526,37 +489,37 @@ def load_ig_result(path: str) -> IGResult:
 
 
 def main():
-    # import sys
+    import sys
     # ── example usage (requires real model) ──────────────────────────────────────
     NEUTRAL_TOKEN_ID = tokenizer.mask_token_id
     # NEUTRAL_TOKEN_ID = 0  # for pad token
     # NEUTRAL_TOKEN_ID = 10   # for N token
     dim_reduction = 'sum'
-    # seq = sys.argv[1]
-    seq = 'TATGAGTATAGATGAAGTATAGTAATAGTACTTAATATGTCGGATCCGTGCTATAAGCAATTTGGATTGTATGAAAAAATCTCTTAAATTTGATTGAAATATTATTCGTCCAATAATTATCAACTCAATACTAAATCGACCTATATCTAATTAATAATTTAACAAATTAATATTTTAAAAAATTGAAATATCAATAAGTCGAATCATTAAGCATAATTATCGGCCTATAAAAAAGATTTAGTCGTATTATCTGGAAAAGATTAAATAAATCCGGCGCCATATTCATAGTGATTTATGGCTGAAGCCCACACGTTATAACAACAACTACTCCATCAATGGAAGCTTCCATTTCTTGAATTTCTCAAACTCTTACTAAATTCAACTCCGGCGGTGGAACCCTTGTAATCTTCAACATATTTCGTTAATTAATTCTTATATACATATATATAAAGAAATTTGTTTTCTACTGCCGAAAGTTTCTTCTTCTCATCGGAGTAGATATGCCGAGCTTAATTGTCAAAGTTTACAGCTTACTCTTCAAGTATAACCTTAATCGCCGATTGCAATCACTAATCCAATCCCCAATTTCATACCCTTTTAACGGTGTCGTCTCACGCGCCGATGAATCGATTATCACTTCTAACCCTAGTTTCTCTACCGACGGTGTTGCAACTAAGGACCTGCATATTGATTCTTTGACTTGTCTATCTCTCAGGATTTACCTCCCTCAATCTGCACTTATTTCGTTGAGAAATTTGGAATCTGGTGAAGGGGTTTATGGGGGTTATGTACCGGGAAAAAATGGGAAAAATTGTAAGAAATTGCCGGTGATTTTGCAGTTTCATGGTGGTGCTTGGGTGACTGGGGGTATTGATACGGTTTCCAATGATGTTTTTTGTAGGAAATTGGCGAAATCTTGTGATGCTATTGTGATTGCTGTTGGGTATAGATTGGCACCGGAGAGTAGGTTTCCGGCTGCGTTTGAAGATGGGGTTGCGGCG'
     
-    SAVE_DIR = "ig_data"
+    SAVE_DIR = "ig_data_201_baseline"
     import os; os.makedirs(SAVE_DIR, exist_ok=True)
     
-    # sanity check
-    sanity_check(seq, model, tokenizer,)
     
-    # test convergency by mask token as baseline when step increasing
-    for n_steps in [64, 128, 256, 512, 1024, 2048]:
-        result = run_lig_mask(
-            seq, model, tokenizer,
-            n_steps=n_steps,
-            dim_reduction="sum",
-            baseline_token_id=NEUTRAL_TOKEN_ID,
-        )
-        print(
-            n_steps,
-            "delta=", result.convergence_delta,
-            "relative_delta=", result.relative_delta,
-            "score_diff=", result.score_diff,
-            flush=True,
+    df_test = pd.read_csv('df_test_giga_1k-diff-201truncated.csv')
+    df_test["seq"] = [
+        centralize_transcript(hp["left_window"], hp["right_window"], s, p)
+        for s, p in zip(df_test["seq"].values, df_test["position"].values)    
+    ]
+    c = 0
+    for s in df_test.seq:
+        c += 1
+        print(str(c) + ' -------------------------------', flush=True)
+        lig_result = run_lig_mask(
+            s, model, tokenizer, NEUTRAL_TOKEN_ID,
+            n_steps=4096,
+            dim_reduction=dim_reduction
         )
         
+        # print(f"P(TIS) = {lig_result.pred_prob:.4f}  |  Δ_conv = {lig_result.convergence_delta:.5f}")
+
+        save_ig_result(lig_result, os.path.join(SAVE_DIR, "df_test_lig_results.jsonl"))
+
+
     print(f"ig run complete")
 
 
