@@ -8,4 +8,5 @@ source $HOME/miniconda3/etc/profile.d/conda.sh
 
 conda activate TIScalling
 
+# make prediction on sequence truncated to central 201nt region
 python inference-201truncated.py

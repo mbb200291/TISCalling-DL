@@ -457,12 +457,13 @@ def main():
     # import os; os.makedirs(SAVE_DIR, exist_ok=True)
         
 
-    N_SAMPLES = 5
-    STEP_LIST = [64, 128, 512]
+    N_SAMPLES = 10
+    # STEP_LIST = [64, 128, 512]
+    # STEP_LIST = [1024, 2048, 4096]
+    STEP_LIST = [10, 50, 250, 500, 1000, 1500]
 
     rows = []
 
-    # 建議先轉成 list，避免 pandas Series 被 random.sample 時出現 index 行為混淆
     sampled_seqs = random.sample(list(df_test.seq), k=min(N_SAMPLES, len(df_test)))
 
     for sample_id, seq in enumerate(sampled_seqs):
@@ -525,13 +526,11 @@ def main():
                     f"[error] sample_id={sample_id}, n_steps={n_steps}: {repr(e)}",
                     flush=True,
                 )
-    # 每一筆原始結果
     delta_df = pd.DataFrame(rows)
 
     print("\n=== raw delta results ===")
     print(delta_df.to_string(index=False))
 
-    # 只統計成功的結果
     ok_df = delta_df[delta_df["status"] == "ok"].copy()
 
     summary_df = (
@@ -540,21 +539,29 @@ def main():
         .agg(
             n=("relative_delta", "count"),
 
+            delta_min=("delta", "min"),
             delta_median=("delta", "median"),
-            delta_pr50=("delta", lambda x: np.percentile(x, 50)),
-            delta_pr90=("delta", lambda x: np.percentile(x, 90)),
+            delta_pr60=("delta", lambda x: np.percentile(x, 60)),
+            delta_pr80=("delta", lambda x: np.percentile(x, 80)),
+            delta_max=("delta", "max"),
 
+            abs_delta_min=("abs_delta", "min"),
             abs_delta_median=("abs_delta", "median"),
-            abs_delta_pr50=("abs_delta", lambda x: np.percentile(x, 50)),
-            abs_delta_pr90=("abs_delta", lambda x: np.percentile(x, 90)),
+            abs_delta_pr60=("abs_delta", lambda x: np.percentile(x, 60)),
+            abs_delta_pr80=("abs_delta", lambda x: np.percentile(x, 80)),
+            abs_delta_max=("abs_delta", 'max'),
 
+            relative_delta_min=("relative_delta", "min"),
             relative_delta_median=("relative_delta", "median"),
-            relative_delta_pr50=("relative_delta", lambda x: np.percentile(x, 50)),
-            relative_delta_pr90=("relative_delta", lambda x: np.percentile(x, 90)),
+            relative_delta_pr60=("relative_delta", lambda x: np.percentile(x, 60)),
+            relative_delta_pr80=("relative_delta", lambda x: np.percentile(x, 80)),
+            relative_delta_max=("relative_delta", 'max'),
 
+            score_diff_min=("score_diff", "min"),
             score_diff_median=("score_diff", "median"),
-            score_diff_pr50=("score_diff", lambda x: np.percentile(x, 50)),
-            score_diff_pr90=("score_diff", lambda x: np.percentile(x, 90)),
+            score_diff_pr60=("score_diff", lambda x: np.percentile(x, 60)),
+            score_diff_pr80=("score_diff", lambda x: np.percentile(x, 80)),
+            score_diff_max=("score_diff", "max"),
         )
         .reset_index()
     )

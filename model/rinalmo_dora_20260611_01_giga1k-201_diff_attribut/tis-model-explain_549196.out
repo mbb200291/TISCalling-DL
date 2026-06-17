@@ -1,0 +1,720 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:1
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:1
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 34573.02it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260611_01_giga1k-201_diff_attribut/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+
+=== sample_id=0 | seq_len=1253 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -43.052459716796875
+relative_delta: 5.203341484069824
+sample_id= 0 n_steps= 10 delta= -43.052459716796875 abs_delta= 43.052459716796875 relative_delta= 5.203341484069824 score_diff= 8.274002075195312
+running n_steps=50
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: 19.58966064453125
+relative_delta: 2.3676161766052246
+sample_id= 0 n_steps= 50 delta= 19.58966064453125 abs_delta= 19.58966064453125 relative_delta= 2.3676161766052246 score_diff= 8.274002075195312
+running n_steps=250
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -6.623723030090332
+relative_delta: 0.8005464673042297
+sample_id= 0 n_steps= 250 delta= -6.623723030090332 abs_delta= 6.623723030090332 relative_delta= 0.8005464673042297 score_diff= 8.274002075195312
+running n_steps=500
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: 3.731149673461914
+relative_delta: 0.4509485960006714
+sample_id= 0 n_steps= 500 delta= 3.731149673461914 abs_delta= 3.731149673461914 relative_delta= 0.4509485960006714 score_diff= 8.274002075195312
+running n_steps=1000
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -1.6581177711486816
+relative_delta: 0.2004009336233139
+sample_id= 0 n_steps= 1000 delta= -1.6581177711486816 abs_delta= 1.6581177711486816 relative_delta= 0.2004009336233139 score_diff= 8.274002075195312
+running n_steps=1500
+
+baseline token:  4
+
+logit: 5.629465103149414
+baseline_logit: -2.6445367336273193
+score_diff: 8.274002075195312
+delta: -0.2396411895751953
+relative_delta: 0.028963152319192886
+sample_id= 0 n_steps= 1500 delta= -0.2396411895751953 abs_delta= 0.2396411895751953 relative_delta= 0.028963152319192886 score_diff= 8.274002075195312
+
+=== sample_id=1 | seq_len=2733 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: 0.7407646179199219
+relative_delta: 0.09052867442369461
+sample_id= 1 n_steps= 10 delta= 0.7407646179199219 abs_delta= 0.7407646179199219 relative_delta= 0.09052867442369461 score_diff= 8.18265151977539
+running n_steps=50
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: 33.17826843261719
+relative_delta: 4.054708480834961
+sample_id= 1 n_steps= 50 delta= 33.17826843261719 abs_delta= 33.17826843261719 relative_delta= 4.054708480834961 score_diff= 8.18265151977539
+running n_steps=250
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -4.99435567855835
+relative_delta: 0.6103590726852417
+sample_id= 1 n_steps= 250 delta= -4.99435567855835 abs_delta= 4.99435567855835 relative_delta= 0.6103590726852417 score_diff= 8.18265151977539
+running n_steps=500
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: 5.392014503479004
+relative_delta: 0.6589568853378296
+sample_id= 1 n_steps= 500 delta= 5.392014503479004 abs_delta= 5.392014503479004 relative_delta= 0.6589568853378296 score_diff= 8.18265151977539
+running n_steps=1000
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -15.225249290466309
+relative_delta: 1.860674262046814
+sample_id= 1 n_steps= 1000 delta= -15.225249290466309 abs_delta= 15.225249290466309 relative_delta= 1.860674262046814 score_diff= 8.18265151977539
+running n_steps=1500
+
+baseline token:  4
+
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -7.094760894775391
+relative_delta: 0.8670491576194763
+sample_id= 1 n_steps= 1500 delta= -7.094760894775391 abs_delta= 7.094760894775391 relative_delta= 0.8670491576194763 score_diff= 8.18265151977539
+
+=== sample_id=2 | seq_len=2909 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -3.7483978271484375
+relative_delta: 0.5108720660209656
+sample_id= 2 n_steps= 10 delta= -3.7483978271484375 abs_delta= 3.7483978271484375 relative_delta= 0.5108720660209656 score_diff= 7.337253570556641
+running n_steps=50
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -15.714509010314941
+relative_delta: 2.141742706298828
+sample_id= 2 n_steps= 50 delta= -15.714509010314941 abs_delta= 15.714509010314941 relative_delta= 2.141742706298828 score_diff= 7.337253570556641
+running n_steps=250
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -7.810035705566406
+relative_delta: 1.0644358396530151
+sample_id= 2 n_steps= 250 delta= -7.810035705566406 abs_delta= 7.810035705566406 relative_delta= 1.0644358396530151 score_diff= 7.337253570556641
+running n_steps=500
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: 1.473897933959961
+relative_delta: 0.20087869465351105
+sample_id= 2 n_steps= 500 delta= 1.473897933959961 abs_delta= 1.473897933959961 relative_delta= 0.20087869465351105 score_diff= 7.337253570556641
+running n_steps=1000
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -8.553628921508789
+relative_delta: 1.165780782699585
+sample_id= 2 n_steps= 1000 delta= -8.553628921508789 abs_delta= 8.553628921508789 relative_delta= 1.165780782699585 score_diff= 7.337253570556641
+running n_steps=1500
+
+baseline token:  4
+
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -0.8956298828125
+relative_delta: 0.12206609547138214
+sample_id= 2 n_steps= 1500 delta= -0.8956298828125 abs_delta= 0.8956298828125 relative_delta= 0.12206609547138214 score_diff= 7.337253570556641
+
+=== sample_id=3 | seq_len=1001 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: 32.341426849365234
+relative_delta: 16.272506713867188
+sample_id= 3 n_steps= 10 delta= 32.341426849365234 abs_delta= 32.341426849365234 relative_delta= 16.272506713867188 score_diff= -1.9874889850616455
+running n_steps=50
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: -1.9115064144134521
+relative_delta: 0.9617695808410645
+sample_id= 3 n_steps= 50 delta= -1.9115064144134521 abs_delta= 1.9115064144134521 relative_delta= 0.9617695808410645 score_diff= -1.9874889850616455
+running n_steps=250
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: 1.5952908992767334
+relative_delta: 0.8026665449142456
+sample_id= 3 n_steps= 250 delta= 1.5952908992767334 abs_delta= 1.5952908992767334 relative_delta= 0.8026665449142456 score_diff= -1.9874889850616455
+running n_steps=500
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: -11.341529846191406
+relative_delta: 5.7064619064331055
+sample_id= 3 n_steps= 500 delta= -11.341529846191406 abs_delta= 11.341529846191406 relative_delta= 5.7064619064331055 score_diff= -1.9874889850616455
+running n_steps=1000
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: 4.512528419494629
+relative_delta: 2.2704670429229736
+sample_id= 3 n_steps= 1000 delta= 4.512528419494629 abs_delta= 4.512528419494629 relative_delta= 2.2704670429229736 score_diff= -1.9874889850616455
+running n_steps=1500
+
+baseline token:  4
+
+logit: -4.376880168914795
+baseline_logit: -2.3893911838531494
+score_diff: -1.9874889850616455
+delta: -5.268823623657227
+relative_delta: 2.6509950160980225
+sample_id= 3 n_steps= 1500 delta= -5.268823623657227 abs_delta= 5.268823623657227 relative_delta= 2.6509950160980225 score_diff= -1.9874889850616455
+
+=== sample_id=4 | seq_len=2181 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -3.636366844177246
+relative_delta: 0.4586597681045532
+sample_id= 4 n_steps= 10 delta= -3.636366844177246 abs_delta= 3.636366844177246 relative_delta= 0.4586597681045532 score_diff= 7.928244590759277
+running n_steps=50
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -9.896207809448242
+relative_delta: 1.248221755027771
+sample_id= 4 n_steps= 50 delta= -9.896207809448242 abs_delta= 9.896207809448242 relative_delta= 1.248221755027771 score_diff= 7.928244590759277
+running n_steps=250
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -6.947056770324707
+relative_delta: 0.8762415051460266
+sample_id= 4 n_steps= 250 delta= -6.947056770324707 abs_delta= 6.947056770324707 relative_delta= 0.8762415051460266 score_diff= 7.928244590759277
+running n_steps=500
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: 10.211573600769043
+relative_delta: 1.2879992723464966
+sample_id= 4 n_steps= 500 delta= 10.211573600769043 abs_delta= 10.211573600769043 relative_delta= 1.2879992723464966 score_diff= 7.928244590759277
+running n_steps=1000
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -8.698503494262695
+relative_delta: 1.0971537828445435
+sample_id= 4 n_steps= 1000 delta= -8.698503494262695 abs_delta= 8.698503494262695 relative_delta= 1.0971537828445435 score_diff= 7.928244590759277
+running n_steps=1500
+
+baseline token:  4
+
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -6.526113033294678
+relative_delta: 0.8231472969055176
+sample_id= 4 n_steps= 1500 delta= -6.526113033294678 abs_delta= 6.526113033294678 relative_delta= 0.8231472969055176 score_diff= 7.928244590759277
+
+=== sample_id=5 | seq_len=1901 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: -62.09706115722656
+relative_delta: 41.906375885009766
+sample_id= 5 n_steps= 10 delta= -62.09706115722656 abs_delta= 62.09706115722656 relative_delta= 41.906375885009766 score_diff= 1.481804609298706
+running n_steps=50
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: 15.878495216369629
+relative_delta: 10.715646743774414
+sample_id= 5 n_steps= 50 delta= 15.878495216369629 abs_delta= 15.878495216369629 relative_delta= 10.715646743774414 score_diff= 1.481804609298706
+running n_steps=250
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: -16.164514541625977
+relative_delta: 10.90866756439209
+sample_id= 5 n_steps= 250 delta= -16.164514541625977 abs_delta= 16.164514541625977 relative_delta= 10.90866756439209 score_diff= 1.481804609298706
+running n_steps=500
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: 3.9685285091400146
+relative_delta: 2.6781725883483887
+sample_id= 5 n_steps= 500 delta= 3.9685285091400146 abs_delta= 3.9685285091400146 relative_delta= 2.6781725883483887 score_diff= 1.481804609298706
+running n_steps=1000
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: -5.429289817810059
+relative_delta: 3.663971424102783
+sample_id= 5 n_steps= 1000 delta= -5.429289817810059 abs_delta= 5.429289817810059 relative_delta= 3.663971424102783 score_diff= 1.481804609298706
+running n_steps=1500
+
+baseline token:  4
+
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: -0.026094913482666016
+relative_delta: 0.017610225826501846
+sample_id= 5 n_steps= 1500 delta= -0.026094913482666016 abs_delta= 0.026094913482666016 relative_delta= 0.017610225826501846 score_diff= 1.481804609298706
+
+=== sample_id=6 | seq_len=1825 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: 48.001922607421875
+relative_delta: 7.97239875793457
+sample_id= 6 n_steps= 10 delta= 48.001922607421875 abs_delta= 48.001922607421875 relative_delta= 7.97239875793457 score_diff= 6.0210137367248535
+running n_steps=50
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: -14.448205947875977
+relative_delta: 2.399630069732666
+sample_id= 6 n_steps= 50 delta= -14.448205947875977 abs_delta= 14.448205947875977 relative_delta= 2.399630069732666 score_diff= 6.0210137367248535
+running n_steps=250
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: -4.176735877990723
+relative_delta: 0.6936931610107422
+sample_id= 6 n_steps= 250 delta= -4.176735877990723 abs_delta= 4.176735877990723 relative_delta= 0.6936931610107422 score_diff= 6.0210137367248535
+running n_steps=500
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: -5.6659770011901855
+relative_delta: 0.9410337209701538
+sample_id= 6 n_steps= 500 delta= -5.6659770011901855 abs_delta= 5.6659770011901855 relative_delta= 0.9410337209701538 score_diff= 6.0210137367248535
+running n_steps=1000
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: 10.628965377807617
+relative_delta: 1.765311598777771
+sample_id= 6 n_steps= 1000 delta= 10.628965377807617 abs_delta= 10.628965377807617 relative_delta= 1.765311598777771 score_diff= 6.0210137367248535
+running n_steps=1500
+
+baseline token:  4
+
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: -5.442695140838623
+relative_delta: 0.9039499759674072
+sample_id= 6 n_steps= 1500 delta= -5.442695140838623 abs_delta= 5.442695140838623 relative_delta= 0.9039499759674072 score_diff= 6.0210137367248535
+
+=== sample_id=7 | seq_len=2905 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: -75.86178588867188
+relative_delta: 8.260533332824707
+sample_id= 7 n_steps= 10 delta= -75.86178588867188 abs_delta= 75.86178588867188 relative_delta= 8.260533332824707 score_diff= 9.183642387390137
+running n_steps=50
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: 0.5315732955932617
+relative_delta: 0.05788262188434601
+sample_id= 7 n_steps= 50 delta= 0.5315732955932617 abs_delta= 0.5315732955932617 relative_delta= 0.05788262188434601 score_diff= 9.183642387390137
+running n_steps=250
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: -31.113014221191406
+relative_delta: 3.3878729343414307
+sample_id= 7 n_steps= 250 delta= -31.113014221191406 abs_delta= 31.113014221191406 relative_delta= 3.3878729343414307 score_diff= 9.183642387390137
+running n_steps=500
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: -2.1396517753601074
+relative_delta: 0.23298509418964386
+sample_id= 7 n_steps= 500 delta= -2.1396517753601074 abs_delta= 2.1396517753601074 relative_delta= 0.23298509418964386 score_diff= 9.183642387390137
+running n_steps=1000
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: -2.0717687606811523
+relative_delta: 0.22559335827827454
+sample_id= 7 n_steps= 1000 delta= -2.0717687606811523 abs_delta= 2.0717687606811523 relative_delta= 0.22559335827827454 score_diff= 9.183642387390137
+running n_steps=1500
+
+baseline token:  4
+
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: 0.37760448455810547
+relative_delta: 0.041117072105407715
+sample_id= 7 n_steps= 1500 delta= 0.37760448455810547 abs_delta= 0.37760448455810547 relative_delta= 0.041117072105407715 score_diff= 9.183642387390137
+
+=== sample_id=8 | seq_len=2525 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: -20.041889190673828
+relative_delta: 11.733138084411621
+sample_id= 8 n_steps= 10 delta= -20.041889190673828 abs_delta= 20.041889190673828 relative_delta= 11.733138084411621 score_diff= 1.708143949508667
+running n_steps=50
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: -9.148520469665527
+relative_delta: 5.355825424194336
+sample_id= 8 n_steps= 50 delta= -9.148520469665527 abs_delta= 9.148520469665527 relative_delta= 5.355825424194336 score_diff= 1.708143949508667
+running n_steps=250
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: 11.06955623626709
+relative_delta: 6.480458736419678
+sample_id= 8 n_steps= 250 delta= 11.06955623626709 abs_delta= 11.06955623626709 relative_delta= 6.480458736419678 score_diff= 1.708143949508667
+running n_steps=500
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: -3.022620677947998
+relative_delta: 1.7695350646972656
+sample_id= 8 n_steps= 500 delta= -3.022620677947998 abs_delta= 3.022620677947998 relative_delta= 1.7695350646972656 score_diff= 1.708143949508667
+running n_steps=1000
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: 0.9960048198699951
+relative_delta: 0.5830918550491333
+sample_id= 8 n_steps= 1000 delta= 0.9960048198699951 abs_delta= 0.9960048198699951 relative_delta= 0.5830918550491333 score_diff= 1.708143949508667
+running n_steps=1500
+
+baseline token:  4
+
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: -2.259601593017578
+relative_delta: 1.3228402137756348
+sample_id= 8 n_steps= 1500 delta= -2.259601593017578 abs_delta= 2.259601593017578 relative_delta= 1.3228402137756348 score_diff= 1.708143949508667
+
+=== sample_id=9 | seq_len=2633 ===
+running n_steps=10
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: -12.26175594329834
+relative_delta: 3.7348644733428955
+sample_id= 9 n_steps= 10 delta= -12.26175594329834 abs_delta= 12.26175594329834 relative_delta= 3.7348644733428955 score_diff= -3.283052444458008
+running n_steps=50
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: 2.1455893516540527
+relative_delta: 0.6535348892211914
+sample_id= 9 n_steps= 50 delta= 2.1455893516540527 abs_delta= 2.1455893516540527 relative_delta= 0.6535348892211914 score_diff= -3.283052444458008
+running n_steps=250
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: -1.3960180282592773
+relative_delta: 0.4252195358276367
+sample_id= 9 n_steps= 250 delta= -1.3960180282592773 abs_delta= 1.3960180282592773 relative_delta= 0.4252195358276367 score_diff= -3.283052444458008
+running n_steps=500
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: -3.4081807136535645
+relative_delta: 1.0381133556365967
+sample_id= 9 n_steps= 500 delta= -3.4081807136535645 abs_delta= 3.4081807136535645 relative_delta= 1.0381133556365967 score_diff= -3.283052444458008
+running n_steps=1000
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: -2.167130470275879
+relative_delta: 0.6600962281227112
+sample_id= 9 n_steps= 1000 delta= -2.167130470275879 abs_delta= 2.167130470275879 relative_delta= 0.6600962281227112 score_diff= -3.283052444458008
+running n_steps=1500
+
+baseline token:  4
+
+logit: -4.1078362464904785
+baseline_logit: -0.8247839212417603
+score_diff: -3.283052444458008
+delta: -1.712395191192627
+relative_delta: 0.5215862989425659
+sample_id= 9 n_steps= 1500 delta= -1.712395191192627 abs_delta= 1.712395191192627 relative_delta= 0.5215862989425659 score_diff= -3.283052444458008
+
+=== raw delta results ===
+ sample_id  seq_len  n_steps      delta  abs_delta  relative_delta  score_diff  baseline_logit  pred_prob status error
+         0     1253       10 -43.052460  43.052460        5.203341    8.274002       -2.644537   0.996422     ok      
+         0     1253       50  19.589661  19.589661        2.367616    8.274002       -2.644537   0.996422     ok      
+         0     1253      250  -6.623723   6.623723        0.800546    8.274002       -2.644537   0.996422     ok      
+         0     1253      500   3.731150   3.731150        0.450949    8.274002       -2.644537   0.996422     ok      
+         0     1253     1000  -1.658118   1.658118        0.200401    8.274002       -2.644537   0.996422     ok      
+         0     1253     1500  -0.239641   0.239641        0.028963    8.274002       -2.644537   0.996422     ok      
+         1     2733       10   0.740765   0.740765        0.090529    8.182652       -0.360180   0.999600     ok      
+         1     2733       50  33.178268  33.178268        4.054708    8.182652       -0.360180   0.999600     ok      
+         1     2733      250  -4.994356   4.994356        0.610359    8.182652       -0.360180   0.999600     ok      
+         1     2733      500   5.392015   5.392015        0.658957    8.182652       -0.360180   0.999600     ok      
+         1     2733     1000 -15.225249  15.225249        1.860674    8.182652       -0.360180   0.999600     ok      
+         1     2733     1500  -7.094761   7.094761        0.867049    8.182652       -0.360180   0.999600     ok      
+         2     2909       10  -3.748398   3.748398        0.510872    7.337254        0.250521   0.999494     ok      
+         2     2909       50 -15.714509  15.714509        2.141743    7.337254        0.250521   0.999494     ok      
+         2     2909      250  -7.810036   7.810036        1.064436    7.337254        0.250521   0.999494     ok      
+         2     2909      500   1.473898   1.473898        0.200879    7.337254        0.250521   0.999494     ok      
+         2     2909     1000  -8.553629   8.553629        1.165781    7.337254        0.250521   0.999494     ok      
+         2     2909     1500  -0.895630   0.895630        0.122066    7.337254        0.250521   0.999494     ok      
+         3     1001       10  32.341427  32.341427       16.272507   -1.987489       -2.389391   0.012409     ok      
+         3     1001       50  -1.911506   1.911506        0.961770   -1.987489       -2.389391   0.012409     ok      
+         3     1001      250   1.595291   1.595291        0.802667   -1.987489       -2.389391   0.012409     ok      
+         3     1001      500 -11.341530  11.341530        5.706462   -1.987489       -2.389391   0.012409     ok      
+         3     1001     1000   4.512528   4.512528        2.270467   -1.987489       -2.389391   0.012409     ok      
+         3     1001     1500  -5.268824   5.268824        2.650995   -1.987489       -2.389391   0.012409     ok      
+         4     2181       10  -3.636367   3.636367        0.458660    7.928245       -2.828214   0.993940     ok      
+         4     2181       50  -9.896208   9.896208        1.248222    7.928245       -2.828214   0.993940     ok      
+         4     2181      250  -6.947057   6.947057        0.876242    7.928245       -2.828214   0.993940     ok      
+         4     2181      500  10.211574  10.211574        1.287999    7.928245       -2.828214   0.993940     ok      
+         4     2181     1000  -8.698503   8.698503        1.097154    7.928245       -2.828214   0.993940     ok      
+         4     2181     1500  -6.526113   6.526113        0.823147    7.928245       -2.828214   0.993940     ok      
+         5     1901       10 -62.097061  62.097061       41.906376    1.481805       -1.160128   0.579733     ok      
+         5     1901       50  15.878495  15.878495       10.715647    1.481805       -1.160128   0.579733     ok      
+         5     1901      250 -16.164515  16.164515       10.908668    1.481805       -1.160128   0.579733     ok      
+         5     1901      500   3.968529   3.968529        2.678173    1.481805       -1.160128   0.579733     ok      
+         5     1901     1000  -5.429290   5.429290        3.663971    1.481805       -1.160128   0.579733     ok      
+         5     1901     1500  -0.026095   0.026095        0.017610    1.481805       -1.160128   0.579733     ok      
+         6     1825       10  48.001923  48.001923        7.972399    6.021014       -0.439686   0.996247     ok      
+         6     1825       50 -14.448206  14.448206        2.399630    6.021014       -0.439686   0.996247     ok      
+         6     1825      250  -4.176736   4.176736        0.693693    6.021014       -0.439686   0.996247     ok      
+         6     1825      500  -5.665977   5.665977        0.941034    6.021014       -0.439686   0.996247     ok      
+         6     1825     1000  10.628965  10.628965        1.765312    6.021014       -0.439686   0.996247     ok      
+         6     1825     1500  -5.442695   5.442695        0.903950    6.021014       -0.439686   0.996247     ok      
+         7     2905       10 -75.861786  75.861786        8.260533    9.183642       -2.235864   0.999040     ok      
+         7     2905       50   0.531573   0.531573        0.057883    9.183642       -2.235864   0.999040     ok      
+         7     2905      250 -31.113014  31.113014        3.387873    9.183642       -2.235864   0.999040     ok      
+         7     2905      500  -2.139652   2.139652        0.232985    9.183642       -2.235864   0.999040     ok      
+         7     2905     1000  -2.071769   2.071769        0.225593    9.183642       -2.235864   0.999040     ok      
+         7     2905     1500   0.377604   0.377604        0.041117    9.183642       -2.235864   0.999040     ok      
+         8     2525       10 -20.041889  20.041889       11.733138    1.708144       -1.623548   0.521136     ok      
+         8     2525       50  -9.148520   9.148520        5.355825    1.708144       -1.623548   0.521136     ok      
+         8     2525      250  11.069556  11.069556        6.480459    1.708144       -1.623548   0.521136     ok      
+         8     2525      500  -3.022621   3.022621        1.769535    1.708144       -1.623548   0.521136     ok      
+         8     2525     1000   0.996005   0.996005        0.583092    1.708144       -1.623548   0.521136     ok      
+         8     2525     1500  -2.259602   2.259602        1.322840    1.708144       -1.623548   0.521136     ok      
+         9     2633       10 -12.261756  12.261756        3.734864   -3.283052       -0.824784   0.016177     ok      
+         9     2633       50   2.145589   2.145589        0.653535   -3.283052       -0.824784   0.016177     ok      
+         9     2633      250  -1.396018   1.396018        0.425220   -3.283052       -0.824784   0.016177     ok      
+         9     2633      500  -3.408181   3.408181        1.038113   -3.283052       -0.824784   0.016177     ok      
+         9     2633     1000  -2.167130   2.167130        0.660096   -3.283052       -0.824784   0.016177     ok      
+         9     2633     1500  -1.712395   1.712395        0.521586   -3.283052       -0.824784   0.016177     ok      
+
+=== delta convergence summary ===
+ n_steps  n  delta_min  delta_median  delta_pr60  delta_pr80  delta_max  abs_delta_min  abs_delta_median  abs_delta_pr60  abs_delta_pr80  abs_delta_max  relative_delta_min  relative_delta_median  relative_delta_pr60  relative_delta_pr80  relative_delta_max  score_diff_min  score_diff_median  score_diff_pr60  score_diff_pr80  score_diff_max
+      10 10 -75.861786     -8.005077   -3.703585    7.060897  48.001923       0.740765         26.191658       36.625840       50.820950      75.861786            0.090529               6.587870             8.087653            12.641012           41.906376       -3.283052           6.679134          7.57365         8.200922        9.183642
+      50 10 -15.714509     -0.689967    1.177180   16.620728  33.178268       0.531573         12.172207       14.954727       16.620728      33.178268            0.057883               2.254679             2.380422             4.314932           10.715647       -3.283052           6.679134          7.57365         8.200922        9.183642
+     250 10 -31.113014     -5.809039   -4.667308   -0.797756  11.069556       1.396018          6.785390        7.292248       12.088548      31.113014            0.425220               0.839454             0.951519             4.006390           10.908668       -3.283052           6.679134          7.57365         8.200922        9.183642
+     500 10 -11.341530     -0.332877    2.376799    4.253226  10.211574       1.473898          3.849839        4.537923        6.575096      11.341530            0.200879               0.989574             1.138068             1.951263            5.706462       -3.283052           6.679134          7.57365         8.200922        9.183642
+    1000 10 -15.225249     -2.119450   -1.906308    1.699310  10.628965       0.996005          4.970909        6.679025        9.084596      15.225249            0.200401               1.131467             1.405593             1.942633            3.663971       -3.283052           6.679134          7.57365         8.200922        9.183642
+    1500 10  -7.094761     -1.985998   -1.385689   -0.196932   0.377604       0.026095          1.985998        3.463290        5.659379       7.094761            0.017610               0.672367             0.840708             0.987728            2.650995       -3.283052           6.679134          7.57365         8.200922        9.183642

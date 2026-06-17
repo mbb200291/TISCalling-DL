@@ -125,6 +125,9 @@ def run_lig_mask(
     attention_mask = enc["attention_mask"].to(DEVICE)
     attention_mask = attention_mask.masked_fill(input_ids == _PAD_ID, 0)
 
+    print()
+    print('baseline token: ', baseline_token_id)
+    print()
     baseline_ids = build_baseline_keep_tis_window(
         input_ids, baseline_token_id,
         keep_left_window=99, keep_right_window=102,
@@ -396,63 +399,6 @@ def run_lig_dinuc(
         relative_delta=relative_delta_mean,
     )
 
-NT_COLOR = {"A": "#e74c3c", "U": "#3498db", "G": "#2ecc71", "C": "#f39c12", "N": "#95a5a6"}
-
-def plot_attribution(
-    result: IGResult,
-    window: Optional[tuple] = None,
-    figsize: tuple = (16, 4),
-    ax_bar=None,
-    ax_seq=None,
-):
-    seq   = result.sequence
-    attrs = result.attributions.copy()
-    if window is not None:
-        s, e  = window
-        seq   = seq[s:e]
-        attrs = attrs[s:e]
-    mx = np.abs(attrs).max()
-    if mx > 0:
-        attrs = attrs / mx
-    pos    = np.arange(len(seq))
-    colors = ["#e74c3c" if v > 0 else "#2563eb" for v in attrs]
-    standalone = ax_bar is None
-    if standalone:
-        fig, (ax_bar, ax_seq) = plt.subplots(
-            2, 1, figsize=figsize,
-            gridspec_kw={"height_ratios": [4, 1]},
-            facecolor="#0d1117",
-        )
-    for ax in (ax_bar, ax_seq):
-        ax.set_facecolor("#0d1117")
-    ax_bar.bar(pos, attrs, color=colors, width=0.85, linewidth=0)
-    ax_bar.axhline(0, color="#30363d", lw=0.8)
-    ax_bar.set_xlim(-0.5, len(seq) - 0.5)
-    ax_bar.set_ylim(-1.2, 1.2)
-    ax_bar.set_ylabel("Attribution (norm.)", color="#8b949e", fontsize=9)
-    ax_bar.tick_params(colors="#8b949e")
-    for sp in ax_bar.spines.values():
-        sp.set_color("#30363d"); sp.set_linewidth(0.5)
-    delta_str = f"Δ={result.convergence_delta:.4f}" if not np.isnan(result.convergence_delta) else "Δ=n/a"
-    ax_bar.set_title(
-        f"reduction_method: {result.dimension_reduction}  |  baseline: {result.baseline_type}  |  P(TIS)={result.pred_prob:.3f}  |  {delta_str}",
-        color="#8b949e", fontsize=9, loc="right", pad=5,
-    )
-    ax_seq.set_facecolor("#0d1117")
-    ax_seq.set_xlim(-0.5, len(seq) - 0.5)
-    ax_seq.set_ylim(0, 1)
-    ax_seq.axis("off")
-    fs = max(5, min(11, 200 // len(seq)))
-    for i, nt in enumerate(seq):
-        ax_seq.text(
-            i, 0.5, nt, ha="center", va="center",
-            fontsize=fs, fontfamily="monospace", fontweight="bold",
-            color=NT_COLOR.get(nt, "#95a5a6"),
-        )
-    if standalone:
-        plt.tight_layout(h_pad=0)
-        return fig
-
 
 def save_ig_result(result: IGResult, path: str):
     """marshal as json"""
@@ -508,6 +454,8 @@ def main():
     c = 0
     for s in df_test.seq:
         c += 1
+        # if c <= 42:
+        #     continue
         print(str(c) + ' -------------------------------', flush=True)
         lig_result = run_lig_mask(
             s, model, tokenizer, NEUTRAL_TOKEN_ID,

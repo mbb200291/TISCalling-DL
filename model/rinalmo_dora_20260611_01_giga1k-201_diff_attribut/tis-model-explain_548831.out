@@ -1,0 +1,324 @@
+[transformers] The `check_model_inputs` decorator is deprecated in favor of `merge_with_config_defaults`.
+DEVICE: cuda:0
+Loading tokenizer: multimolecule/rinalmo-giga
+pad token id = 0
+device : cuda:0
+captum : OK
+Loading backbone: multimolecule/rinalmo-giga
+Loading weights:   0%|          | 0/498 [00:00<?, ?it/s]Loading weights: 100%|██████████| 498/498 [00:00<00:00, 34585.04it/s]
+[transformers] [1mRiNALMoModel LOAD REPORT[0m from: multimolecule/rinalmo-giga
+Key                                 | Status     | 
+------------------------------------+------------+-
+lm_head.transform.layer_norm.weight | UNEXPECTED | 
+lm_head.decoder.weight              | UNEXPECTED | 
+lm_head.transform.dense.weight      | UNEXPECTED | 
+lm_head.bias                        | UNEXPECTED | 
+lm_head.transform.layer_norm.bias   | UNEXPECTED | 
+lm_head.transform.dense.bias        | UNEXPECTED | 
+pooler.dense.weight                 | MISSING    | 
+pooler.dense.bias                   | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+trainable params: 2,193,876 || all params: 653,072,607 || trainable%: 0.3359
+Total params: 659,633,888  |  Trainable: 8,755,157
+/nas/cluster_data/homes/bangchi/TISCalling/model/rinalmo_dora_20260611_01_giga1k-201_diff_attribut/main.py:649: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  sd    = torch.load(path, map_location=device)
+[load_model] backbone vocab mismatch (current=28, checkpoint=26); resizing to 26
+1 -------------------------------
+logit: 0.31220322847366333
+baseline_logit: -1.9912785291671753
+score_diff: 2.3034818172454834
+delta: -0.5328788757324219
+relative_delta: 0.23133626580238342
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+2 -------------------------------
+logit: 0.3381960391998291
+baseline_logit: -0.9962676763534546
+score_diff: 1.3344637155532837
+delta: -6.935606479644775
+relative_delta: 5.197298526763916
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+3 -------------------------------
+logit: 4.052172660827637
+baseline_logit: -1.951780915260315
+score_diff: 6.003953456878662
+delta: -5.969799995422363
+relative_delta: 0.994311511516571
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+4 -------------------------------
+logit: 7.587774753570557
+baseline_logit: 0.25052109360694885
+score_diff: 7.337253570556641
+delta: -3.031385898590088
+relative_delta: 0.41314995288848877
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+5 -------------------------------
+logit: 0.1756497323513031
+baseline_logit: -2.651374101638794
+score_diff: 2.82702374458313
+delta: -5.377987861633301
+relative_delta: 1.9023497104644775
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+6 -------------------------------
+logit: 4.878781318664551
+baseline_logit: -1.5736572742462158
+score_diff: 6.4524383544921875
+delta: -5.634472370147705
+relative_delta: 0.8732314705848694
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+7 -------------------------------
+logit: 7.204833030700684
+baseline_logit: -1.423182487487793
+score_diff: 8.628015518188477
+delta: -1.7612404823303223
+relative_delta: 0.20413042604923248
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+8 -------------------------------
+logit: 5.184544563293457
+baseline_logit: 0.3230261504650116
+score_diff: 4.861518383026123
+delta: -3.071460008621216
+relative_delta: 0.631790280342102
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+9 -------------------------------
+logit: 5.1203389167785645
+baseline_logit: -2.459806203842163
+score_diff: 7.580144882202148
+delta: -5.388704776763916
+relative_delta: 0.7108973264694214
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+10 -------------------------------
+logit: 2.174431562423706
+baseline_logit: -2.0425188541412354
+score_diff: 4.216950416564941
+delta: -3.980003833770752
+relative_delta: 0.9438109397888184
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+11 -------------------------------
+logit: 8.009818077087402
+baseline_logit: 0.46996670961380005
+score_diff: 7.539851188659668
+delta: 3.503572463989258
+relative_delta: 0.4646739661693573
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+12 -------------------------------
+logit: 4.779730319976807
+baseline_logit: 0.5968650579452515
+score_diff: 4.182865142822266
+delta: -4.829672336578369
+relative_delta: 1.154632568359375
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+13 -------------------------------
+logit: 7.978464126586914
+baseline_logit: -2.3676679134368896
+score_diff: 10.346132278442383
+delta: -3.6107988357543945
+relative_delta: 0.34899985790252686
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+14 -------------------------------
+logit: 0.08459640294313431
+baseline_logit: -1.6235475540161133
+score_diff: 1.708143949508667
+delta: -1.7843629121780396
+relative_delta: 1.0446208715438843
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+15 -------------------------------
+logit: 7.8224711418151855
+baseline_logit: -0.3601799011230469
+score_diff: 8.18265151977539
+delta: -4.768459320068359
+relative_delta: 0.5827523469924927
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+16 -------------------------------
+logit: 7.838470935821533
+baseline_logit: -0.8715752363204956
+score_diff: 8.71004581451416
+delta: -3.9479880332946777
+relative_delta: 0.4532683491706848
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+17 -------------------------------
+logit: 5.625161647796631
+baseline_logit: -1.3368562459945679
+score_diff: 6.962018013000488
+delta: -1.5657720565795898
+relative_delta: 0.22490203380584717
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+18 -------------------------------
+logit: 6.947778224945068
+baseline_logit: -2.2358639240264893
+score_diff: 9.183642387390137
+delta: -3.88967227935791
+relative_delta: 0.4235435128211975
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+19 -------------------------------
+logit: 4.699880123138428
+baseline_logit: -4.435572624206543
+score_diff: 9.135452270507812
+delta: -9.265495300292969
+relative_delta: 1.014235019683838
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+20 -------------------------------
+logit: 6.582403659820557
+baseline_logit: -0.6251119375228882
+score_diff: 7.207515716552734
+delta: -3.736285924911499
+relative_delta: 0.518387496471405
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+21 -------------------------------
+logit: 3.5524566173553467
+baseline_logit: -3.3646867275238037
+score_diff: 6.91714334487915
+delta: -5.4372406005859375
+relative_delta: 0.7860528826713562
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+22 -------------------------------
+logit: 3.3851540088653564
+baseline_logit: 1.0008835792541504
+score_diff: 2.384270429611206
+delta: -0.005938053131103516
+relative_delta: 0.002490511629730463
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+23 -------------------------------
+logit: 5.878403186798096
+baseline_logit: -1.4525165557861328
+score_diff: 7.3309197425842285
+delta: -4.36905574798584
+relative_delta: 0.5959764719009399
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+24 -------------------------------
+logit: 6.551002025604248
+baseline_logit: 0.3407701253890991
+score_diff: 6.210231781005859
+delta: -2.0317511558532715
+relative_delta: 0.32716187834739685
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+25 -------------------------------
+logit: 2.346489906311035
+baseline_logit: -0.2180519700050354
+score_diff: 2.564541816711426
+delta: 3.6418886184692383
+relative_delta: 1.420093297958374
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+26 -------------------------------
+logit: 2.838810682296753
+baseline_logit: -2.7189362049102783
+score_diff: 5.557746887207031
+delta: 2.9915037155151367
+relative_delta: 0.5382583737373352
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+27 -------------------------------
+logit: 1.6633079051971436
+baseline_logit: -1.4046299457550049
+score_diff: 3.0679378509521484
+delta: -8.890634536743164
+relative_delta: 2.897918701171875
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+28 -------------------------------
+logit: 6.774616718292236
+baseline_logit: -0.078517846763134
+score_diff: 6.853134632110596
+delta: -2.034914016723633
+relative_delta: 0.2969318628311157
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+29 -------------------------------
+logit: 5.58132791519165
+baseline_logit: -0.4396856129169464
+score_diff: 6.0210137367248535
+delta: -7.32279109954834
+relative_delta: 1.2162057161331177
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+30 -------------------------------
+logit: 5.511775493621826
+baseline_logit: -1.216428279876709
+score_diff: 6.728203773498535
+delta: -1.2481842041015625
+relative_delta: 0.18551522493362427
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+31 -------------------------------
+logit: 1.4250746965408325
+baseline_logit: -0.9208862781524658
+score_diff: 2.345961093902588
+delta: -1.5316743850708008
+relative_delta: 0.6528984308242798
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+32 -------------------------------
+logit: 0.3216765522956848
+baseline_logit: -1.1601279973983765
+score_diff: 1.481804609298706
+delta: -1.3815867900848389
+relative_delta: 0.932367742061615
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+33 -------------------------------
+logit: 8.903738021850586
+baseline_logit: -2.786129951477051
+score_diff: 11.689867973327637
+delta: -6.252368450164795
+relative_delta: 0.5348536372184753
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+34 -------------------------------
+logit: 6.396397113800049
+baseline_logit: -0.4514830708503723
+score_diff: 6.8478803634643555
+delta: -5.185830116271973
+relative_delta: 0.7572898268699646
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+35 -------------------------------
+logit: 6.239576816558838
+baseline_logit: -0.3658726215362549
+score_diff: 6.605449676513672
+delta: -4.475522041320801
+relative_delta: 0.6775499582290649
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+36 -------------------------------
+logit: 5.100030422210693
+baseline_logit: -2.828213930130005
+score_diff: 7.928244590759277
+delta: -5.453314781188965
+relative_delta: 0.687833845615387
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+37 -------------------------------
+logit: 6.535571098327637
+baseline_logit: -2.1517062187194824
+score_diff: 8.687276840209961
+delta: -1.1966285705566406
+relative_delta: 0.1377449631690979
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+38 -------------------------------
+logit: 2.631910562515259
+baseline_logit: -1.4860751628875732
+score_diff: 4.117985725402832
+delta: -2.379267454147339
+relative_delta: 0.5777745842933655
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+39 -------------------------------
+logit: 2.1403610706329346
+baseline_logit: -0.9799841046333313
+score_diff: 3.120345115661621
+delta: -0.23647069931030273
+relative_delta: 0.07578350603580475
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+40 -------------------------------
+logit: 1.9387266635894775
+baseline_logit: 0.6443641781806946
+score_diff: 1.2943625450134277
+delta: 1.5702412128448486
+relative_delta: 1.2131385803222656
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+41 -------------------------------
+logit: 7.807924747467041
+baseline_logit: 0.5419933199882507
+score_diff: 7.265931606292725
+delta: -1.8030929565429688
+relative_delta: 0.24815715849399567
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+42 -------------------------------
+logit: 5.478275299072266
+baseline_logit: -1.6302282810211182
+score_diff: 7.108503341674805
+delta: 3.1734275817871094
+relative_delta: 0.44642695784568787
+saved → ig_data_201_baseline/df_test_lig_results.jsonl
+43 -------------------------------
+slurmstepd: error: *** JOB 548831 ON handel CANCELLED AT 2026-06-12T17:39:24 ***
