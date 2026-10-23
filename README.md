@@ -101,9 +101,10 @@ Integrated Gradients is being evaluated to identify nucleotide-level contributio
 │   ├── tiscalling_original_method/   # Original feature-based baseline
 │   ├── prev_experiments/              # Earlier model experiments
 │   └── rinalmo_dora_*/                # RiNALMo + LoRA/DoRA experiments
-├── performance.xlsx                   # Experiment results and metrics
-├── progress_report.md                 # Research progress notes
-├── report.pptx                        # Progress presentation
+├── report/
+│   ├── performance.xlsx               # Experiment results and metrics
+│   ├── progress_report.md             # Research progress notes
+│   └── report.pptx                    # Progress presentation
 ├── requirements.txt                   # Python dependencies
 └── LICENSE                            # MIT license
 ```
@@ -134,7 +135,7 @@ The main metrics used in the current work are:
 - **MCC:** supplementary measure of balanced classification quality
 - **Balanced F1:** category-level performance measure
 
-For a compact summary of the current experiments, see [`performance.xlsx`](performance.xlsx) and [`progress_report.md`](progress_report.md).
+For a compact summary of the current experiments, see [`performance.xlsx`](report/performance.xlsx) and [`progress_report.md`](report/progress_report.md).
 
 ## Current Limitations and Next Steps
 
